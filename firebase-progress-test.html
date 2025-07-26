@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Progress Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6">
+        <h1 class="text-2xl font-bold mb-4">Firebase Progress Test</h1>
+        
+        <div class="space-y-4">
+            <div>
+                <button id="testProgressSave" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Test Save Progress to Firebase
+                </button>
+            </div>
+            
+            <div>
+                <button id="testProgressRead" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                    Test Read Progress from Firebase
+                </button>
+            </div>
+            
+            <div id="results" class="mt-6 p-4 bg-gray-50 rounded-lg">
+                <h3 class="font-semibold mb-2">Results:</h3>
+                <pre id="output" class="text-sm text-gray-700"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBbOMWi1qdWOzpm_0KeLE_mOHUGjzk0He4",
+            authDomain: "programming-series-hub.firebaseapp.com",
+            projectId: "programming-series-hub",
+            storageBucket: "programming-series-hub.firebasestorage.app",
+            messagingSenderId: "919993604014",
+            appId: "1:919993604014:web:bd0f8f34a5e923ecf31a3f",
+            measurementId: "G-ZJY6P2HHR7"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const output = document.getElementById('output');
+
+        function log(message) {
+            output.textContent += message + '\n';
+        }
+
+        document.getElementById('testProgressSave').addEventListener('click', async () => {
+            output.textContent = '';
+            log('Testing progress save to Firebase...');
+            
+            // Create test user and progress data
+            const testUser = {
+                name: "Test User",
+                email: "test@example.com",
+                sheets: {
+                    "Array": {
+                        completed: 5,
+                        total: 20,
+                        percentage: 25,
+                        lastUpdated: new Date().toISOString()
+                    },
+                    "Binary Search": {
+                        completed: 3,
+                        total: 15,
+                        percentage: 20,
+                        lastUpdated: new Date().toISOString()
+                    }
+                }
+            };
+
+            try {
+                await db.collection('userProgress').doc(testUser.email).set(testUser);
+                log('✅ Progress saved successfully!');
+                log('Data: ' + JSON.stringify(testUser, null, 2));
+            } catch (error) {
+                log('❌ Error saving progress: ' + error.message);
+            }
+        });
+
+        document.getElementById('testProgressRead').addEventListener('click', async () => {
+            output.textContent = '';
+            log('Testing progress read from Firebase...');
+            
+            try {
+                const snapshot = await db.collection('userProgress').get();
+                log('✅ Progress data retrieved!');
+                log('Number of users with progress: ' + snapshot.size);
+                
+                snapshot.forEach(doc => {
+                    log('\n--- User: ' + doc.id + ' ---');
+                    log(JSON.stringify(doc.data(), null, 2));
+                });
+                
+                if (snapshot.empty) {
+                    log('No progress data found in Firebase. Try saving some progress first.');
+                }
+            } catch (error) {
+                log('❌ Error reading progress: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>

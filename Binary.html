@@ -6,6 +6,9 @@
     <title>DSA Binary Search Problems</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -98,6 +101,21 @@
     </div>
 
     <script>
+        // Firebase Configuration - YOUR ACTUAL CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyBbOMWi1qdWOzpm_0KeLE_mOHUGjzk0He4",
+            authDomain: "programming-series-hub.firebaseapp.com",
+            projectId: "programming-series-hub",
+            storageBucket: "programming-series-hub.firebasestorage.app",
+            messagingSenderId: "919993604014",
+            appId: "1:919993604014:web:bd0f8f34a5e923ecf31a3f",
+            measurementId: "G-ZJY6P2HHR7"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         // Theme management
         let isDarkMode = localStorage.getItem('darkMode') === 'true' || false;
         
@@ -326,7 +344,7 @@
         }
 
         // Update user progress tracking
-        function updateUserProgress() {
+        async function updateUserProgress() {
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             if (!currentUser) return;
             
@@ -352,7 +370,17 @@
                 }
             };
             
+            // Save to localStorage (backup)
             localStorage.setItem('userProgress', JSON.stringify(userProgress));
+            
+            // Save to Firebase for real-time admin access
+            try {
+                await db.collection('userProgress').doc(currentUser.email).set(userProgress[currentUser.email]);
+                console.log('Binary Search progress saved to Firebase successfully');
+            } catch (error) {
+                console.error('Error saving Binary Search progress to Firebase:', error);
+                // Firebase error is not critical, localStorage backup exists
+            }
         }
 
         // Update statistics
