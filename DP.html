@@ -131,13 +131,13 @@
                 return true;
             }
             
-            if (!currentUser || !currentUser.email) {
+            if (!currentUser || !currentUser.id) {
                 return true; // Let normal auth flow handle this
             }
             
             try {
-                // Check if user still exists in Firebase
-                const userDoc = await db.collection('users').doc(currentUser.email).get();
+                // Check if user still exists in Firebase using their ID (not email)
+                const userDoc = await db.collection('users').doc(currentUser.id.toString()).get();
                 
                 if (!userDoc.exists) {
                     // User has been deleted from Firebase, logout immediately
