@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Programming Series Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <link rel="shortcut icon" href="logo.png">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -200,6 +203,22 @@
                     <p class="text-gray-600 dark:text-gray-300 mb-4">
                         Master array operations, searching, sorting, and advanced array techniques.
                     </p>
+                    
+                    <!-- Progress Section -->
+                    <div id="arrayProgress" class="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Progress</span>
+                            <span id="arrayPercentage" class="text-sm font-bold text-blue-600 dark:text-blue-400">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 mb-2">
+                            <div id="arrayProgressBar" class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                            <span id="arrayCompleted">0 completed</span>
+                            <span id="arrayTotal">of 0 problems</span>
+                        </div>
+                    </div>
+                    
                     <div class="flex items-center text-green-600 dark:text-green-400 font-medium">
                         <span>Start Learning</span>
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -224,6 +243,22 @@
                     <p class="text-gray-600 dark:text-gray-300 mb-4">
                         Explore binary search, bit manipulation, and binary-related algorithms step-by-step.
                     </p>
+                    
+                    <!-- Progress Section -->
+                    <div id="binaryProgress" class="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Progress</span>
+                            <span id="binaryPercentage" class="text-sm font-bold text-indigo-600 dark:text-indigo-400">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 mb-2">
+                            <div id="binaryProgressBar" class="bg-gradient-to-r from-indigo-500 to-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                            <span id="binaryCompleted">0 completed</span>
+                            <span id="binaryTotal">of 0 problems</span>
+                        </div>
+                    </div>
+                    
                     <div class="flex items-center text-green-600 dark:text-green-400 font-medium">
                         <span>Start Learning</span>
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -248,6 +283,22 @@
                     <p class="text-gray-600 dark:text-gray-300 mb-4">
                         Linked list operations, reversing, merging, and complex manipulations.
                     </p>
+                    
+                    <!-- Progress Section -->
+                    <div id="linkedlistProgress" class="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Progress</span>
+                            <span id="linkedlistPercentage" class="text-sm font-bold text-purple-600 dark:text-purple-400">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 mb-2">
+                            <div id="linkedlistProgressBar" class="bg-gradient-to-r from-purple-500 to-pink-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                            <span id="linkedlistCompleted">0 completed</span>
+                            <span id="linkedlistTotal">of 0 problems</span>
+                        </div>
+                    </div>
+                    
                     <div class="flex items-center text-green-600 dark:text-green-400 font-medium">
                         <span>Start Learning</span>
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -273,6 +324,22 @@
                     <p class="text-gray-600 dark:text-gray-300 mb-4">
                         Binary trees, BSTs, AVL trees, and advanced tree algorithms.
                     </p>
+                    
+                    <!-- Progress Section -->
+                    <div id="treeProgress" class="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Progress</span>
+                            <span id="treePercentage" class="text-sm font-bold text-green-600 dark:text-green-400">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 mb-2">
+                            <div id="treeProgressBar" class="bg-gradient-to-r from-green-500 to-teal-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                            <span id="treeCompleted">0 completed</span>
+                            <span id="treeTotal">of 0 problems</span>
+                        </div>
+                    </div>
+                    
                     <div class="flex items-center text-green-600 dark:text-green-400 font-medium">
                         <span>Start Learning</span>
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -297,6 +364,22 @@
                     <p class="text-gray-600 dark:text-gray-300 mb-4">
                         Recursive thinking, backtracking, and divide-and-conquer strategies.
                     </p>
+                    
+                    <!-- Progress Section -->
+                    <div id="recursionProgress" class="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Progress</span>
+                            <span id="recursionPercentage" class="text-sm font-bold text-cyan-600 dark:text-cyan-400">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 mb-2">
+                            <div id="recursionProgressBar" class="bg-gradient-to-r from-cyan-500 to-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                            <span id="recursionCompleted">0 completed</span>
+                            <span id="recursionTotal">of 0 problems</span>
+                        </div>
+                    </div>
+                    
                     <div class="flex items-center text-green-600 dark:text-green-400 font-medium">
                         <span>Start Learning</span>
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -321,6 +404,22 @@
                     <p class="text-gray-600 dark:text-gray-300 mb-4">
                         Dynamic programming patterns, memoization, and optimization techniques.
                     </p>
+                    
+                    <!-- Progress Section -->
+                    <div id="dpProgress" class="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Progress</span>
+                            <span id="dpPercentage" class="text-sm font-bold text-yellow-600 dark:text-yellow-400">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 mb-2">
+                            <div id="dpProgressBar" class="bg-gradient-to-r from-yellow-500 to-orange-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                            <span id="dpCompleted">0 completed</span>
+                            <span id="dpTotal">of 0 problems</span>
+                        </div>
+                    </div>
+                    
                     <div class="flex items-center text-green-600 dark:text-green-400 font-medium">
                         <span>Start Learning</span>
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -330,7 +429,7 @@
                 </a>
 
                 <!-- College Series -->
-                <a href="collage1.html" class="card-hover bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg border-2 border-green-200 dark:border-green-700 glow-effect">
+                <a href="College.html" class="card-hover bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg border-2 border-green-200 dark:border-green-700 glow-effect">
                     <div class="flex items-center mb-6">
                         <div class="bg-gradient-to-r from-red-500 to-pink-600 rounded-lg p-3 mr-4">
                             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -347,6 +446,22 @@
                     <p class="text-gray-600 dark:text-gray-300 mb-4">
                         Essential college-level problems covering all major DSA topics for interviews.
                     </p>
+                    
+                    <!-- Progress Section -->
+                    <div id="collegeProgress" class="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Progress</span>
+                            <span id="collegePercentage" class="text-sm font-bold text-red-600 dark:text-red-400">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 mb-2">
+                            <div id="collegeProgressBar" class="bg-gradient-to-r from-red-500 to-pink-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                            <span id="collegeCompleted">0 completed</span>
+                            <span id="collegeTotal">of 0 problems</span>
+                        </div>
+                    </div>
+                    
                     <div class="flex items-center text-green-600 dark:text-green-400 font-medium">
                         <span>Start Learning</span>
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -449,6 +564,94 @@
     </footer>
 
     <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBbOMWi1qdWOzpm_0KeLE_mOHUGjzk0He4",
+            authDomain: "programming-series-hub.firebaseapp.com",
+            projectId: "programming-series-hub",
+            storageBucket: "programming-series-hub.firebasestorage.app",
+            messagingSenderId: "919993604014",
+            appId: "1:919993604014:web:bd0f8f34a5e923ecf31a3f",
+            measurementId: "G-ZJY6P2HHR7"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Progress data mapping for each sheet
+        const progressSheets = {
+            'Array': { id: 'array', totalProblems: 100 },
+            'Binary': { id: 'binary', totalProblems: 35 },
+            'LinkedList': { id: 'linkedlist', totalProblems: 28 },
+            'Tree': { id: 'tree', totalProblems: 55 },
+            'Recursion': { id: 'recursion', totalProblems: 25 },
+            'DP': { id: 'dp', totalProblems: 56 },
+            'College': { id: 'college', totalProblems: 53 }
+        };
+
+        // Load user progress from Firebase
+        async function loadUserProgress() {
+            try {
+                const currentUser = localStorage.getItem('currentUser');
+                if (!currentUser) return;
+
+                const user = JSON.parse(currentUser);
+                const userEmail = user.email;
+                
+                const progressDoc = await db.collection('userProgress').doc(userEmail).get();
+                const progressData = progressDoc.exists ? progressDoc.data() : { sheets: {} };
+                
+                // Update progress display for each sheet
+                Object.entries(progressSheets).forEach(([sheetName, sheetInfo]) => {
+                    const sheetProgress = progressData.sheets[sheetName];
+                    updateProgressDisplay(sheetInfo.id, sheetProgress, sheetInfo.totalProblems);
+                });
+                
+            } catch (error) {
+                console.error('Error loading user progress:', error);
+                // Fallback to localStorage if Firebase fails
+                loadProgressFromLocalStorage();
+            }
+        }
+
+        // Fallback: Load progress from localStorage
+        function loadProgressFromLocalStorage() {
+            try {
+                const currentUser = localStorage.getItem('currentUser');
+                if (!currentUser) return;
+
+                const user = JSON.parse(currentUser);
+                const userEmail = user.email;
+                const allProgress = JSON.parse(localStorage.getItem('userProgress') || '{}');
+                const userProgress = allProgress[userEmail] || { sheets: {} };
+                
+                Object.entries(progressSheets).forEach(([sheetName, sheetInfo]) => {
+                    const sheetProgress = userProgress.sheets[sheetName];
+                    updateProgressDisplay(sheetInfo.id, sheetProgress, sheetInfo.totalProblems);
+                });
+            } catch (error) {
+                console.error('Error loading progress from localStorage:', error);
+            }
+        }
+
+        // Update progress display for a specific sheet
+        function updateProgressDisplay(sheetId, progressData, totalProblems) {
+            const completed = progressData ? progressData.completed : 0;
+            const percentage = progressData ? progressData.percentage : 0;
+            
+            // Update DOM elements
+            const percentageElement = document.getElementById(`${sheetId}Percentage`);
+            const progressBarElement = document.getElementById(`${sheetId}ProgressBar`);
+            const completedElement = document.getElementById(`${sheetId}Completed`);
+            const totalElement = document.getElementById(`${sheetId}Total`);
+            
+            if (percentageElement) percentageElement.textContent = `${percentage}%`;
+            if (progressBarElement) progressBarElement.style.width = `${percentage}%`;
+            if (completedElement) completedElement.textContent = `${completed} completed`;
+            if (totalElement) totalElement.textContent = `of ${totalProblems} problems`;
+        }
+
         // Authentication check - redirect to login if not authenticated
         function checkAuthentication() {
             const currentUser = localStorage.getItem('currentUser');
@@ -464,6 +667,9 @@
                 const user = JSON.parse(currentUser);
                 document.getElementById('userName').textContent = user.name;
                 document.getElementById('welcomeMessage').classList.remove('hidden');
+                
+                // Load user progress after authentication
+                loadUserProgress();
             }
             
             // Show admin button if user is admin

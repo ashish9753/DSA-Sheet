@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Binary Search Problem Tracker</title>
+    <title>DSA Tree Problem Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <!-- Firebase SDK -->
@@ -15,7 +15,7 @@
         }
     </script>
 </head>
-<body class="bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 min-h-screen transition-all duration-300">
+<body class="bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50 dark:from-gray-900 dark:via-green-900 dark:to-emerald-900 min-h-screen transition-all duration-300">
     <!-- Authentication Check -->
     <script>
         // Check authentication first
@@ -32,15 +32,16 @@
         <div class="mb-8">
             <div class="flex justify-between items-center mb-4">
                 <div>
-                    <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                        Binary Search Mastery
+                    <h1 class="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-2">
+                        DSA Tree Sheet
                     </h1>
-                    <p class="text-gray-700 dark:text-gray-300 text-base">Master binary search algorithms step by step — <a href="https://www.linkedin.com/in/ashish2208/" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-2 py-1 rounded shadow transition">Ashish Sharma</a></p>
+                    <p class="text-gray-700 dark:text-gray-300 text-base">Track your progress through tree problems with style — <a href="https://www.linkedin.com/in/ashish2208/" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-2 py-1 rounded shadow transition">Ashish Sharma</a></p>
                 </div>
                 <div class="flex space-x-4">
-                    <a href="index.html" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-300">
+                    <a href="index.html" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors duration-300">
                         ← Back to Hub
                     </a>
+                    <!-- Dark Mode Toggle -->
                     <button 
                         id="darkModeToggle"
                         class="p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700"
@@ -58,8 +59,8 @@
                     <input 
                         type="text" 
                         id="searchInput" 
-                        placeholder="Search problems..." 
-                        class="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300"
+                        placeholder="Search tree problems..." 
+                        class="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300"
                     >
                     <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
                 </div>
@@ -68,11 +69,11 @@
                         <i class="fas fa-check mr-2"></i>
                         Completed: <span id="completedCount" class="font-semibold">0</span>
                     </div>
-                    <div class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl shadow-lg">
-                        <i class="fas fa-list mr-2"></i>
+                    <div class="px-4 py-2 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl shadow-lg">
+                        <i class="fas fa-tree mr-2"></i>
                         Total: <span id="totalCount" class="font-semibold">0</span>
                     </div>
-                    <div class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg">
+                    <div class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-500 text-white rounded-xl shadow-lg">
                         <i class="fas fa-percentage mr-2"></i>
                         <span id="progressPercentage">0%</span>
                     </div>
@@ -87,7 +88,7 @@
                 <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                     <div 
                         id="progressBar" 
-                        class="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all duration-500 ease-out"
+                        class="bg-gradient-to-r from-green-500 to-emerald-500 h-3 rounded-full transition-all duration-500 ease-out"
                         style="width: 0%"
                     ></div>
                 </div>
@@ -117,11 +118,11 @@
         const db = firebase.firestore();
 
         // Theme management
-        let isDarkMode = localStorage.getItem('darkMode') === 'true' || false;
+        let isDarkMode = localStorage.getItem('treeDarkMode') === 'true' || false;
         
         function toggleDarkMode() {
             isDarkMode = !isDarkMode;
-            localStorage.setItem('darkMode', isDarkMode);
+            localStorage.setItem('treeDarkMode', isDarkMode);
             updateTheme();
         }
 
@@ -139,52 +140,75 @@
         }
 
         // In-memory storage for problem completion status
-        let problemStatus = JSON.parse(localStorage.getItem('binaryProblemStatus')) || {};
+        let problemStatus = JSON.parse(localStorage.getItem('treeProblemStatus')) || {};
         let allProblems = [];
 
-        // Binary Search Problem data - COMPREHENSIVE SET (35 problems)
+        // Tree Problem data structure - 55 problems across 5 days
         const problemData = {
-            "Day 1: Fundamentals": [
-                { name: "Binary Search to find X in sorted array", difficulty: "Easy", leetcode: "https://leetcode.com/problems/binary-search/", gfg: "https://www.geeksforgeeks.org/binary-search/" },
-                { name: "Implement Lower Bound", difficulty: "Easy", leetcode: "https://leetcode.com/problems/search-insert-position/", gfg: "https://www.geeksforgeeks.org/lower_bound-in-cpp/" },
-                { name: "Implement Upper Bound", difficulty: "Easy", leetcode: "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/", gfg: "https://www.geeksforgeeks.org/upper_bound-in-cpp/" },
-                { name: "Search Insert Position", difficulty: "Easy", leetcode: "https://leetcode.com/problems/search-insert-position/", gfg: "https://www.geeksforgeeks.org/search-insert-position-of-k-in-a-sorted-array/" },
-                { name: "Floor/Ceil in Sorted Array", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/ceiling-in-a-sorted-array/" }
+            "Day 1: Tree Fundamentals": [
+                { name: "Introduction to Trees", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/introduction-to-tree-data-structure-and-algorithm-tutorials/" },
+                { name: "Iterative Inorder Traversal of Binary Tree", difficulty: "Easy", leetcode: "https://leetcode.com/problems/binary-tree-inorder-traversal/", gfg: "https://www.geeksforgeeks.org/inorder-tree-traversal-without-recursion/" },
+                { name: "Post-order Traversal of Binary Tree using 2 stack", difficulty: "Easy", leetcode: "https://leetcode.com/problems/binary-tree-postorder-traversal/", gfg: "https://www.geeksforgeeks.org/iterative-postorder-traversal-using-stack/" },
+                { name: "Post-order Traversal of Binary Tree using 1 stack", difficulty: "Medium", leetcode: "https://leetcode.com/problems/binary-tree-postorder-traversal/", gfg: "https://www.geeksforgeeks.org/iterative-postorder-traversal/" },
+                { name: "Preorder, Inorder, and Postorder Traversal in one Traversal", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/tree-traversals-inorder-preorder-and-postorder/" },
+                { name: "Binary Tree Representation in C++", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/binary-tree-array-implementation/" },
+                { name: "Binary Tree Representation in Java", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/binary-tree-data-structure/" },
+                { name: "Binary Tree Traversals in Binary Tree", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/tree-traversals-inorder-preorder-and-postorder/" },
+                { name: "Preorder Traversal of Binary Tree", difficulty: "Easy", leetcode: "https://leetcode.com/problems/binary-tree-preorder-traversal/", gfg: "https://www.geeksforgeeks.org/tree-traversals-inorder-preorder-and-postorder/" },
+                { name: "Inorder Traversal of Binary Tree", difficulty: "Easy", leetcode: "https://leetcode.com/problems/binary-tree-inorder-traversal/", gfg: "https://www.geeksforgeeks.org/tree-traversals-inorder-preorder-and-postorder/" },
+                { name: "Post-order Traversal of Binary Tree", difficulty: "Easy", leetcode: "https://leetcode.com/problems/binary-tree-postorder-traversal/", gfg: "https://www.geeksforgeeks.org/tree-traversals-inorder-preorder-and-postorder/" },
+                { name: "Level order Traversal / Level order traversal in spiral form", difficulty: "Easy", leetcode: "https://leetcode.com/problems/binary-tree-level-order-traversal/", gfg: "https://www.geeksforgeeks.org/level-order-tree-traversal/" },
+                { name: "Iterative Preorder Traversal of Binary Tree", difficulty: "Easy", leetcode: "https://leetcode.com/problems/binary-tree-preorder-traversal/", gfg: "https://www.geeksforgeeks.org/iterative-preorder-traversal/" }
             ],
-            "Day 2: Search Variants": [
-                { name: "Find the first or last occurrence of a given number in a sorted array", difficulty: "Easy", leetcode: "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/", gfg: "https://www.geeksforgeeks.org/find-first-and-last-positions-of-an-element-in-a-sorted-array/" },
-                { name: "Count occurrences of a number in a sorted array with duplicates", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/count-number-of-occurrences-or-frequency-in-a-sorted-array/" },
-                { name: "Search in Rotated Sorted Array I", difficulty: "Medium", leetcode: "https://leetcode.com/problems/search-in-rotated-sorted-array/", gfg: "https://www.geeksforgeeks.org/search-an-element-in-a-sorted-and-pivoted-array/" },
-                { name: "Search in Rotated Sorted Array II", difficulty: "Medium", leetcode: "https://leetcode.com/problems/search-in-rotated-sorted-array-ii/", gfg: "https://www.geeksforgeeks.org/search-element-sorted-rotated-array-duplicate-elements/" },
-                { name: "Find minimum in Rotated Sorted Array", difficulty: "Medium", leetcode: "https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/", gfg: "https://www.geeksforgeeks.org/find-minimum-element-in-a-sorted-and-rotated-array/" },
-                { name: "Find out how many times has an array been rotated", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-rotation-count-rotated-sorted-array/" },
-                { name: "Single element in a Sorted Array", difficulty: "Easy", leetcode: "https://leetcode.com/problems/single-element-in-a-sorted-array/", gfg: "https://www.geeksforgeeks.org/find-the-element-that-appears-once-in-a-sorted-array/" },
-                { name: "Find peak element", difficulty: "Hard", leetcode: "https://leetcode.com/problems/find-peak-element/", gfg: "https://www.geeksforgeeks.org/find-a-peak-in-a-given-array/" }
+            "Day 2: Tree Properties": [
+                { name: "Height of a Binary Tree", difficulty: "Medium", leetcode: "https://leetcode.com/problems/maximum-depth-of-binary-tree/", gfg: "https://www.geeksforgeeks.org/write-a-c-program-to-find-the-maximum-depth-or-height-of-a-tree/" },
+                { name: "Bottom View of Binary Tree", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/bottom-view-binary-tree/" },
+                { name: "Right/Left View of Binary Tree", difficulty: "Medium", leetcode: "https://leetcode.com/problems/binary-tree-right-side-view/", gfg: "https://www.geeksforgeeks.org/print-right-view-binary-tree-2/" },
+                { name: "Symmetric Binary Tree", difficulty: "Medium", leetcode: "https://leetcode.com/problems/symmetric-tree/", gfg: "https://www.geeksforgeeks.org/symmetric-tree-tree-which-is-mirror-image-of-itself/" },
+                { name: "Check if the Binary tree is height-balanced or not", difficulty: "Medium", leetcode: "https://leetcode.com/problems/balanced-binary-tree/", gfg: "https://www.geeksforgeeks.org/how-to-determine-if-a-binary-tree-is-balanced/" },
+                { name: "Diameter of Binary Tree", difficulty: "Medium", leetcode: "https://leetcode.com/problems/diameter-of-binary-tree/", gfg: "https://www.geeksforgeeks.org/diameter-of-a-binary-tree/" },
+                { name: "Maximum path sum", difficulty: "Hard", leetcode: "https://leetcode.com/problems/binary-tree-maximum-path-sum/", gfg: "https://www.geeksforgeeks.org/find-maximum-path-sum-in-a-binary-tree/" },
+                { name: "Check if two trees are identical or not", difficulty: "Medium", leetcode: "https://leetcode.com/problems/same-tree/", gfg: "https://www.geeksforgeeks.org/write-c-code-to-determine-if-two-trees-are-identical/" },
+                { name: "Zig Zag Traversal of Binary Tree", difficulty: "Easy", leetcode: "https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/", gfg: "https://www.geeksforgeeks.org/zigzag-tree-traversal/" },
+                { name: "Boundary Traversal of Binary Tree", difficulty: "Medium", leetcode: "https://leetcode.com/problems/boundary-of-binary-tree/", gfg: "https://www.geeksforgeeks.org/boundary-traversal-of-binary-tree/" },
+                { name: "Vertical Order Traversal of Binary Tree", difficulty: "Easy", leetcode: "https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree/", gfg: "https://www.geeksforgeeks.org/print-binary-tree-vertical-order/" },
+                { name: "Top View of Binary Tree", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/print-nodes-top-view-binary-tree/" }
             ],
-            "Day 3: Mathematical Binary Search": [
-                { name: "Find square root of a number in log n", difficulty: "Medium", leetcode: "https://leetcode.com/problems/sqrtx/", gfg: "https://www.geeksforgeeks.org/square-root-of-an-integer/" },
-                { name: "Find the Nth root of a number using binary search", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/problems/find-nth-root-of-m5843/1" },
-                { name: "Koko Eating Bananas", difficulty: "Hard", leetcode: "https://leetcode.com/problems/koko-eating-bananas/", gfg: "https://www.geeksforgeeks.org/koko-eating-bananas/" },
-                { name: "Minimum days to make M bouquets", difficulty: "Hard", leetcode: "https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/", gfg: "https://www.geeksforgeeks.org/minimum-days-to-make-m-bouquets/" },
-                { name: "Find the smallest Divisor", difficulty: "Easy", leetcode: "https://leetcode.com/problems/find-the-smallest-divisor-given-a-threshold/", gfg: "http://geeksforgeeks.org/dsa/smallest-divisor-for-sum-constraint-in-array-division/" },
-                { name: "Capacity to Ship Packages within D Days", difficulty: "Hard", leetcode: "https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/", gfg: "https://www.geeksforgeeks.org/capacity-to-ship-packages-within-d-days/" },
-                { name: "Kth Missing Positive Number", difficulty: "Easy", leetcode: "https://leetcode.com/problems/kth-missing-positive-number/", gfg: "https://www.geeksforgeeks.org/kth-missing-positive-number-in-sorted-array/" }
+            "Day 3: Advanced Tree Operations": [
+                { name: "Root to Node Path in Binary Tree", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/print-path-root-given-node-binary-tree/" },
+                { name: "Construct the Binary Tree from Postorder and Inorder Traversal", difficulty: "Hard", leetcode: "https://leetcode.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/", gfg: "https://www.geeksforgeeks.org/construct-a-binary-tree-from-postorder-and-inorder/" },
+                { name: "Serialize and deserialize Binary Tree", difficulty: "Hard", leetcode: "https://leetcode.com/problems/serialize-and-deserialize-binary-tree/", gfg: "https://www.geeksforgeeks.org/serialize-deserialize-binary-tree/" },
+                { name: "Morris Preorder Traversal of a Binary Tree", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/morris-traversal-for-preorder/" },
+                { name: "Morris Inorder Traversal of a Binary Tree", difficulty: "Medium", leetcode: "https://leetcode.com/problems/binary-tree-inorder-traversal/", gfg: "https://www.geeksforgeeks.org/inorder-tree-traversal-without-recursion-and-without-stack/" },
+                { name: "Flatten Binary Tree to LinkedList", difficulty: "Hard", leetcode: "https://leetcode.com/problems/flatten-binary-tree-to-linked-list/", gfg: "https://www.geeksforgeeks.org/flatten-a-binary-tree-into-linked-list/" },
+                { name: "LCA in Binary Tree", difficulty: "Medium", leetcode: "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/", gfg: "https://www.geeksforgeeks.org/lowest-common-ancestor-binary-tree-set-1/" },
+                { name: "Maximum width of a Binary Tree", difficulty: "Medium", leetcode: "https://leetcode.com/problems/maximum-width-of-binary-tree/", gfg: "https://www.geeksforgeeks.org/maximum-width-of-a-binary-tree/" },
+                { name: "Check for Children Sum Property", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/check-for-children-sum-property-in-a-binary-tree/" },
+                { name: "Print all the Nodes at a distance of K in a Binary Tree", difficulty: "Medium", leetcode: "https://leetcode.com/problems/all-nodes-distance-k-in-binary-tree/", gfg: "https://www.geeksforgeeks.org/print-nodes-distance-k-given-node-binary-tree/" },
+                { name: "Minimum time taken to BURN the Binary Tree from a Node", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/burn-the-binary-tree-starting-from-the-target-node/" },
+                { name: "Count total Nodes in a COMPLETE Binary Tree", difficulty: "Medium", leetcode: "https://leetcode.com/problems/count-complete-tree-nodes/", gfg: "https://www.geeksforgeeks.org/count-nodes-complete-binary-tree/" },
+                { name: "Requirements needed to construct a Unique Binary Tree | Theory", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/full-and-complete-binary-tree-from-given-preorder-and-postorder-traversals/" },
+                { name: "Construct Binary Tree from inorder and preorder", difficulty: "Hard", leetcode: "https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/", gfg: "https://www.geeksforgeeks.org/construct-tree-from-given-inorder-and-preorder-traversal/" }
             ],
-            "Day 4: Advanced Applications": [
-                { name: "Aggressive Cows", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/aggressive-cows-problem/" },
-                { name: "Book Allocation Problem", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/allocate-minimum-number-pages/" },
-                { name: "Split array - Largest Sum", difficulty: "Hard", leetcode: "https://leetcode.com/problems/split-array-largest-sum/", gfg: "https://www.geeksforgeeks.org/split-array-largest-sum/" },
-                { name: "Painter's partition", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/painters-partition-problem/" },
-                { name: "Minimize Max Distance to Gas Station", difficulty: "Hard", leetcode: "https://leetcode.com/problems/minimize-max-distance-to-gas-station/", gfg: "https://www.geeksforgeeks.org/minimize-max-distance-gas-station/" },
-                { name: "Median of 2 sorted arrays", difficulty: "Hard", leetcode: "https://leetcode.com/problems/median-of-two-sorted-arrays/", gfg: "https://www.geeksforgeeks.org/median-of-two-sorted-arrays/" },
-                { name: "Kth element of 2 sorted arrays", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/k-th-element-two-sorted-arrays/" }
+            "Day 4: Binary Search Tree Basics": [
+                { name: "Introduction to Binary Search Tree", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/binary-search-tree-data-structure/" },
+                { name: "Search in a Binary Search Tree", difficulty: "Easy", leetcode: "https://leetcode.com/problems/search-in-a-binary-search-tree/", gfg: "https://www.geeksforgeeks.org/binary-search-tree-set-1-search-and-insertion/" },
+                { name: "Find Min/Max in BST", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-the-minimum-element-in-a-binary-search-tree/" }
             ],
-            "Day 5: 2D Binary Search": [
-                { name: "Find the row with maximum number of 1's", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-the-row-with-maximum-number-1s/" },
-                { name: "Search in a 2D matrix", difficulty: "Medium", leetcode: "https://leetcode.com/problems/search-a-2d-matrix/", gfg: "https://www.geeksforgeeks.org/search-in-row-wise-and-column-wise-sorted-matrix/" },
-                { name: "Search in a row and column wise sorted matrix", difficulty: "Medium", leetcode: "https://leetcode.com/problems/search-a-2d-matrix-ii/", gfg: "https://www.geeksforgeeks.org/search-in-row-wise-and-column-wise-sorted-matrix/" },
-                { name: "Find Peak Element (2D Matrix)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/find-a-peak-element-ii/", gfg: "https://www.geeksforgeeks.org/find-peak-element-2d-array/" },
-                { name: "Matrix Median", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-median-row-wise-sorted-matrix/" }
+            "Day 5: Advanced BST Operations": [
+                { name: "Ceil in a Binary Search Tree", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-ceil-bst-given-key/" },
+                { name: "Merge 2 BST's", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/merge-two-bsts-with-limited-extra-space/" },
+                { name: "Two Sum In BST | Check if there exists a pair with Sum K", difficulty: "Medium", leetcode: "https://leetcode.com/problems/two-sum-iv-input-is-a-bst/", gfg: "https://www.geeksforgeeks.org/find-a-pair-with-given-sum-in-bst/" },
+                { name: "Recover BST | Correct BST with two nodes swapped", difficulty: "Hard", leetcode: "https://leetcode.com/problems/recover-binary-search-tree/", gfg: "https://www.geeksforgeeks.org/fix-two-swapped-nodes-of-bst/" },
+                { name: "Largest BST in Binary Tree", difficulty: "Hard", leetcode: "https://leetcode.com/problems/largest-bst-subtree/", gfg: "https://www.geeksforgeeks.org/largest-bst-binary-tree-set-2/" },
+                { name: "Floor in a Binary Search Tree", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/floor-in-binary-search-tree/" },
+                { name: "Insert a given Node in Binary Search Tree", difficulty: "Easy", leetcode: "https://leetcode.com/problems/insert-into-a-binary-search-tree/", gfg: "https://www.geeksforgeeks.org/binary-search-tree-set-1-search-and-insertion/" },
+                { name: "Delete a Node in Binary Search Tree", difficulty: "Medium", leetcode: "https://leetcode.com/problems/delete-node-in-a-bst/", gfg: "https://www.geeksforgeeks.org/binary-search-tree-set-2-delete/" },
+                { name: "Find K-th smallest/largest element in BST", difficulty: "Medium", leetcode: "https://leetcode.com/problems/kth-smallest-element-in-a-bst/", gfg: "https://www.geeksforgeeks.org/find-k-th-smallest-element-in-bst-order-statistics-in-bst/" },
+                { name: "Check if a tree is a BST or BT", difficulty: "Medium", leetcode: "https://leetcode.com/problems/validate-binary-search-tree/", gfg: "https://www.geeksforgeeks.org/a-program-to-check-if-a-binary-tree-is-bst-or-not/" },
+                { name: "LCA in Binary Search Tree", difficulty: "Medium", leetcode: "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/", gfg: "https://www.geeksforgeeks.org/lowest-common-ancestor-in-a-binary-search-tree/" },
+                { name: "Construct a BST from a preorder traversal", difficulty: "Medium", leetcode: "https://leetcode.com/problems/construct-binary-search-tree-from-preorder-traversal/", gfg: "https://www.geeksforgeeks.org/construct-bst-from-given-preorder-traversal-set-1/" },
+                { name: "Inorder Successor/Predecessor in BST", difficulty: "Medium", leetcode: "https://leetcode.com/problems/inorder-successor-in-bst/", gfg: "https://www.geeksforgeeks.org/inorder-successor-in-binary-search-tree/" }
             ]
         };
 
@@ -223,11 +247,11 @@
         // Get section gradient
         function getSectionGradient(section) {
             const gradients = [
-                'from-blue-500 to-purple-600',
-                'from-purple-500 to-pink-600',
-                'from-pink-500 to-rose-600',
-                'from-indigo-500 to-blue-600',
-                'from-cyan-500 to-teal-600'
+                'from-green-500 to-emerald-600',
+                'from-emerald-500 to-teal-600',
+                'from-teal-500 to-cyan-600',
+                'from-cyan-500 to-blue-600',
+                'from-blue-500 to-indigo-600'
             ];
             const index = Object.keys(problemData).indexOf(section) % gradients.length;
             return gradients[index];
@@ -317,11 +341,11 @@
                                                     ${problemStatus[problem.id] ? 'checked' : ''}
                                                     onchange="toggleProblem('${problem.id}')"
                                                 >
-                                                <div class="w-6 h-6 bg-white dark:bg-gray-600 border-2 border-gray-300 dark:border-gray-500 rounded-lg flex items-center justify-center transition-all duration-300 ${problemStatus[problem.id] ? 'bg-gradient-to-r from-green-500 to-emerald-500 border-green-500' : 'group-hover:border-blue-400'}">
+                                                <div class="w-6 h-6 bg-white dark:bg-gray-600 border-2 border-gray-300 dark:border-gray-500 rounded-lg flex items-center justify-center transition-all duration-300 ${problemStatus[problem.id] ? 'bg-gradient-to-r from-green-500 to-emerald-500 border-green-500' : 'group-hover:border-green-400'}">
                                                     <i class="fas fa-check text-white text-sm ${problemStatus[problem.id] ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300"></i>
                                                 </div>
                                             </label>
-                                            <span class="text-gray-800 dark:text-gray-200 font-medium transition-all duration-300 ${problemStatus[problem.id] ? 'line-through opacity-60' : 'group-hover:text-blue-600 dark:group-hover:text-blue-400'} flex-1">${problem.name}</span>
+                                            <span class="text-gray-800 dark:text-gray-200 font-medium transition-all duration-300 ${problemStatus[problem.id] ? 'line-through opacity-60' : 'group-hover:text-green-600 dark:group-hover:text-green-400'} flex-1">${problem.name}</span>
                                         </div>
                                         <div class="flex items-center space-x-3">
                                             ${generatePlatformLinks(problem)}
@@ -342,7 +366,7 @@
         // Toggle problem completion
         function toggleProblem(problemId) {
             problemStatus[problemId] = !problemStatus[problemId];
-            localStorage.setItem('binaryProblemStatus', JSON.stringify(problemStatus));
+            localStorage.setItem('treeProblemStatus', JSON.stringify(problemStatus));
             
             // Track user progress for admin
             updateUserProgress();
@@ -375,7 +399,7 @@
                 email: currentUser.email,
                 sheets: {
                     ...userProgress[currentUser.email]?.sheets,
-                    'Binary Search': {
+                    'Tree': {
                         completed: completed,
                         total: total,
                         percentage: percentage,
@@ -390,9 +414,9 @@
             // Save to Firebase for real-time admin access
             try {
                 await db.collection('userProgress').doc(currentUser.email).set(userProgress[currentUser.email]);
-                console.log('Binary Search progress saved to Firebase successfully');
+                console.log('Tree progress saved to Firebase successfully');
             } catch (error) {
-                console.error('Error saving Binary Search progress to Firebase:', error);
+                console.error('Error saving Tree progress to Firebase:', error);
                 // Firebase error is not critical, localStorage backup exists
             }
         }

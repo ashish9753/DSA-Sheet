@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Search Database Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6 text-center">Binary Search Database Functionality Test</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Test Results -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h2 class="text-xl font-semibold mb-4">Test Results</h2>
+                <div id="testResults" class="space-y-2">
+                    <div class="flex items-center">
+                        <span class="w-4 h-4 bg-yellow-500 rounded-full mr-2"></span>
+                        <span>Running tests...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Problem Count -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h2 class="text-xl font-semibold mb-4">Problem Statistics</h2>
+                <div id="problemStats" class="space-y-2">
+                    <div>Total Problems: <span id="totalProblems" class="font-bold">0</span></div>
+                    <div>Day 1 (Fundamentals): <span id="day1Count" class="font-bold">0</span></div>
+                    <div>Day 2 (Search Variants): <span id="day2Count" class="font-bold">0</span></div>
+                    <div>Day 3 (Mathematical): <span id="day3Count" class="font-bold">0</span></div>
+                    <div>Day 4 (Advanced): <span id="day4Count" class="font-bold">0</span></div>
+                    <div>Day 5 (2D Binary Search): <span id="day5Count" class="font-bold">0</span></div>
+                </div>
+            </div>
+            
+            <!-- Firebase Test -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h2 class="text-xl font-semibold mb-4">Firebase Connectivity</h2>
+                <div id="firebaseStatus" class="space-y-2">
+                    <div class="flex items-center">
+                        <span class="w-4 h-4 bg-yellow-500 rounded-full mr-2"></span>
+                        <span>Testing Firebase connection...</span>
+                    </div>
+                </div>
+                <button id="testFirebase" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Test Firebase Write/Read
+                </button>
+            </div>
+            
+            <!-- Problem Coverage -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h2 class="text-xl font-semibold mb-4">Problem Coverage Analysis</h2>
+                <div id="coverage" class="space-y-2">
+                    <div>LeetCode Links: <span id="leetcodeCount" class="font-bold">0</span></div>
+                    <div>GeeksforGeeks Links: <span id="gfgCount" class="font-bold">0</span></div>
+                    <div>Problems with Both: <span id="bothLinksCount" class="font-bold">0</span></div>
+                    <div>Problems with No Links: <span id="noLinksCount" class="font-bold">0</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Detailed Problem List -->
+        <div class="bg-white rounded-lg p-6 shadow-lg mt-6">
+            <h2 class="text-xl font-semibold mb-4">All Problems List</h2>
+            <div id="problemsList" class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                <!-- Will be populated by script -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBbOMWi1qdWOzpm_0KeLE_mOHUGjzk0He4",
+            authDomain: "programming-series-hub.firebaseapp.com",
+            projectId: "programming-series-hub",
+            storageBucket: "programming-series-hub.firebasestorage.app",
+            messagingSenderId: "919993604014",
+            appId: "1:919993604014:web:bd0f8f34a5e923ecf31a3f",
+            measurementId: "G-ZJY6P2HHR7"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Problem data from Binary.html (comprehensive set)
+        const problemData = {
+            "Day 1: Fundamentals": [
+                { name: "Binary Search to find X in sorted array", difficulty: "Easy", leetcode: "https://leetcode.com/problems/binary-search/", gfg: "https://www.geeksforgeeks.org/binary-search/" },
+                { name: "Implement Lower Bound", difficulty: "Easy", leetcode: "https://leetcode.com/problems/search-insert-position/", gfg: "https://www.geeksforgeeks.org/lower_bound-in-cpp/" },
+                { name: "Implement Upper Bound", difficulty: "Easy", leetcode: "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/", gfg: "https://www.geeksforgeeks.org/upper_bound-in-cpp/" },
+                { name: "Search Insert Position", difficulty: "Easy", leetcode: "https://leetcode.com/problems/search-insert-position/", gfg: "https://www.geeksforgeeks.org/search-insert-position-of-k-in-a-sorted-array/" },
+                { name: "Floor/Ceil in Sorted Array", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/ceiling-in-a-sorted-array/" }
+            ],
+            "Day 2: Search Variants": [
+                { name: "Find the first or last occurrence of a given number in a sorted array", difficulty: "Easy", leetcode: "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/", gfg: "https://www.geeksforgeeks.org/find-first-and-last-positions-of-an-element-in-a-sorted-array/" },
+                { name: "Count occurrences of a number in a sorted array with duplicates", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/count-number-of-occurrences-or-frequency-in-a-sorted-array/" },
+                { name: "Search in Rotated Sorted Array I", difficulty: "Medium", leetcode: "https://leetcode.com/problems/search-in-rotated-sorted-array/", gfg: "https://www.geeksforgeeks.org/search-an-element-in-a-sorted-and-pivoted-array/" },
+                { name: "Search in Rotated Sorted Array II", difficulty: "Medium", leetcode: "https://leetcode.com/problems/search-in-rotated-sorted-array-ii/", gfg: "https://www.geeksforgeeks.org/search-element-sorted-rotated-array-duplicate-elements/" },
+                { name: "Find minimum in Rotated Sorted Array", difficulty: "Medium", leetcode: "https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/", gfg: "https://www.geeksforgeeks.org/find-minimum-element-in-a-sorted-and-rotated-array/" },
+                { name: "Find out how many times has an array been rotated", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-rotation-count-rotated-sorted-array/" },
+                { name: "Single element in a Sorted Array", difficulty: "Easy", leetcode: "https://leetcode.com/problems/single-element-in-a-sorted-array/", gfg: "https://www.geeksforgeeks.org/find-the-element-that-appears-once-in-a-sorted-array/" },
+                { name: "Find peak element", difficulty: "Hard", leetcode: "https://leetcode.com/problems/find-peak-element/", gfg: "https://www.geeksforgeeks.org/find-a-peak-in-a-given-array/" }
+            ],
+            "Day 3: Mathematical Binary Search": [
+                { name: "Find square root of a number in log n", difficulty: "Medium", leetcode: "https://leetcode.com/problems/sqrtx/", gfg: "https://www.geeksforgeeks.org/square-root-of-an-integer/" },
+                { name: "Find the Nth root of a number using binary search", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/problems/find-nth-root-of-m5843/1" },
+                { name: "Koko Eating Bananas", difficulty: "Hard", leetcode: "https://leetcode.com/problems/koko-eating-bananas/", gfg: "https://www.geeksforgeeks.org/koko-eating-bananas/" },
+                { name: "Minimum days to make M bouquets", difficulty: "Hard", leetcode: "https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/", gfg: "https://www.geeksforgeeks.org/minimum-days-to-make-m-bouquets/" },
+                { name: "Find the smallest Divisor", difficulty: "Easy", leetcode: "https://leetcode.com/problems/find-the-smallest-divisor-given-a-threshold/", gfg: "http://geeksforgeeks.org/dsa/smallest-divisor-for-sum-constraint-in-array-division/" },
+                { name: "Capacity to Ship Packages within D Days", difficulty: "Hard", leetcode: "https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/", gfg: "https://www.geeksforgeeks.org/capacity-to-ship-packages-within-d-days/" },
+                { name: "Kth Missing Positive Number", difficulty: "Easy", leetcode: "https://leetcode.com/problems/kth-missing-positive-number/", gfg: "https://www.geeksforgeeks.org/kth-missing-positive-number-in-sorted-array/" }
+            ],
+            "Day 4: Advanced Applications": [
+                { name: "Aggressive Cows", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/aggressive-cows-problem/" },
+                { name: "Book Allocation Problem", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/allocate-minimum-number-pages/" },
+                { name: "Split array - Largest Sum", difficulty: "Hard", leetcode: "https://leetcode.com/problems/split-array-largest-sum/", gfg: "https://www.geeksforgeeks.org/split-array-largest-sum/" },
+                { name: "Painter's partition", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/painters-partition-problem/" },
+                { name: "Minimize Max Distance to Gas Station", difficulty: "Hard", leetcode: "https://leetcode.com/problems/minimize-max-distance-to-gas-station/", gfg: "https://www.geeksforgeeks.org/minimize-max-distance-gas-station/" },
+                { name: "Median of 2 sorted arrays", difficulty: "Hard", leetcode: "https://leetcode.com/problems/median-of-two-sorted-arrays/", gfg: "https://www.geeksforgeeks.org/median-of-two-sorted-arrays/" },
+                { name: "Kth element of 2 sorted arrays", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/k-th-element-two-sorted-arrays/" }
+            ],
+            "Day 5: 2D Binary Search": [
+                { name: "Find the row with maximum number of 1's", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-the-row-with-maximum-number-1s/" },
+                { name: "Search in a 2D matrix", difficulty: "Medium", leetcode: "https://leetcode.com/problems/search-a-2d-matrix/", gfg: "https://www.geeksforgeeks.org/search-in-row-wise-and-column-wise-sorted-matrix/" },
+                { name: "Search in a row and column wise sorted matrix", difficulty: "Medium", leetcode: "https://leetcode.com/problems/search-a-2d-matrix-ii/", gfg: "https://www.geeksforgeeks.org/search-in-row-wise-and-column-wise-sorted-matrix/" },
+                { name: "Find Peak Element (2D Matrix)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/find-a-peak-element-ii/", gfg: "https://www.geeksforgeeks.org/find-peak-element-2d-array/" },
+                { name: "Matrix Median", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-median-row-wise-sorted-matrix/" }
+            ]
+        };
+
+        // Test Functions
+        function updateStatus(elementId, success, message) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `
+                <div class="flex items-center">
+                    <span class="w-4 h-4 ${success ? 'bg-green-500' : 'bg-red-500'} rounded-full mr-2"></span>
+                    <span>${message}</span>
+                </div>
+            `;
+        }
+
+        function runTests() {
+            const results = document.getElementById('testResults');
+            results.innerHTML = '';
+
+            // Test 1: Problem Data Structure
+            let allProblems = [];
+            Object.keys(problemData).forEach(section => {
+                problemData[section].forEach(problem => {
+                    allProblems.push({
+                        section: section,
+                        name: problem.name,
+                        difficulty: problem.difficulty,
+                        leetcode: problem.leetcode,
+                        gfg: problem.gfg
+                    });
+                });
+            });
+
+            updateStatus('testResults', true, `✅ Problem data loaded: ${allProblems.length} problems`);
+            
+            // Update problem statistics
+            document.getElementById('totalProblems').textContent = allProblems.length;
+            document.getElementById('day1Count').textContent = problemData["Day 1: Fundamentals"].length;
+            document.getElementById('day2Count').textContent = problemData["Day 2: Search Variants"].length;
+            document.getElementById('day3Count').textContent = problemData["Day 3: Mathematical Binary Search"].length;
+            document.getElementById('day4Count').textContent = problemData["Day 4: Advanced Applications"].length;
+            document.getElementById('day5Count').textContent = problemData["Day 5: 2D Binary Search"].length;
+
+            // Test 2: Link Coverage
+            let leetcodeCount = 0, gfgCount = 0, bothLinksCount = 0, noLinksCount = 0;
+            
+            allProblems.forEach(problem => {
+                const hasLeetcode = problem.leetcode && problem.leetcode.trim() !== '';
+                const hasGfg = problem.gfg && problem.gfg.trim() !== '';
+                
+                if (hasLeetcode) leetcodeCount++;
+                if (hasGfg) gfgCount++;
+                if (hasLeetcode && hasGfg) bothLinksCount++;
+                if (!hasLeetcode && !hasGfg) noLinksCount++;
+            });
+
+            document.getElementById('leetcodeCount').textContent = leetcodeCount;
+            document.getElementById('gfgCount').textContent = gfgCount;
+            document.getElementById('bothLinksCount').textContent = bothLinksCount;
+            document.getElementById('noLinksCount').textContent = noLinksCount;
+
+            results.innerHTML += `
+                <div class="flex items-center">
+                    <span class="w-4 h-4 bg-green-500 rounded-full mr-2"></span>
+                    <span>✅ Link coverage analysis completed</span>
+                </div>
+            `;
+
+            // Test 3: Generate problem list
+            const problemsList = document.getElementById('problemsList');
+            problemsList.innerHTML = '';
+            
+            Object.keys(problemData).forEach(section => {
+                problemsList.innerHTML += `<div class="col-span-2 font-bold text-lg mt-4 mb-2 text-blue-600">${section}</div>`;
+                problemData[section].forEach((problem, index) => {
+                    problemsList.innerHTML += `
+                        <div class="p-2 border rounded">
+                            <div class="font-medium">${index + 1}. ${problem.name}</div>
+                            <div class="text-xs text-gray-600">
+                                <span class="inline-block px-2 py-1 bg-${problem.difficulty === 'Easy' ? 'green' : problem.difficulty === 'Medium' ? 'yellow' : 'red'}-100 text-${problem.difficulty === 'Easy' ? 'green' : problem.difficulty === 'Medium' ? 'yellow' : 'red'}-800 rounded">${problem.difficulty}</span>
+                                ${problem.leetcode ? '<span class="ml-2">📝 LC</span>' : ''}
+                                ${problem.gfg ? '<span class="ml-2">🔗 GFG</span>' : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+
+            results.innerHTML += `
+                <div class="flex items-center">
+                    <span class="w-4 h-4 bg-green-500 rounded-full mr-2"></span>
+                    <span>✅ Problem list generated successfully</span>
+                </div>
+            `;
+
+            // Test 4: Firebase Connection Test
+            testFirebaseConnection();
+        }
+
+        async function testFirebaseConnection() {
+            const firebaseStatus = document.getElementById('firebaseStatus');
+            
+            try {
+                // Test Firebase connection
+                const testDoc = await db.collection('test').doc('connection').set({
+                    timestamp: new Date().toISOString(),
+                    status: 'connected',
+                    test: 'binary-search-db-test'
+                });
+
+                firebaseStatus.innerHTML = `
+                    <div class="flex items-center">
+                        <span class="w-4 h-4 bg-green-500 rounded-full mr-2"></span>
+                        <span>✅ Firebase connection successful</span>
+                    </div>
+                `;
+
+                document.getElementById('testResults').innerHTML += `
+                    <div class="flex items-center">
+                        <span class="w-4 h-4 bg-green-500 rounded-full mr-2"></span>
+                        <span>✅ Firebase database test passed</span>
+                    </div>
+                `;
+
+            } catch (error) {
+                firebaseStatus.innerHTML = `
+                    <div class="flex items-center">
+                        <span class="w-4 h-4 bg-red-500 rounded-full mr-2"></span>
+                        <span>❌ Firebase connection failed: ${error.message}</span>
+                    </div>
+                `;
+
+                document.getElementById('testResults').innerHTML += `
+                    <div class="flex items-center">
+                        <span class="w-4 h-4 bg-red-500 rounded-full mr-2"></span>
+                        <span>❌ Firebase database test failed</span>
+                    </div>
+                `;
+            }
+        }
+
+        async function testFirebaseReadWrite() {
+            const firebaseStatus = document.getElementById('firebaseStatus');
+            
+            try {
+                // Test writing user progress
+                const testUser = 'test@example.com';
+                const testProgress = {
+                    name: 'Test User',
+                    email: testUser,
+                    sheets: {
+                        'Binary Search': {
+                            completed: 10,
+                            total: 35,
+                            percentage: 29,
+                            lastUpdated: new Date().toISOString()
+                        }
+                    }
+                };
+
+                await db.collection('userProgress').doc(testUser).set(testProgress);
+                
+                // Test reading back
+                const doc = await db.collection('userProgress').doc(testUser).get();
+                
+                if (doc.exists) {
+                    const data = doc.data();
+                    firebaseStatus.innerHTML += `
+                        <div class="mt-2 p-2 bg-green-100 rounded">
+                            <div class="text-sm">✅ Write/Read test successful</div>
+                            <div class="text-xs">Progress: ${data.sheets['Binary Search'].percentage}%</div>
+                        </div>
+                    `;
+                    
+                    // Clean up test data
+                    await db.collection('userProgress').doc(testUser).delete();
+                    
+                } else {
+                    throw new Error('Document not found after write');
+                }
+
+            } catch (error) {
+                firebaseStatus.innerHTML += `
+                    <div class="mt-2 p-2 bg-red-100 rounded">
+                        <div class="text-sm">❌ Write/Read test failed</div>
+                        <div class="text-xs">${error.message}</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('testFirebase').addEventListener('click', testFirebaseReadWrite);
+
+        // Run tests on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            runTests();
+        });
+    </script>
+</body>
+</html>

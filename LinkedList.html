@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Binary Search Problem Tracker</title>
+    <title>DSA LinkedList Problem Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <!-- Firebase SDK -->
@@ -33,14 +33,15 @@
             <div class="flex justify-between items-center mb-4">
                 <div>
                     <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                        Binary Search Mastery
+                        DSA LinkedList Sheet
                     </h1>
-                    <p class="text-gray-700 dark:text-gray-300 text-base">Master binary search algorithms step by step — <a href="https://www.linkedin.com/in/ashish2208/" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-2 py-1 rounded shadow transition">Ashish Sharma</a></p>
+                    <p class="text-gray-700 dark:text-gray-300 text-base">Master LinkedList problems with structured practice — <a href="https://www.linkedin.com/in/ashish2208/" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-2 py-1 rounded shadow transition">Ashish Sharma</a></p>
                 </div>
                 <div class="flex space-x-4">
                     <a href="index.html" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-300">
                         ← Back to Hub
                     </a>
+                    <!-- Dark Mode Toggle -->
                     <button 
                         id="darkModeToggle"
                         class="p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700"
@@ -69,7 +70,7 @@
                         Completed: <span id="completedCount" class="font-semibold">0</span>
                     </div>
                     <div class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl shadow-lg">
-                        <i class="fas fa-list mr-2"></i>
+                        <i class="fas fa-link mr-2"></i>
                         Total: <span id="totalCount" class="font-semibold">0</span>
                     </div>
                     <div class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg">
@@ -117,11 +118,11 @@
         const db = firebase.firestore();
 
         // Theme management
-        let isDarkMode = localStorage.getItem('darkMode') === 'true' || false;
+        let isDarkMode = localStorage.getItem('linkedlistDarkMode') === 'true' || false;
         
         function toggleDarkMode() {
             isDarkMode = !isDarkMode;
-            localStorage.setItem('darkMode', isDarkMode);
+            localStorage.setItem('linkedlistDarkMode', isDarkMode);
             updateTheme();
         }
 
@@ -139,52 +140,50 @@
         }
 
         // In-memory storage for problem completion status
-        let problemStatus = JSON.parse(localStorage.getItem('binaryProblemStatus')) || {};
+        let problemStatus = JSON.parse(localStorage.getItem('linkedlistProblemStatus')) || {};
         let allProblems = [];
 
-        // Binary Search Problem data - COMPREHENSIVE SET (35 problems)
+        // LinkedList Problem data structure - 28 problems across 6 days
         const problemData = {
-            "Day 1: Fundamentals": [
-                { name: "Binary Search to find X in sorted array", difficulty: "Easy", leetcode: "https://leetcode.com/problems/binary-search/", gfg: "https://www.geeksforgeeks.org/binary-search/" },
-                { name: "Implement Lower Bound", difficulty: "Easy", leetcode: "https://leetcode.com/problems/search-insert-position/", gfg: "https://www.geeksforgeeks.org/lower_bound-in-cpp/" },
-                { name: "Implement Upper Bound", difficulty: "Easy", leetcode: "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/", gfg: "https://www.geeksforgeeks.org/upper_bound-in-cpp/" },
-                { name: "Search Insert Position", difficulty: "Easy", leetcode: "https://leetcode.com/problems/search-insert-position/", gfg: "https://www.geeksforgeeks.org/search-insert-position-of-k-in-a-sorted-array/" },
-                { name: "Floor/Ceil in Sorted Array", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/ceiling-in-a-sorted-array/" }
+            "Day 1: Singly LinkedList (Basics)": [
+                { name: "Introduction to LinkedList, learn about struct, and how is node represented", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/data-structures/linked-list/" },
+                { name: "Find the length of the linkedlist [learn traversal]", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-length-of-a-linked-list-iterative-and-recursive/" },
+                { name: "Search an element in the LL", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/search-an-element-in-a-linked-list-iterative-and-recursive/" },
+                { name: "Delete a node in single linked list", difficulty: "Easy", leetcode: "https://leetcode.com/problems/delete-node-in-a-linked-list/", gfg: "https://www.geeksforgeeks.org/linked-list-set-3-deleting-node/" }
             ],
-            "Day 2: Search Variants": [
-                { name: "Find the first or last occurrence of a given number in a sorted array", difficulty: "Easy", leetcode: "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/", gfg: "https://www.geeksforgeeks.org/find-first-and-last-positions-of-an-element-in-a-sorted-array/" },
-                { name: "Count occurrences of a number in a sorted array with duplicates", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/count-number-of-occurrences-or-frequency-in-a-sorted-array/" },
-                { name: "Search in Rotated Sorted Array I", difficulty: "Medium", leetcode: "https://leetcode.com/problems/search-in-rotated-sorted-array/", gfg: "https://www.geeksforgeeks.org/search-an-element-in-a-sorted-and-pivoted-array/" },
-                { name: "Search in Rotated Sorted Array II", difficulty: "Medium", leetcode: "https://leetcode.com/problems/search-in-rotated-sorted-array-ii/", gfg: "https://www.geeksforgeeks.org/search-element-sorted-rotated-array-duplicate-elements/" },
-                { name: "Find minimum in Rotated Sorted Array", difficulty: "Medium", leetcode: "https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/", gfg: "https://www.geeksforgeeks.org/find-minimum-element-in-a-sorted-and-rotated-array/" },
-                { name: "Find out how many times has an array been rotated", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-rotation-count-rotated-sorted-array/" },
-                { name: "Single element in a Sorted Array", difficulty: "Easy", leetcode: "https://leetcode.com/problems/single-element-in-a-sorted-array/", gfg: "https://www.geeksforgeeks.org/find-the-element-that-appears-once-in-a-sorted-array/" },
-                { name: "Find peak element", difficulty: "Hard", leetcode: "https://leetcode.com/problems/find-peak-element/", gfg: "https://www.geeksforgeeks.org/find-a-peak-in-a-given-array/" }
+            "Day 2: Double LinkedList (Basics)": [
+                { name: "Introduction to DLL, learn about struct, and how is node represented", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/doubly-linked-list/" },
+                { name: "Reverse a DLL", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/reverse-a-doubly-linked-list/" }
             ],
-            "Day 3: Mathematical Binary Search": [
-                { name: "Find square root of a number in log n", difficulty: "Medium", leetcode: "https://leetcode.com/problems/sqrtx/", gfg: "https://www.geeksforgeeks.org/square-root-of-an-integer/" },
-                { name: "Find the Nth root of a number using binary search", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/problems/find-nth-root-of-m5843/1" },
-                { name: "Koko Eating Bananas", difficulty: "Hard", leetcode: "https://leetcode.com/problems/koko-eating-bananas/", gfg: "https://www.geeksforgeeks.org/koko-eating-bananas/" },
-                { name: "Minimum days to make M bouquets", difficulty: "Hard", leetcode: "https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/", gfg: "https://www.geeksforgeeks.org/minimum-days-to-make-m-bouquets/" },
-                { name: "Find the smallest Divisor", difficulty: "Easy", leetcode: "https://leetcode.com/problems/find-the-smallest-divisor-given-a-threshold/", gfg: "http://geeksforgeeks.org/dsa/smallest-divisor-for-sum-constraint-in-array-division/" },
-                { name: "Capacity to Ship Packages within D Days", difficulty: "Hard", leetcode: "https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/", gfg: "https://www.geeksforgeeks.org/capacity-to-ship-packages-within-d-days/" },
-                { name: "Kth Missing Positive Number", difficulty: "Easy", leetcode: "https://leetcode.com/problems/kth-missing-positive-number/", gfg: "https://www.geeksforgeeks.org/kth-missing-positive-number-in-sorted-array/" }
+            "Day 3: LinkedList (Medium)": [
+                { name: "Add 2 numbers in LL", difficulty: "Medium", leetcode: "https://leetcode.com/problems/add-two-numbers/", gfg: "https://www.geeksforgeeks.org/add-two-numbers-represented-by-linked-lists/" },
+                { name: "Segregate odd and even nodes in LL", difficulty: "Medium", leetcode: "https://leetcode.com/problems/odd-even-linked-list/", gfg: "https://www.geeksforgeeks.org/segregate-even-and-odd-elements-in-a-linked-list/" },
+                { name: "Sort a LL of 0's 1's and 2's by changing links", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/sort-a-linked-list-of-0s-1s-or-2s/" },
+                { name: "Remove Nth node from the back of the LL", difficulty: "Medium", leetcode: "https://leetcode.com/problems/remove-nth-node-from-end-of-list/", gfg: "https://www.geeksforgeeks.org/remove-nth-node-from-end-of-the-linked-list/" },
+                { name: "Reverse a LinkedList [Iterative]", difficulty: "Easy", leetcode: "https://leetcode.com/problems/reverse-linked-list/", gfg: "https://www.geeksforgeeks.org/reverse-a-linked-list/" },
+                { name: "Reverse a LL [Recursive]", difficulty: "Easy", leetcode: "https://leetcode.com/problems/reverse-linked-list/", gfg: "https://www.geeksforgeeks.org/recursively-reversing-a-linked-list-a-simple-implementation/" },
+                { name: "Check if LL is palindrome or not", difficulty: "Medium", leetcode: "https://leetcode.com/problems/palindrome-linked-list/", gfg: "https://www.geeksforgeeks.org/function-to-check-if-a-singly-linked-list-is-palindrome/" },
+                { name: "Add 1 to a number represented by LL", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/add-1-number-represented-linked-list/" },
+                { name: "Find the intersection point of Y LL", difficulty: "Medium", leetcode: "https://leetcode.com/problems/intersection-of-two-linked-lists/", gfg: "https://www.geeksforgeeks.org/write-a-function-to-get-the-intersection-point-of-two-linked-lists/" }
             ],
-            "Day 4: Advanced Applications": [
-                { name: "Aggressive Cows", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/aggressive-cows-problem/" },
-                { name: "Book Allocation Problem", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/allocate-minimum-number-pages/" },
-                { name: "Split array - Largest Sum", difficulty: "Hard", leetcode: "https://leetcode.com/problems/split-array-largest-sum/", gfg: "https://www.geeksforgeeks.org/split-array-largest-sum/" },
-                { name: "Painter's partition", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/painters-partition-problem/" },
-                { name: "Minimize Max Distance to Gas Station", difficulty: "Hard", leetcode: "https://leetcode.com/problems/minimize-max-distance-to-gas-station/", gfg: "https://www.geeksforgeeks.org/minimize-max-distance-gas-station/" },
-                { name: "Median of 2 sorted arrays", difficulty: "Hard", leetcode: "https://leetcode.com/problems/median-of-two-sorted-arrays/", gfg: "https://www.geeksforgeeks.org/median-of-two-sorted-arrays/" },
-                { name: "Kth element of 2 sorted arrays", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/k-th-element-two-sorted-arrays/" }
+            "Day 4: LinkedList (Tortoise & Hare Algorithm)": [
+                { name: "Middle of a LinkedList [TortoiseHare Method]", difficulty: "Easy", leetcode: "https://leetcode.com/problems/middle-of-the-linked-list/", gfg: "https://www.geeksforgeeks.org/write-a-c-function-to-print-the-middle-of-the-linked-list/" },
+                { name: "Detect a loop in LL", difficulty: "Medium", leetcode: "https://leetcode.com/problems/linked-list-cycle/", gfg: "https://www.geeksforgeeks.org/detect-loop-in-a-linked-list/" },
+                { name: "Find the starting point in LL", difficulty: "Medium", leetcode: "https://leetcode.com/problems/linked-list-cycle-ii/", gfg: "https://www.geeksforgeeks.org/find-first-node-of-loop-in-a-linked-list/" },
+                { name: "Length of Loop in LL", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-length-of-loop-in-linked-list/" },
+                { name: "Delete the middle node of LL", difficulty: "Medium", leetcode: "https://leetcode.com/problems/delete-the-middle-node-of-a-linked-list/", gfg: "https://www.geeksforgeeks.org/delete-middle-of-linked-list/" }
             ],
-            "Day 5: 2D Binary Search": [
-                { name: "Find the row with maximum number of 1's", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-the-row-with-maximum-number-1s/" },
-                { name: "Search in a 2D matrix", difficulty: "Medium", leetcode: "https://leetcode.com/problems/search-a-2d-matrix/", gfg: "https://www.geeksforgeeks.org/search-in-row-wise-and-column-wise-sorted-matrix/" },
-                { name: "Search in a row and column wise sorted matrix", difficulty: "Medium", leetcode: "https://leetcode.com/problems/search-a-2d-matrix-ii/", gfg: "https://www.geeksforgeeks.org/search-in-row-wise-and-column-wise-sorted-matrix/" },
-                { name: "Find Peak Element (2D Matrix)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/find-a-peak-element-ii/", gfg: "https://www.geeksforgeeks.org/find-peak-element-2d-array/" },
-                { name: "Matrix Median", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-median-row-wise-sorted-matrix/" }
+            "Day 5: Doubly LinkedList (Medium + Hard)": [
+                { name: "Delete all occurrences of a key in DLL", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/delete-occurrences-given-key-doubly-linked-list/" },
+                { name: "Find pairs with given sum in DLL", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-pairs-given-sum-doubly-linked-list/" },
+                { name: "Remove duplicates from sorted DLL", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/remove-duplicates-sorted-doubly-linked-list/" }
+            ],
+            "Day 6: LinkedList (Hard)": [
+                { name: "Flattening of LL", difficulty: "Hard", leetcode: "https://leetcode.com/problems/flatten-a-multilevel-doubly-linked-list/", gfg: "https://www.geeksforgeeks.org/flattening-a-linked-list/" },
+                { name: "Rotate a LL", difficulty: "Medium", leetcode: "https://leetcode.com/problems/rotate-list/", gfg: "https://www.geeksforgeeks.org/rotate-a-linked-list/" },
+                { name: "Sort LL", difficulty: "Medium", leetcode: "https://leetcode.com/problems/sort-list/", gfg: "https://www.geeksforgeeks.org/merge-sort-for-linked-list/" },
+                { name: "Reverse LL in group of given size K", difficulty: "Hard", leetcode: "https://leetcode.com/problems/reverse-nodes-in-k-group/", gfg: "https://www.geeksforgeeks.org/reverse-a-list-in-groups-of-given-size/" },
+                { name: "Clone a Linked List with random and next pointer", difficulty: "Hard", leetcode: "https://leetcode.com/problems/copy-list-with-random-pointer/", gfg: "https://www.geeksforgeeks.org/a-linked-list-with-next-and-arbit-pointer/" }
             ]
         };
 
@@ -223,11 +222,12 @@
         // Get section gradient
         function getSectionGradient(section) {
             const gradients = [
-                'from-blue-500 to-purple-600',
+                'from-blue-500 to-indigo-600',
+                'from-indigo-500 to-purple-600',
                 'from-purple-500 to-pink-600',
-                'from-pink-500 to-rose-600',
-                'from-indigo-500 to-blue-600',
-                'from-cyan-500 to-teal-600'
+                'from-pink-500 to-red-600',
+                'from-red-500 to-orange-600',
+                'from-orange-500 to-yellow-600'
             ];
             const index = Object.keys(problemData).indexOf(section) % gradients.length;
             return gradients[index];
@@ -342,7 +342,7 @@
         // Toggle problem completion
         function toggleProblem(problemId) {
             problemStatus[problemId] = !problemStatus[problemId];
-            localStorage.setItem('binaryProblemStatus', JSON.stringify(problemStatus));
+            localStorage.setItem('linkedlistProblemStatus', JSON.stringify(problemStatus));
             
             // Track user progress for admin
             updateUserProgress();
@@ -375,7 +375,7 @@
                 email: currentUser.email,
                 sheets: {
                     ...userProgress[currentUser.email]?.sheets,
-                    'Binary Search': {
+                    'LinkedList': {
                         completed: completed,
                         total: total,
                         percentage: percentage,
@@ -390,9 +390,9 @@
             // Save to Firebase for real-time admin access
             try {
                 await db.collection('userProgress').doc(currentUser.email).set(userProgress[currentUser.email]);
-                console.log('Binary Search progress saved to Firebase successfully');
+                console.log('LinkedList progress saved to Firebase successfully');
             } catch (error) {
-                console.error('Error saving Binary Search progress to Firebase:', error);
+                console.error('Error saving LinkedList progress to Firebase:', error);
                 // Firebase error is not critical, localStorage backup exists
             }
         }

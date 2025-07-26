@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Binary Search Problem Tracker</title>
+    <title>DSA Recursion Problem Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <!-- Firebase SDK -->
@@ -15,7 +15,7 @@
         }
     </script>
 </head>
-<body class="bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 min-h-screen transition-all duration-300">
+<body class="bg-gradient-to-br from-gray-50 via-cyan-50 to-blue-50 dark:from-gray-900 dark:via-cyan-900 dark:to-blue-900 min-h-screen transition-all duration-300">
     <!-- Authentication Check -->
     <script>
         // Check authentication first
@@ -32,15 +32,16 @@
         <div class="mb-8">
             <div class="flex justify-between items-center mb-4">
                 <div>
-                    <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                        Binary Search Mastery
+                    <h1 class="text-4xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent mb-2">
+                        DSA Recursion Sheet
                     </h1>
-                    <p class="text-gray-700 dark:text-gray-300 text-base">Master binary search algorithms step by step — <a href="https://www.linkedin.com/in/ashish2208/" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-2 py-1 rounded shadow transition">Ashish Sharma</a></p>
+                    <p class="text-gray-700 dark:text-gray-300 text-base">Master recursion patterns and backtracking problems — <a href="https://www.linkedin.com/in/ashish2208/" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-2 py-1 rounded shadow transition">Ashish Sharma</a></p>
                 </div>
                 <div class="flex space-x-4">
-                    <a href="index.html" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-300">
+                    <a href="index.html" class="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg transition-colors duration-300">
                         ← Back to Hub
                     </a>
+                    <!-- Dark Mode Toggle -->
                     <button 
                         id="darkModeToggle"
                         class="p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700"
@@ -59,7 +60,7 @@
                         type="text" 
                         id="searchInput" 
                         placeholder="Search problems..." 
-                        class="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300"
+                        class="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300"
                     >
                     <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
                 </div>
@@ -68,11 +69,15 @@
                         <i class="fas fa-check mr-2"></i>
                         Completed: <span id="completedCount" class="font-semibold">0</span>
                     </div>
-                    <div class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl shadow-lg">
-                        <i class="fas fa-list mr-2"></i>
+                    <div class="px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl shadow-lg">
+                        <i class="fas fa-clock mr-2"></i>
+                        Remaining: <span id="remainingCount" class="font-semibold">0</span>
+                    </div>
+                    <div class="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl shadow-lg">
+                        <i class="fas fa-layer-group mr-2"></i>
                         Total: <span id="totalCount" class="font-semibold">0</span>
                     </div>
-                    <div class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg">
+                    <div class="px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl shadow-lg">
                         <i class="fas fa-percentage mr-2"></i>
                         <span id="progressPercentage">0%</span>
                     </div>
@@ -87,7 +92,7 @@
                 <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                     <div 
                         id="progressBar" 
-                        class="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all duration-500 ease-out"
+                        class="bg-gradient-to-r from-cyan-500 to-blue-500 h-3 rounded-full transition-all duration-500 ease-out"
                         style="width: 0%"
                     ></div>
                 </div>
@@ -117,11 +122,11 @@
         const db = firebase.firestore();
 
         // Theme management
-        let isDarkMode = localStorage.getItem('darkMode') === 'true' || false;
+        let isDarkMode = localStorage.getItem('recursionDarkMode') === 'true' || false;
         
         function toggleDarkMode() {
             isDarkMode = !isDarkMode;
-            localStorage.setItem('darkMode', isDarkMode);
+            localStorage.setItem('recursionDarkMode', isDarkMode);
             updateTheme();
         }
 
@@ -139,52 +144,43 @@
         }
 
         // In-memory storage for problem completion status
-        let problemStatus = JSON.parse(localStorage.getItem('binaryProblemStatus')) || {};
+        let problemStatus = JSON.parse(localStorage.getItem('recursionProblemStatus')) || {};
         let allProblems = [];
 
-        // Binary Search Problem data - COMPREHENSIVE SET (35 problems)
+        // Recursion Problem data structure - 25 problems across 4 days
         const problemData = {
-            "Day 1: Fundamentals": [
-                { name: "Binary Search to find X in sorted array", difficulty: "Easy", leetcode: "https://leetcode.com/problems/binary-search/", gfg: "https://www.geeksforgeeks.org/binary-search/" },
-                { name: "Implement Lower Bound", difficulty: "Easy", leetcode: "https://leetcode.com/problems/search-insert-position/", gfg: "https://www.geeksforgeeks.org/lower_bound-in-cpp/" },
-                { name: "Implement Upper Bound", difficulty: "Easy", leetcode: "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/", gfg: "https://www.geeksforgeeks.org/upper_bound-in-cpp/" },
-                { name: "Search Insert Position", difficulty: "Easy", leetcode: "https://leetcode.com/problems/search-insert-position/", gfg: "https://www.geeksforgeeks.org/search-insert-position-of-k-in-a-sorted-array/" },
-                { name: "Floor/Ceil in Sorted Array", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/ceiling-in-a-sorted-array/" }
+            "Day 1: Basic Recursion": [
+                { name: "Recursive Implementation of atoi()", difficulty: "Hard", leetcode: "https://leetcode.com/problems/string-to-integer-atoi/", gfg: "https://www.geeksforgeeks.org/write-your-own-atoi/" },
+                { name: "Pow(x, n)", difficulty: "Medium", leetcode: "https://leetcode.com/problems/powx-n/", gfg: "https://www.geeksforgeeks.org/write-a-c-program-to-calculate-powxn/" },
+                { name: "Count Good numbers", difficulty: "Easy", leetcode: "https://leetcode.com/problems/count-good-numbers/", gfg: "https://www.geeksforgeeks.org/count-good-numbers/" },
+                { name: "Sort a stack using recursion", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/sort-a-stack-using-recursion/" },
+                { name: "Reverse a stack using recursion", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/reverse-a-stack-using-recursion/" }
             ],
-            "Day 2: Search Variants": [
-                { name: "Find the first or last occurrence of a given number in a sorted array", difficulty: "Easy", leetcode: "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/", gfg: "https://www.geeksforgeeks.org/find-first-and-last-positions-of-an-element-in-a-sorted-array/" },
-                { name: "Count occurrences of a number in a sorted array with duplicates", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/count-number-of-occurrences-or-frequency-in-a-sorted-array/" },
-                { name: "Search in Rotated Sorted Array I", difficulty: "Medium", leetcode: "https://leetcode.com/problems/search-in-rotated-sorted-array/", gfg: "https://www.geeksforgeeks.org/search-an-element-in-a-sorted-and-pivoted-array/" },
-                { name: "Search in Rotated Sorted Array II", difficulty: "Medium", leetcode: "https://leetcode.com/problems/search-in-rotated-sorted-array-ii/", gfg: "https://www.geeksforgeeks.org/search-element-sorted-rotated-array-duplicate-elements/" },
-                { name: "Find minimum in Rotated Sorted Array", difficulty: "Medium", leetcode: "https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/", gfg: "https://www.geeksforgeeks.org/find-minimum-element-in-a-sorted-and-rotated-array/" },
-                { name: "Find out how many times has an array been rotated", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-rotation-count-rotated-sorted-array/" },
-                { name: "Single element in a Sorted Array", difficulty: "Easy", leetcode: "https://leetcode.com/problems/single-element-in-a-sorted-array/", gfg: "https://www.geeksforgeeks.org/find-the-element-that-appears-once-in-a-sorted-array/" },
-                { name: "Find peak element", difficulty: "Hard", leetcode: "https://leetcode.com/problems/find-peak-element/", gfg: "https://www.geeksforgeeks.org/find-a-peak-in-a-given-array/" }
+            "Day 2: Subsequences & Strings": [
+                { name: "Generate all binary strings", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/generate-all-binary-strings-without-consecutive-1s/" },
+                { name: "Generate Paranthesis", difficulty: "Medium", leetcode: "https://leetcode.com/problems/generate-parentheses/", gfg: "https://www.geeksforgeeks.org/print-all-combinations-of-balanced-parentheses/" },
+                { name: "Print all subsequences/Power Set", difficulty: "Medium", leetcode: "https://leetcode.com/problems/subsets/", gfg: "https://www.geeksforgeeks.org/power-set/" },
+                { name: "Learn All Patterns of Subsequences (Theory)", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/generating-all-possible-subsequences-using-recursion/" },
+                { name: "Count all subsequences with sum K", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/count-of-subsequences-having-sum-equal-to-x/" },
+                { name: "Check if there exists a subsequence with sum K", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/given-an-array-a-and-a-number-x-check-for-pair-in-a-with-sum-as-x/" }
             ],
-            "Day 3: Mathematical Binary Search": [
-                { name: "Find square root of a number in log n", difficulty: "Medium", leetcode: "https://leetcode.com/problems/sqrtx/", gfg: "https://www.geeksforgeeks.org/square-root-of-an-integer/" },
-                { name: "Find the Nth root of a number using binary search", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/problems/find-nth-root-of-m5843/1" },
-                { name: "Koko Eating Bananas", difficulty: "Hard", leetcode: "https://leetcode.com/problems/koko-eating-bananas/", gfg: "https://www.geeksforgeeks.org/koko-eating-bananas/" },
-                { name: "Minimum days to make M bouquets", difficulty: "Hard", leetcode: "https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/", gfg: "https://www.geeksforgeeks.org/minimum-days-to-make-m-bouquets/" },
-                { name: "Find the smallest Divisor", difficulty: "Easy", leetcode: "https://leetcode.com/problems/find-the-smallest-divisor-given-a-threshold/", gfg: "http://geeksforgeeks.org/dsa/smallest-divisor-for-sum-constraint-in-array-division/" },
-                { name: "Capacity to Ship Packages within D Days", difficulty: "Hard", leetcode: "https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/", gfg: "https://www.geeksforgeeks.org/capacity-to-ship-packages-within-d-days/" },
-                { name: "Kth Missing Positive Number", difficulty: "Easy", leetcode: "https://leetcode.com/problems/kth-missing-positive-number/", gfg: "https://www.geeksforgeeks.org/kth-missing-positive-number-in-sorted-array/" }
+            "Day 3: Combinations & Subsets": [
+                { name: "Combination Sum", difficulty: "Medium", leetcode: "https://leetcode.com/problems/combination-sum/", gfg: "https://www.geeksforgeeks.org/combinational-sum/" },
+                { name: "Combination Sum-II", difficulty: "Medium", leetcode: "https://leetcode.com/problems/combination-sum-ii/", gfg: "https://www.geeksforgeeks.org/combinational-sum-ii/" },
+                { name: "Subset Sum-I", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/subset-sum-problem-dp-25/" },
+                { name: "Subset Sum-II", difficulty: "Medium", leetcode: "https://leetcode.com/problems/subsets-ii/", gfg: "https://www.geeksforgeeks.org/finding-all-subsets-of-a-given-set-in-java/" },
+                { name: "Combination Sum - III", difficulty: "Hard", leetcode: "https://leetcode.com/problems/combination-sum-iii/", gfg: "https://www.geeksforgeeks.org/combinational-sum-iii/" },
+                { name: "Letter Combinations of a Phone number", difficulty: "Medium", leetcode: "https://leetcode.com/problems/letter-combinations-of-a-phone-number/", gfg: "https://www.geeksforgeeks.org/iterative-letter-combinations-of-a-phone-number/" },
+                { name: "Palindrome Partitioning", difficulty: "Medium", leetcode: "https://leetcode.com/problems/palindrome-partitioning/", gfg: "https://www.geeksforgeeks.org/palindrome-partitioning-dp-17/" }
             ],
-            "Day 4: Advanced Applications": [
-                { name: "Aggressive Cows", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/aggressive-cows-problem/" },
-                { name: "Book Allocation Problem", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/allocate-minimum-number-pages/" },
-                { name: "Split array - Largest Sum", difficulty: "Hard", leetcode: "https://leetcode.com/problems/split-array-largest-sum/", gfg: "https://www.geeksforgeeks.org/split-array-largest-sum/" },
-                { name: "Painter's partition", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/painters-partition-problem/" },
-                { name: "Minimize Max Distance to Gas Station", difficulty: "Hard", leetcode: "https://leetcode.com/problems/minimize-max-distance-to-gas-station/", gfg: "https://www.geeksforgeeks.org/minimize-max-distance-gas-station/" },
-                { name: "Median of 2 sorted arrays", difficulty: "Hard", leetcode: "https://leetcode.com/problems/median-of-two-sorted-arrays/", gfg: "https://www.geeksforgeeks.org/median-of-two-sorted-arrays/" },
-                { name: "Kth element of 2 sorted arrays", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/k-th-element-two-sorted-arrays/" }
-            ],
-            "Day 5: 2D Binary Search": [
-                { name: "Find the row with maximum number of 1's", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-the-row-with-maximum-number-1s/" },
-                { name: "Search in a 2D matrix", difficulty: "Medium", leetcode: "https://leetcode.com/problems/search-a-2d-matrix/", gfg: "https://www.geeksforgeeks.org/search-in-row-wise-and-column-wise-sorted-matrix/" },
-                { name: "Search in a row and column wise sorted matrix", difficulty: "Medium", leetcode: "https://leetcode.com/problems/search-a-2d-matrix-ii/", gfg: "https://www.geeksforgeeks.org/search-in-row-wise-and-column-wise-sorted-matrix/" },
-                { name: "Find Peak Element (2D Matrix)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/find-a-peak-element-ii/", gfg: "https://www.geeksforgeeks.org/find-peak-element-2d-array/" },
-                { name: "Matrix Median", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-median-row-wise-sorted-matrix/" }
+            "Day 4: Advanced Backtracking": [
+                { name: "Word Search", difficulty: "Medium", leetcode: "https://leetcode.com/problems/word-search/", gfg: "https://www.geeksforgeeks.org/search-a-word-in-a-2d-grid-of-characters/" },
+                { name: "N Queen", difficulty: "Hard", leetcode: "https://leetcode.com/problems/n-queens/", gfg: "https://www.geeksforgeeks.org/n-queen-problem-backtracking-3/" },
+                { name: "Rat in a Maze", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/rat-in-a-maze-backtracking-2/" },
+                { name: "Word Break", difficulty: "Medium", leetcode: "https://leetcode.com/problems/word-break/", gfg: "https://www.geeksforgeeks.org/word-break-problem-dp-32/" },
+                { name: "M Coloring Problem", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/m-coloring-problem-backtracking-5/" },
+                { name: "Sudoko Solver", difficulty: "Hard", leetcode: "https://leetcode.com/problems/sudoku-solver/", gfg: "https://www.geeksforgeeks.org/sudoku-backtracking-7/" },
+                { name: "Expression Add Operators", difficulty: "Hard", leetcode: "https://leetcode.com/problems/expression-add-operators/", gfg: "https://www.geeksforgeeks.org/expression-add-operators/" }
             ]
         };
 
@@ -223,11 +219,10 @@
         // Get section gradient
         function getSectionGradient(section) {
             const gradients = [
-                'from-blue-500 to-purple-600',
-                'from-purple-500 to-pink-600',
-                'from-pink-500 to-rose-600',
-                'from-indigo-500 to-blue-600',
-                'from-cyan-500 to-teal-600'
+                'from-cyan-500 to-blue-600',
+                'from-blue-500 to-indigo-600',
+                'from-indigo-500 to-purple-600',
+                'from-purple-500 to-pink-600'
             ];
             const index = Object.keys(problemData).indexOf(section) % gradients.length;
             return gradients[index];
@@ -286,6 +281,7 @@
             Object.keys(groupedProblems).forEach(section => {
                 const sectionProblems = groupedProblems[section];
                 const completedInSection = sectionProblems.filter(p => problemStatus[p.id]).length;
+                const remainingInSection = sectionProblems.length - completedInSection;
                 const sectionProgress = (completedInSection / sectionProblems.length) * 100;
                 
                 const sectionHtml = `
@@ -296,6 +292,7 @@
                                 <div class="text-right">
                                     <div class="text-sm opacity-90">Progress</div>
                                     <div class="text-lg font-semibold">${completedInSection} / ${sectionProblems.length}</div>
+                                    <div class="text-xs opacity-75">${remainingInSection} remaining</div>
                                 </div>
                             </div>
                             <div class="w-full bg-white/20 rounded-full h-2">
@@ -317,11 +314,11 @@
                                                     ${problemStatus[problem.id] ? 'checked' : ''}
                                                     onchange="toggleProblem('${problem.id}')"
                                                 >
-                                                <div class="w-6 h-6 bg-white dark:bg-gray-600 border-2 border-gray-300 dark:border-gray-500 rounded-lg flex items-center justify-center transition-all duration-300 ${problemStatus[problem.id] ? 'bg-gradient-to-r from-green-500 to-emerald-500 border-green-500' : 'group-hover:border-blue-400'}">
+                                                <div class="w-6 h-6 bg-white dark:bg-gray-600 border-2 border-gray-300 dark:border-gray-500 rounded-lg flex items-center justify-center transition-all duration-300 ${problemStatus[problem.id] ? 'bg-gradient-to-r from-green-500 to-emerald-500 border-green-500' : 'group-hover:border-cyan-400'}">
                                                     <i class="fas fa-check text-white text-sm ${problemStatus[problem.id] ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300"></i>
                                                 </div>
                                             </label>
-                                            <span class="text-gray-800 dark:text-gray-200 font-medium transition-all duration-300 ${problemStatus[problem.id] ? 'line-through opacity-60' : 'group-hover:text-blue-600 dark:group-hover:text-blue-400'} flex-1">${problem.name}</span>
+                                            <span class="text-gray-800 dark:text-gray-200 font-medium transition-all duration-300 ${problemStatus[problem.id] ? 'line-through opacity-60' : 'group-hover:text-cyan-600 dark:group-hover:text-cyan-400'} flex-1">${problem.name}</span>
                                         </div>
                                         <div class="flex items-center space-x-3">
                                             ${generatePlatformLinks(problem)}
@@ -342,7 +339,7 @@
         // Toggle problem completion
         function toggleProblem(problemId) {
             problemStatus[problemId] = !problemStatus[problemId];
-            localStorage.setItem('binaryProblemStatus', JSON.stringify(problemStatus));
+            localStorage.setItem('recursionProblemStatus', JSON.stringify(problemStatus));
             
             // Track user progress for admin
             updateUserProgress();
@@ -375,7 +372,7 @@
                 email: currentUser.email,
                 sheets: {
                     ...userProgress[currentUser.email]?.sheets,
-                    'Binary Search': {
+                    'Recursion': {
                         completed: completed,
                         total: total,
                         percentage: percentage,
@@ -390,9 +387,9 @@
             // Save to Firebase for real-time admin access
             try {
                 await db.collection('userProgress').doc(currentUser.email).set(userProgress[currentUser.email]);
-                console.log('Binary Search progress saved to Firebase successfully');
+                console.log('Recursion progress saved to Firebase successfully');
             } catch (error) {
-                console.error('Error saving Binary Search progress to Firebase:', error);
+                console.error('Error saving Recursion progress to Firebase:', error);
                 // Firebase error is not critical, localStorage backup exists
             }
         }
@@ -401,9 +398,11 @@
         function updateStats() {
             const completed = Object.values(problemStatus).filter(Boolean).length;
             const total = allProblems.length;
+            const remaining = total - completed;
             const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
             
             document.getElementById('completedCount').textContent = completed;
+            document.getElementById('remainingCount').textContent = remaining;
             document.getElementById('totalCount').textContent = total;
             document.getElementById('progressPercentage').textContent = percentage + '%';
             document.getElementById('progressText').textContent = `${completed} / ${total}`;

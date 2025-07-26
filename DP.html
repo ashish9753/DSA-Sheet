@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Binary Search Problem Tracker</title>
+    <title>DSA Dynamic Programming Problem Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <!-- Firebase SDK -->
@@ -15,7 +15,7 @@
         }
     </script>
 </head>
-<body class="bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 min-h-screen transition-all duration-300">
+<body class="bg-gradient-to-br from-gray-50 via-yellow-50 to-orange-50 dark:from-gray-900 dark:via-yellow-900 dark:to-orange-900 min-h-screen transition-all duration-300">
     <!-- Authentication Check -->
     <script>
         // Check authentication first
@@ -32,15 +32,16 @@
         <div class="mb-8">
             <div class="flex justify-between items-center mb-4">
                 <div>
-                    <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                        Binary Search Mastery
+                    <h1 class="text-4xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent mb-2">
+                        Dynamic Programming Sheet
                     </h1>
-                    <p class="text-gray-700 dark:text-gray-300 text-base">Master binary search algorithms step by step — <a href="https://www.linkedin.com/in/ashish2208/" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-2 py-1 rounded shadow transition">Ashish Sharma</a></p>
+                    <p class="text-gray-700 dark:text-gray-300 text-base">Master DP concepts step by step — <a href="https://www.linkedin.com/in/ashish2208/" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-2 py-1 rounded shadow transition">Ashish Sharma</a></p>
                 </div>
                 <div class="flex space-x-4">
-                    <a href="index.html" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-300">
+                    <a href="index.html" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-colors duration-300">
                         ← Back to Hub
                     </a>
+                    <!-- Dark Mode Toggle -->
                     <button 
                         id="darkModeToggle"
                         class="p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700"
@@ -58,8 +59,8 @@
                     <input 
                         type="text" 
                         id="searchInput" 
-                        placeholder="Search problems..." 
-                        class="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300"
+                        placeholder="Search DP problems..." 
+                        class="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300"
                     >
                     <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
                 </div>
@@ -68,11 +69,15 @@
                         <i class="fas fa-check mr-2"></i>
                         Completed: <span id="completedCount" class="font-semibold">0</span>
                     </div>
-                    <div class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl shadow-lg">
-                        <i class="fas fa-list mr-2"></i>
+                    <div class="px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl shadow-lg">
+                        <i class="fas fa-clock mr-2"></i>
+                        Remaining: <span id="remainingCount" class="font-semibold">0</span>
+                    </div>
+                    <div class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl shadow-lg">
+                        <i class="fas fa-layer-group mr-2"></i>
                         Total: <span id="totalCount" class="font-semibold">0</span>
                     </div>
-                    <div class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg">
+                    <div class="px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl shadow-lg">
                         <i class="fas fa-percentage mr-2"></i>
                         <span id="progressPercentage">0%</span>
                     </div>
@@ -87,7 +92,7 @@
                 <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                     <div 
                         id="progressBar" 
-                        class="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all duration-500 ease-out"
+                        class="bg-gradient-to-r from-yellow-500 to-orange-500 h-3 rounded-full transition-all duration-500 ease-out"
                         style="width: 0%"
                     ></div>
                 </div>
@@ -117,11 +122,11 @@
         const db = firebase.firestore();
 
         // Theme management
-        let isDarkMode = localStorage.getItem('darkMode') === 'true' || false;
+        let isDarkMode = localStorage.getItem('dpDarkMode') === 'true' || false;
         
         function toggleDarkMode() {
             isDarkMode = !isDarkMode;
-            localStorage.setItem('darkMode', isDarkMode);
+            localStorage.setItem('dpDarkMode', isDarkMode);
             updateTheme();
         }
 
@@ -139,52 +144,84 @@
         }
 
         // In-memory storage for problem completion status
-        let problemStatus = JSON.parse(localStorage.getItem('binaryProblemStatus')) || {};
+        let problemStatus = JSON.parse(localStorage.getItem('dpProblemStatus')) || {};
         let allProblems = [];
 
-        // Binary Search Problem data - COMPREHENSIVE SET (35 problems)
+        // Dynamic Programming Problem data structure - 56 problems across 9 days
         const problemData = {
-            "Day 1: Fundamentals": [
-                { name: "Binary Search to find X in sorted array", difficulty: "Easy", leetcode: "https://leetcode.com/problems/binary-search/", gfg: "https://www.geeksforgeeks.org/binary-search/" },
-                { name: "Implement Lower Bound", difficulty: "Easy", leetcode: "https://leetcode.com/problems/search-insert-position/", gfg: "https://www.geeksforgeeks.org/lower_bound-in-cpp/" },
-                { name: "Implement Upper Bound", difficulty: "Easy", leetcode: "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/", gfg: "https://www.geeksforgeeks.org/upper_bound-in-cpp/" },
-                { name: "Search Insert Position", difficulty: "Easy", leetcode: "https://leetcode.com/problems/search-insert-position/", gfg: "https://www.geeksforgeeks.org/search-insert-position-of-k-in-a-sorted-array/" },
-                { name: "Floor/Ceil in Sorted Array", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/ceiling-in-a-sorted-array/" }
+            "Day 1: Introduction to DP": [
+                { name: "Dynamic Programming Introduction", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/dynamic-programming/" }
             ],
-            "Day 2: Search Variants": [
-                { name: "Find the first or last occurrence of a given number in a sorted array", difficulty: "Easy", leetcode: "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/", gfg: "https://www.geeksforgeeks.org/find-first-and-last-positions-of-an-element-in-a-sorted-array/" },
-                { name: "Count occurrences of a number in a sorted array with duplicates", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/count-number-of-occurrences-or-frequency-in-a-sorted-array/" },
-                { name: "Search in Rotated Sorted Array I", difficulty: "Medium", leetcode: "https://leetcode.com/problems/search-in-rotated-sorted-array/", gfg: "https://www.geeksforgeeks.org/search-an-element-in-a-sorted-and-pivoted-array/" },
-                { name: "Search in Rotated Sorted Array II", difficulty: "Medium", leetcode: "https://leetcode.com/problems/search-in-rotated-sorted-array-ii/", gfg: "https://www.geeksforgeeks.org/search-element-sorted-rotated-array-duplicate-elements/" },
-                { name: "Find minimum in Rotated Sorted Array", difficulty: "Medium", leetcode: "https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/", gfg: "https://www.geeksforgeeks.org/find-minimum-element-in-a-sorted-and-rotated-array/" },
-                { name: "Find out how many times has an array been rotated", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-rotation-count-rotated-sorted-array/" },
-                { name: "Single element in a Sorted Array", difficulty: "Easy", leetcode: "https://leetcode.com/problems/single-element-in-a-sorted-array/", gfg: "https://www.geeksforgeeks.org/find-the-element-that-appears-once-in-a-sorted-array/" },
-                { name: "Find peak element", difficulty: "Hard", leetcode: "https://leetcode.com/problems/find-peak-element/", gfg: "https://www.geeksforgeeks.org/find-a-peak-in-a-given-array/" }
+            "Day 2: 1D DP": [
+                { name: "Climbing Stars", difficulty: "Medium", leetcode: "https://leetcode.com/problems/climbing-stairs/", gfg: "https://www.geeksforgeeks.org/count-ways-reach-nth-stair/" },
+                { name: "Frog Jump(DP-3)", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/minimum-number-of-jumps-to-reach-end-of-a-given-array/" },
+                { name: "Frog Jump with k distances(DP-4)", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/minimum-number-of-jumps-to-reach-end-of-a-given-array/" },
+                { name: "Maximum sum of non-adjacent elements (DP 5)", difficulty: "Medium", leetcode: "https://leetcode.com/problems/house-robber/", gfg: "https://www.geeksforgeeks.org/maximum-sum-such-that-no-two-elements-are-adjacent/" },
+                { name: "House Robber (DP 6)", difficulty: "Medium", leetcode: "https://leetcode.com/problems/house-robber/", gfg: "https://www.geeksforgeeks.org/find-maximum-possible-stolen-value-houses/" }
             ],
-            "Day 3: Mathematical Binary Search": [
-                { name: "Find square root of a number in log n", difficulty: "Medium", leetcode: "https://leetcode.com/problems/sqrtx/", gfg: "https://www.geeksforgeeks.org/square-root-of-an-integer/" },
-                { name: "Find the Nth root of a number using binary search", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/problems/find-nth-root-of-m5843/1" },
-                { name: "Koko Eating Bananas", difficulty: "Hard", leetcode: "https://leetcode.com/problems/koko-eating-bananas/", gfg: "https://www.geeksforgeeks.org/koko-eating-bananas/" },
-                { name: "Minimum days to make M bouquets", difficulty: "Hard", leetcode: "https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/", gfg: "https://www.geeksforgeeks.org/minimum-days-to-make-m-bouquets/" },
-                { name: "Find the smallest Divisor", difficulty: "Easy", leetcode: "https://leetcode.com/problems/find-the-smallest-divisor-given-a-threshold/", gfg: "http://geeksforgeeks.org/dsa/smallest-divisor-for-sum-constraint-in-array-division/" },
-                { name: "Capacity to Ship Packages within D Days", difficulty: "Hard", leetcode: "https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/", gfg: "https://www.geeksforgeeks.org/capacity-to-ship-packages-within-d-days/" },
-                { name: "Kth Missing Positive Number", difficulty: "Easy", leetcode: "https://leetcode.com/problems/kth-missing-positive-number/", gfg: "https://www.geeksforgeeks.org/kth-missing-positive-number-in-sorted-array/" }
+            "Day 3: 2D/3D DP and DP on Grids": [
+                { name: "Ninja's Training (DP 7)", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/maximum-points-ninja-can-earn/" },
+                { name: "Grid Unique Paths : DP on Grids (DP8)", difficulty: "Medium", leetcode: "https://leetcode.com/problems/unique-paths/", gfg: "https://www.geeksforgeeks.org/count-possible-paths-top-left-bottom-right-nxm-matrix/" },
+                { name: "Grid Unique Paths 2 (DP 9)", difficulty: "Medium", leetcode: "https://leetcode.com/problems/unique-paths-ii/", gfg: "https://www.geeksforgeeks.org/unique-paths-in-a-grid-with-obstacles/" },
+                { name: "Minimum path sum in Grid (DP 10)", difficulty: "Medium", leetcode: "https://leetcode.com/problems/minimum-path-sum/", gfg: "https://www.geeksforgeeks.org/minimum-sum-path-in-a-triangle/" },
+                { name: "Minimum path sum in Triangular Grid (DP 11)", difficulty: "Medium", leetcode: "https://leetcode.com/problems/triangle/", gfg: "https://www.geeksforgeeks.org/minimum-sum-path-in-a-triangle/" },
+                { name: "Minimum/Maximum Falling Path Sum (DP-12)", difficulty: "Medium", leetcode: "https://leetcode.com/problems/falling-path-sum/", gfg: "https://www.geeksforgeeks.org/minimum-sum-falling-path-in-a-nxn-grid/" },
+                { name: "3-d DP : Ninja and his friends (DP-13)", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/cherry-pickup-problem/" }
             ],
-            "Day 4: Advanced Applications": [
-                { name: "Aggressive Cows", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/aggressive-cows-problem/" },
-                { name: "Book Allocation Problem", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/allocate-minimum-number-pages/" },
-                { name: "Split array - Largest Sum", difficulty: "Hard", leetcode: "https://leetcode.com/problems/split-array-largest-sum/", gfg: "https://www.geeksforgeeks.org/split-array-largest-sum/" },
-                { name: "Painter's partition", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/painters-partition-problem/" },
-                { name: "Minimize Max Distance to Gas Station", difficulty: "Hard", leetcode: "https://leetcode.com/problems/minimize-max-distance-to-gas-station/", gfg: "https://www.geeksforgeeks.org/minimize-max-distance-gas-station/" },
-                { name: "Median of 2 sorted arrays", difficulty: "Hard", leetcode: "https://leetcode.com/problems/median-of-two-sorted-arrays/", gfg: "https://www.geeksforgeeks.org/median-of-two-sorted-arrays/" },
-                { name: "Kth element of 2 sorted arrays", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/k-th-element-two-sorted-arrays/" }
+            "Day 4: DP on Subsequences": [
+                { name: "Subset sum equal to target (DP- 14)", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/subset-sum-problem-dp-25/" },
+                { name: "Unbounded Knapsack (DP - 23)", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/unbounded-knapsack-repetition-items-allowed/" },
+                { name: "Rod Cutting Problem | (DP - 24)", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/cutting-a-rod-dp-13/" },
+                { name: "Partition Equal Subset Sum (DP- 15)", difficulty: "Medium", leetcode: "https://leetcode.com/problems/partition-equal-subset-sum/", gfg: "https://www.geeksforgeeks.org/partition-problem-dp-18/" },
+                { name: "Partition Set Into 2 Subsets With Min Absolute Sum Diff (DP- 16)", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/partition-a-set-into-two-subsets-such-that-the-difference-of-subset-sums-is-minimum/" },
+                { name: "Count Subsets with Sum K (DP - 17)", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/count-of-subsets-with-sum-equal-to-x/" },
+                { name: "Count Partitions with Given Difference (DP - 18)", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/count-subsets-given-difference/" },
+                { name: "Assign Cookies", difficulty: "Hard", leetcode: "https://leetcode.com/problems/assign-cookies/", gfg: "https://www.geeksforgeeks.org/assign-cookies/" },
+                { name: "Minimum Coins (DP - 20)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/coin-change/", gfg: "https://www.geeksforgeeks.org/find-minimum-number-of-coins-that-make-a-change/" },
+                { name: "Target Sum (DP - 21)", difficulty: "Medium", leetcode: "https://leetcode.com/problems/target-sum/", gfg: "https://www.geeksforgeeks.org/target-sum/" },
+                { name: "Coin Change 2 (DP - 22)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/coin-change-2/", gfg: "https://www.geeksforgeeks.org/coin-change-dp-7/" }
             ],
-            "Day 5: 2D Binary Search": [
-                { name: "Find the row with maximum number of 1's", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-the-row-with-maximum-number-1s/" },
-                { name: "Search in a 2D matrix", difficulty: "Medium", leetcode: "https://leetcode.com/problems/search-a-2d-matrix/", gfg: "https://www.geeksforgeeks.org/search-in-row-wise-and-column-wise-sorted-matrix/" },
-                { name: "Search in a row and column wise sorted matrix", difficulty: "Medium", leetcode: "https://leetcode.com/problems/search-a-2d-matrix-ii/", gfg: "https://www.geeksforgeeks.org/search-in-row-wise-and-column-wise-sorted-matrix/" },
-                { name: "Find Peak Element (2D Matrix)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/find-a-peak-element-ii/", gfg: "https://www.geeksforgeeks.org/find-peak-element-2d-array/" },
-                { name: "Matrix Median", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-median-row-wise-sorted-matrix/" }
+            "Day 5: DP on Strings": [
+                { name: "Longest Common Subsequence | (DP - 25)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/longest-common-subsequence/", gfg: "https://www.geeksforgeeks.org/longest-common-subsequence-dp-4/" },
+                { name: "Wildcard Matching | (DP-34)", difficulty: "Medium", leetcode: "https://leetcode.com/problems/wildcard-matching/", gfg: "https://www.geeksforgeeks.org/wildcard-pattern-matching/" },
+                { name: "Print Longest Common Subsequence | (DP - 26)", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/printing-longest-common-subsequence/" },
+                { name: "Longest Common Substring | (DP - 27)", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/longest-common-substring-dp-29/" },
+                { name: "Longest Palindromic Subsequence | (DP-28)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/longest-palindromic-subsequence/", gfg: "https://www.geeksforgeeks.org/longest-palindromic-subsequence-dp-12/" },
+                { name: "Minimum insertions to make string palindrome | DP-29", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/minimum-insertions-to-form-a-palindrome-dp-28/" },
+                { name: "Minimum Insertions/Deletions to Convert String | (DP- 30)", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/minimum-number-deletions-insertions-transform-one-string-another/" },
+                { name: "Shortest Common Supersequence | (DP - 31)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/shortest-common-supersequence/", gfg: "https://www.geeksforgeeks.org/shortest-common-supersequence/" },
+                { name: "Distinct Subsequences| (DP-32)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/distinct-subsequences/", gfg: "https://www.geeksforgeeks.org/distinct-subsequences-problem/" },
+                { name: "Edit Distance | (DP-33)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/edit-distance/", gfg: "https://www.geeksforgeeks.org/edit-distance-dp-5/" }
+            ],
+            "Day 6: DP on Stocks": [
+                { name: "Best Time to Buy and Sell Stock |(DP-35)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/", gfg: "https://www.geeksforgeeks.org/best-time-to-buy-and-sell-stock/" },
+                { name: "Buy and Sell Stock - II|(DP-36)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/", gfg: "https://www.geeksforgeeks.org/stock-buy-sell/" },
+                { name: "Buy and Sell Stocks III|(DP-37)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii/", gfg: "https://www.geeksforgeeks.org/buy-and-sell-a-share-at-most-twice/" },
+                { name: "Buy and Stock Sell IV |(DP-38)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/", gfg: "https://www.geeksforgeeks.org/best-time-to-buy-and-sell-stocks-with-transaction-fee/" },
+                { name: "Buy and Sell Stocks With Cooldown|(DP-39)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/", gfg: "https://www.geeksforgeeks.org/stock-buy-sell-k-transactions-allowed/" },
+                { name: "Buy and Sell Stocks With Transaction Fee|(DP-40)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/", gfg: "https://www.geeksforgeeks.org/best-time-to-buy-and-sell-stocks-with-transaction-fee/" }
+            ],
+            "Day 7: DP on LIS": [
+                { name: "Longest Increasing Subsequence |(DP-41)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/longest-increasing-subsequence/", gfg: "https://www.geeksforgeeks.org/longest-increasing-subsequence-dp-3/" },
+                { name: "Printing Longest Increasing Subsequence|(DP-42)", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/construction-of-longest-increasing-subsequence-using-dynamic-programming/" },
+                { name: "Longest Increasing Subsequence |(DP-43)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/longest-increasing-subsequence/", gfg: "https://www.geeksforgeeks.org/longest-increasing-subsequence-dp-3/" },
+                { name: "Largest Divisible Subset|(DP-44)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/largest-divisible-subset/", gfg: "https://www.geeksforgeeks.org/largest-divisible-subset-array/" },
+                { name: "Longest String Chain|(DP-45)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/longest-string-chain/", gfg: "https://www.geeksforgeeks.org/longest-string-chain/" },
+                { name: "Longest Bitonic Subsequence |(DP-46)", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/longest-bitonic-subsequence-dp-15/" },
+                { name: "Number of Longest Increasing Subsequences|(DP-47)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/number-of-longest-increasing-subsequence/", gfg: "https://www.geeksforgeeks.org/number-of-longest-increasing-subsequences/" }
+            ],
+            "Day 8: MCM DP | Partition DP": [
+                { name: "Matrix Chain Multiplication|(DP-48)", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/matrix-chain-multiplication-dp-8/" },
+                { name: "Matrix Chain Multiplication | Bottom-Up|(DP-49)", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/matrix-chain-multiplication-dp-8/" },
+                { name: "Minimum Cost to Cut the Stick|(DP-50)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/minimum-cost-to-cut-a-stick/", gfg: "https://www.geeksforgeeks.org/minimum-cost-to-cut-a-board-into-squares/" },
+                { name: "Burst Balloons|(DP-51)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/burst-balloons/", gfg: "https://www.geeksforgeeks.org/burst-balloon-to-maximize-coins/" },
+                { name: "Evaluate Boolean Expression to True|(DP-52)", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/boolean-parenthesization-problem-dp-37/" },
+                { name: "Palindrome Partitioning - II|(DP-53)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/palindrome-partitioning-ii/", gfg: "https://www.geeksforgeeks.org/palindrome-partitioning-dp-17/" },
+                { name: "Partition Array for Maximum Sum|(DP-54)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/partition-array-for-maximum-sum/", gfg: "https://www.geeksforgeeks.org/partition-array-maximum-sum/" }
+            ],
+            "Day 9: DP on Squares": [
+                { name: "Maximum Rectangle Area with all 1's|(DP-55)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/maximal-rectangle/", gfg: "https://www.geeksforgeeks.org/maximum-size-rectangle-binary-sub-matrix-1s/" },
+                { name: "Count Square Submatrices with All Ones|(DP-56)", difficulty: "Hard", leetcode: "https://leetcode.com/problems/count-square-submatrices-with-all-ones/", gfg: "https://www.geeksforgeeks.org/count-square-submatrices-with-all-ones/" }
             ]
         };
 
@@ -223,11 +260,15 @@
         // Get section gradient
         function getSectionGradient(section) {
             const gradients = [
-                'from-blue-500 to-purple-600',
-                'from-purple-500 to-pink-600',
-                'from-pink-500 to-rose-600',
+                'from-yellow-500 to-orange-600',
+                'from-orange-500 to-red-600',
+                'from-red-500 to-pink-600',
+                'from-pink-500 to-purple-600',
+                'from-purple-500 to-indigo-600',
                 'from-indigo-500 to-blue-600',
-                'from-cyan-500 to-teal-600'
+                'from-blue-500 to-cyan-600',
+                'from-cyan-500 to-teal-600',
+                'from-teal-500 to-green-600'
             ];
             const index = Object.keys(problemData).indexOf(section) % gradients.length;
             return gradients[index];
@@ -286,6 +327,7 @@
             Object.keys(groupedProblems).forEach(section => {
                 const sectionProblems = groupedProblems[section];
                 const completedInSection = sectionProblems.filter(p => problemStatus[p.id]).length;
+                const remainingInSection = sectionProblems.length - completedInSection;
                 const sectionProgress = (completedInSection / sectionProblems.length) * 100;
                 
                 const sectionHtml = `
@@ -296,6 +338,7 @@
                                 <div class="text-right">
                                     <div class="text-sm opacity-90">Progress</div>
                                     <div class="text-lg font-semibold">${completedInSection} / ${sectionProblems.length}</div>
+                                    <div class="text-xs opacity-75">${remainingInSection} remaining</div>
                                 </div>
                             </div>
                             <div class="w-full bg-white/20 rounded-full h-2">
@@ -317,11 +360,11 @@
                                                     ${problemStatus[problem.id] ? 'checked' : ''}
                                                     onchange="toggleProblem('${problem.id}')"
                                                 >
-                                                <div class="w-6 h-6 bg-white dark:bg-gray-600 border-2 border-gray-300 dark:border-gray-500 rounded-lg flex items-center justify-center transition-all duration-300 ${problemStatus[problem.id] ? 'bg-gradient-to-r from-green-500 to-emerald-500 border-green-500' : 'group-hover:border-blue-400'}">
+                                                <div class="w-6 h-6 bg-white dark:bg-gray-600 border-2 border-gray-300 dark:border-gray-500 rounded-lg flex items-center justify-center transition-all duration-300 ${problemStatus[problem.id] ? 'bg-gradient-to-r from-green-500 to-emerald-500 border-green-500' : 'group-hover:border-yellow-400'}">
                                                     <i class="fas fa-check text-white text-sm ${problemStatus[problem.id] ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300"></i>
                                                 </div>
                                             </label>
-                                            <span class="text-gray-800 dark:text-gray-200 font-medium transition-all duration-300 ${problemStatus[problem.id] ? 'line-through opacity-60' : 'group-hover:text-blue-600 dark:group-hover:text-blue-400'} flex-1">${problem.name}</span>
+                                            <span class="text-gray-800 dark:text-gray-200 font-medium transition-all duration-300 ${problemStatus[problem.id] ? 'line-through opacity-60' : 'group-hover:text-yellow-600 dark:group-hover:text-yellow-400'} flex-1">${problem.name}</span>
                                         </div>
                                         <div class="flex items-center space-x-3">
                                             ${generatePlatformLinks(problem)}
@@ -342,7 +385,7 @@
         // Toggle problem completion
         function toggleProblem(problemId) {
             problemStatus[problemId] = !problemStatus[problemId];
-            localStorage.setItem('binaryProblemStatus', JSON.stringify(problemStatus));
+            localStorage.setItem('dpProblemStatus', JSON.stringify(problemStatus));
             
             // Track user progress for admin
             updateUserProgress();
@@ -375,7 +418,7 @@
                 email: currentUser.email,
                 sheets: {
                     ...userProgress[currentUser.email]?.sheets,
-                    'Binary Search': {
+                    'DP': {
                         completed: completed,
                         total: total,
                         percentage: percentage,
@@ -390,9 +433,9 @@
             // Save to Firebase for real-time admin access
             try {
                 await db.collection('userProgress').doc(currentUser.email).set(userProgress[currentUser.email]);
-                console.log('Binary Search progress saved to Firebase successfully');
+                console.log('DP progress saved to Firebase successfully');
             } catch (error) {
-                console.error('Error saving Binary Search progress to Firebase:', error);
+                console.error('Error saving DP progress to Firebase:', error);
                 // Firebase error is not critical, localStorage backup exists
             }
         }
@@ -401,9 +444,11 @@
         function updateStats() {
             const completed = Object.values(problemStatus).filter(Boolean).length;
             const total = allProblems.length;
+            const remaining = total - completed;
             const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
             
             document.getElementById('completedCount').textContent = completed;
+            document.getElementById('remainingCount').textContent = remaining;
             document.getElementById('totalCount').textContent = total;
             document.getElementById('progressPercentage').textContent = percentage + '%';
             document.getElementById('progressText').textContent = `${completed} / ${total}`;
