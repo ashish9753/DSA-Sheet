@@ -383,14 +383,24 @@
 
         async function deleteUserFromFirebase(userId) {
             try {
+                // Delete from users collection
                 await db.collection('users').doc(userId.toString()).delete();
-                console.log('User deleted from Firebase');
+                
+                // Also delete from userProgress collection to clean up completely
+                await db.collection('userProgress').doc(userId.toString()).delete();
+                
+                console.log('User and progress data deleted from Firebase');
             } catch (error) {
                 console.error('Error deleting user:', error);
                 // Fallback to localStorage
                 const users = JSON.parse(localStorage.getItem('users') || '[]');
                 const filteredUsers = users.filter(user => user.id !== userId);
                 localStorage.setItem('users', JSON.stringify(filteredUsers));
+                
+                // Also clean up progress from localStorage
+                const userProgress = JSON.parse(localStorage.getItem('userProgress') || '{}');
+                delete userProgress[userId.toString()];
+                localStorage.setItem('userProgress', JSON.stringify(userProgress));
             }
         }
 

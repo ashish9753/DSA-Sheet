@@ -117,6 +117,52 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // Auto-logout if user is deleted from Firebase
+        async function verifyUserExists() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const isAdmin = localStorage.getItem('isAdmin');
+            
+            // Skip verification for admin users
+            if (isAdmin === 'true') {
+                return true;
+            }
+            
+            if (!currentUser || !currentUser.email) {
+                return true; // Let normal auth flow handle this
+            }
+            
+            try {
+                // Check if user still exists in Firebase
+                const userDoc = await db.collection('users').doc(currentUser.email).get();
+                
+                if (!userDoc.exists) {
+                    // User has been deleted from Firebase, logout immediately
+                    console.log('User deleted by admin, logging out...');
+                    localStorage.removeItem('currentUser');
+                    localStorage.removeItem('userProgress');
+                    localStorage.removeItem('collegeProblemStatus');
+                    localStorage.removeItem('collegeDarkMode');
+                    
+                    // Show notification and redirect
+                    alert('Your account has been removed by the administrator. You will be redirected to the login page.');
+                    window.location.href = 'auth.html';
+                    return false;
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('Error verifying user:', error);
+                // On error, allow user to continue (Firebase might be temporarily unavailable)
+                return true;
+            }
+        }
+
+        // Run verification on page load and periodically
+        verifyUserExists();
+        
+        // Check every 30 seconds if user still exists
+        setInterval(verifyUserExists, 30000);
+
         // Theme management
         let isDarkMode = localStorage.getItem('collegeDarkMode') === 'true' || false;
         
