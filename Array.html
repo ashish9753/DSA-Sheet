@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA Problem Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 min-h-screen transition-all duration-300">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                        DSA Array Sheet.
+                    </h1>
+                    <p class="text-gray-700 dark:text-gray-300 text-base">Track your progress through coding problems with style — <a href="https://www.linkedin.com/in/ashish2208/" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-2 py-1 rounded shadow transition">Ashish Sharma</a></p>
+
+                </div>
+                <!-- Navigation and Dark Mode Toggle -->
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-300 flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Hub
+                    </a>
+                    <button 
+                        id="darkModeToggle"
+                        class="p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700"
+                    >
+                        <i class="fas fa-moon text-gray-600 dark:text-yellow-400 text-xl" id="darkModeIcon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Stats -->
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 mb-6">
+            <div class="flex flex-col md:flex-row gap-6 items-center justify-between">
+                <div class="relative flex-1 max-w-md">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Search problems..." 
+                        class="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300"
+                    >
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
+                </div>
+                <div class="flex gap-4 text-sm">
+                    <div class="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl shadow-lg">
+                        <i class="fas fa-check mr-2"></i>
+                        Completed: <span id="completedCount" class="font-semibold">0</span>
+                    </div>
+                    <div class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl shadow-lg">
+                        <i class="fas fa-list mr-2"></i>
+                        Total: <span id="totalCount" class="font-semibold">0</span>
+                    </div>
+                    <div class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg">
+                        <i class="fas fa-percentage mr-2"></i>
+                        <span id="progressPercentage">0%</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Progress Bar -->
+            <div class="mt-4">
+                <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    <span>Overall Progress</span>
+                    <span id="progressText">0 / 0</span>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                    <div 
+                        id="progressBar" 
+                        class="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all duration-500 ease-out"
+                        style="width: 0%"
+                    ></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Problem Sections -->
+        <div id="problemSections" class="space-y-6">
+            <!-- Sections will be populated here -->
+        </div>
+    </div>
+
+    <script>
+        // Theme management
+        let isDarkMode = localStorage.getItem('darkMode') === 'true' || false;
+        
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            localStorage.setItem('darkMode', isDarkMode);
+            updateTheme();
+        }
+
+        function updateTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('darkModeIcon');
+            
+            if (isDarkMode) {
+                html.classList.add('dark');
+                icon.className = 'fas fa-sun text-yellow-400 text-xl';
+            } else {
+                html.classList.remove('dark');
+                icon.className = 'fas fa-moon text-gray-600 text-xl';
+            }
+        }
+
+        // In-memory storage for problem completion status
+        let problemStatus = JSON.parse(localStorage.getItem('problemStatus')) || {};
+        let allProblems = [];
+
+        // Problem data structure with platform links
+        const problemData = {
+            "Day 1: Basic": [
+                { name: "Largest Element in an Array", difficulty: "Easy", leetcode: "https://leetcode.com/problems/largest-number/", gfg: "https://www.geeksforgeeks.org/c-program-find-largest-element-array/" },
+                { name: "Check if the array is sorted", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/program-check-array-sorted-not-iterative-recursive/" },
+                { name: "Second Largest Element in an Array without sorting", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-second-largest-element-array/" },
+                { name: "Linear Search", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/linear-search/" },
+                { name: "Left Rotate an array by one place", difficulty: "Easy", leetcode: "https://leetcode.com/problems/rotate-array/", gfg: "https://www.geeksforgeeks.org/array-rotation/" },
+                { name: "Single Number (Every element appears twice except one)", difficulty: "Easy", leetcode: "https://leetcode.com/problems/single-number/", gfg: "" },
+                { name: "Two Sum (Find indices of two numbers that add up to target)", difficulty: "Easy", leetcode: "https://leetcode.com/problems/two-sum/", gfg: "" }
+
+
+            ],
+            "Day 2: Easy": [
+                { name: "Maximum Consecutive Ones", difficulty: "Easy", leetcode: "https://leetcode.com/problems/max-consecutive-ones/", gfg: "https://www.geeksforgeeks.org/count-maximum-consecutive-ones-in-binary-string/" },
+                { name: "Move Zeros to end", difficulty: "Easy", leetcode: "https://leetcode.com/problems/move-zeroes/", gfg: "https://www.geeksforgeeks.org/move-zeroes-end-array/" },
+                { name: "Left rotate an array by D places", difficulty: "Easy", leetcode: "https://leetcode.com/problems/rotate-array/", gfg: "https://www.geeksforgeeks.org/array-rotation/" },
+                { name: "Remove duplicates from Sorted array", difficulty: "Easy", leetcode: "https://leetcode.com/problems/remove-duplicates-from-sorted-array/", gfg: "https://www.geeksforgeeks.org/remove-duplicates-sorted-array/" },
+                { name: "Find missing number in an array", difficulty: "Easy", leetcode: "https://leetcode.com/problems/missing-number/", gfg: "https://www.geeksforgeeks.org/find-the-missing-number/" },
+                { name: "Find the number that appears once, and other numbers twice.", difficulty: "Medium", leetcode: "https://leetcode.com/problems/single-number/", gfg: "https://www.geeksforgeeks.org/find-the-element-that-appears-once/" },
+                { name: "Find the Union", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-union-and-intersection-of-two-unsorted-arrays/" },
+                { name: "2Sum Problem", difficulty: "Medium", leetcode: "https://leetcode.com/problems/two-sum/", gfg: "https://www.geeksforgeeks.org/given-an-array-a-and-a-number-x-check-for-pair-in-a-with-sum-as-x/" },
+                { name: "Sort Colors (Dutch National Flag Problem)", difficulty: "Medium", leetcode: "https://leetcode.com/problems/sort-colors/", gfg: "" }
+
+            ],
+            "Day 3: Medium": [
+                { name: "Search in a 2 D matrix", difficulty: "Medium", leetcode: "https://leetcode.com/problems/search-a-2d-matrix/", gfg: "https://www.geeksforgeeks.org/search-in-row-wise-and-column-wise-sorted-matrix/" },
+                { name: "Leaders in an Array problem", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/leaders-in-an-array/" },
+                { name: "Print the matrix in spiral manner", difficulty: "Medium", leetcode: "https://leetcode.com/problems/spiral-matrix/", gfg: "https://www.geeksforgeeks.org/print-a-given-matrix-in-spiral-form/" },
+                { name: "Rotate Matrix by 90 degrees", difficulty: "Medium", leetcode: "https://leetcode.com/problems/rotate-image/", gfg: "https://www.geeksforgeeks.org/rotate-a-matrix-by-90-degree-in-clockwise-direction/" },
+                { name: "Stock Buy and Sell", difficulty: "Easy", leetcode: "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/", gfg: "https://www.geeksforgeeks.org/best-time-to-buy-and-sell-stock/" },
+                { name: "Rearrange the array in alternating positive and negative items", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/rearrange-array-alternating-positive-negative-items-o1-extra-space/" },
+                { name: "Find the duplicate in an array of N+1 integers", difficulty: "Medium", leetcode: "https://leetcode.com/problems/find-the-duplicate-number/", gfg: "https://www.geeksforgeeks.org/find-duplicates-in-on-time-and-constant-extra-space/" },
+                { name: "Kadane's Algorithm, maximum subarray sum", difficulty: "Easy", leetcode: "https://leetcode.com/problems/maximum-subarray/", gfg: "https://www.geeksforgeeks.org/largest-sum-contiguous-subarray/" },
+                { name: "Print subarray with maximum subarray sum (extended version of above problem)", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/print-the-maximum-subarray-sum/" },
+                { name: "Grid Unique Paths", difficulty: "Medium", leetcode: "https://leetcode.com/problems/unique-paths/", gfg: "https://www.geeksforgeeks.org/count-possible-paths-top-left-bottom-right-nxm-matrix/" },
+                { name: "Sort an array of 0's, 1's and 2's", difficulty: "Medium", leetcode: "https://leetcode.com/problems/sort-colors/", gfg: "https://www.geeksforgeeks.org/sort-an-array-of-0s-1s-and-2s/" },
+                { name: "Pascal's Triangle", difficulty: "Medium", leetcode: "https://leetcode.com/problems/pascals-triangle/", gfg: "https://www.geeksforgeeks.org/pascal-triangle/" }
+            ],
+            "Day 4: Hard": [
+                { name: "Majority Element (>n/2 times)", difficulty: "Easy", leetcode: "https://leetcode.com/problems/majority-element/", gfg: "https://www.geeksforgeeks.org/majority-element/" },
+                { name: "Next Permutation", difficulty: "Medium", leetcode: "https://leetcode.com/problems/next-permutation/", gfg: "https://www.geeksforgeeks.org/find-next-greater-number-set-digits/" },
+                { name: "Set Matrix Zeros", difficulty: "Medium", leetcode: "https://leetcode.com/problems/set-matrix-zeroes/", gfg: "https://www.geeksforgeeks.org/a-boolean-matrix-question/" },
+                { name: "Majority Element (n/3 times)", difficulty: "Medium", leetcode: "https://leetcode.com/problems/majority-element-ii/", gfg: "https://www.geeksforgeeks.org/given-an-array-of-of-size-n-finds-all-the-elements-that-appear-more-than-nk-times/" },
+                { name: "Merge Overlapping Subintervals", difficulty: "Medium", leetcode: "https://leetcode.com/problems/merge-intervals/", gfg: "https://www.geeksforgeeks.org/merging-intervals/" },
+                { name: "Merge two sorted arrays without extra space", difficulty: "Medium", leetcode: "https://leetcode.com/problems/merge-sorted-array/", gfg: "https://www.geeksforgeeks.org/merge-two-sorted-arrays-o1-extra-space/" },
+                { name: "Longest Consecutive Sequence in an Array", difficulty: "Medium", leetcode: "https://leetcode.com/problems/longest-consecutive-sequence/", gfg: "https://www.geeksforgeeks.org/longest-consecutive-subsequence/" },
+                { name: "Longest subarray with given sum K(positives)", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/longest-sub-array-sum-k/" },
+                { name: "Longest subarray with sum K (Positives + Negatives)", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/longest-subarray-sum-k-set-2/" },
+                { name: "Count subarrays with given sum", difficulty: "Easy", leetcode: "https://leetcode.com/problems/subarray-sum-equals-k/", gfg: "https://www.geeksforgeeks.org/number-subarrays-sum-exactly-equal-k/" },
+                { name: "Count number of subarrays with given xor K", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/count-number-of-subarrays-with-given-xor/" }
+            ],
+            "Day 5: Expert": [
+                { name: "3-Sum Problem", difficulty: "Medium", leetcode: "https://leetcode.com/problems/3sum/", gfg: "https://www.geeksforgeeks.org/find-a-triplet-that-sum-to-a-given-value/" },
+                { name: "4-Sum Problem", difficulty: "Hard", leetcode: "https://leetcode.com/problems/4sum/", gfg: "https://www.geeksforgeeks.org/find-four-numbers-with-sum-equal-to-given-sum/" },
+                { name: "Find the repeating and missing number", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-a-repeating-and-a-missing-number/" },
+                { name: "Maximum Product Subarray", difficulty: "Easy", leetcode: "https://leetcode.com/problems/maximum-product-subarray/", gfg: "https://www.geeksforgeeks.org/maximum-product-subarray/" },
+                { name: "Merge Sort", difficulty: "Medium", leetcode: "https://leetcode.com/problems/sort-an-array/", gfg: "https://www.geeksforgeeks.org/merge-sort/" },
+                { name: "Count Inversions", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/counting-inversions/" },
+                { name: "Reverse Pairs", difficulty: "Hard", leetcode: "https://leetcode.com/problems/reverse-pairs/", gfg: "https://www.geeksforgeeks.org/counting-inversions/" }
+            ]
+        };
+
+        // Initialize problem list
+        function initializeProblems() {
+            allProblems = [];
+            Object.keys(problemData).forEach(section => {
+                problemData[section].forEach(problem => {
+                    allProblems.push({
+                        section: section,
+                        name: problem.name,
+                        difficulty: problem.difficulty,
+                        leetcode: problem.leetcode,
+                        gfg: problem.gfg,
+                        id: generateId(problem.name)
+                    });
+                });
+            });
+        }
+
+        // Generate unique ID for each problem
+        function generateId(name) {
+            return name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        }
+
+        // Get difficulty color
+        function getDifficultyColor(difficulty) {
+            switch(difficulty) {
+                case 'Easy': return 'bg-gradient-to-r from-green-500 to-emerald-500 text-white';
+                case 'Medium': return 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white';
+                case 'Hard': return 'bg-gradient-to-r from-red-500 to-pink-500 text-white';
+                default: return 'bg-gradient-to-r from-gray-500 to-gray-600 text-white';
+            }
+        }
+
+        // Get section gradient
+        function getSectionGradient(section) {
+            const gradients = [
+                'from-blue-500 to-purple-600',
+                'from-purple-500 to-pink-600',
+                'from-pink-500 to-rose-600',
+                'from-indigo-500 to-blue-600',
+                'from-cyan-500 to-teal-600'
+            ];
+            const index = Object.keys(problemData).indexOf(section) % gradients.length;
+            return gradients[index];
+        }
+
+        // Generate platform links HTML
+        function generatePlatformLinks(problem) {
+            let linksHtml = '';
+            
+            if (problem.leetcode) {
+                linksHtml += `
+                    <a href="${problem.leetcode}" target="_blank" 
+                       class="p-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+                       title="Open in LeetCode">
+                        <i class="fab fa-leetcode text-lg"></i>
+                    </a>
+                `;
+            } else if (problem.gfg) {
+                linksHtml += `
+                    <a href="${problem.gfg}" target="_blank" 
+                       class="p-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+                       title="Open in GeeksforGeeks">
+                        <i class="fas fa-code text-lg"></i>
+                    </a>
+                `;
+            } else {
+                linksHtml += `
+                    <div class="p-2 bg-red-500 text-white rounded-lg opacity-50 cursor-not-allowed" 
+                         title="No link available">
+                        <i class="fas fa-times text-lg"></i>
+                    </div>
+                `;
+            }
+            
+            return linksHtml;
+        }
+
+        // Render problems
+        function renderProblems(problems = allProblems) {
+            const container = document.getElementById('problemSections');
+            container.innerHTML = '';
+
+            // Group problems by section
+            const groupedProblems = {};
+            problems.forEach(problem => {
+                if (!groupedProblems[problem.section]) {
+                    groupedProblems[problem.section] = [];
+                }
+                groupedProblems[problem.section].push(problem);
+            });
+
+            Object.keys(groupedProblems).forEach(section => {
+                const sectionProblems = groupedProblems[section];
+                const completedInSection = sectionProblems.filter(p => problemStatus[p.id]).length;
+                const sectionProgress = (completedInSection / sectionProblems.length) * 100;
+                
+                const sectionHtml = `
+                    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-2xl transition-all duration-300">
+                        <div class="bg-gradient-to-r ${getSectionGradient(section)} text-white p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <h2 class="text-2xl font-bold">${section}</h2>
+                                <div class="text-right">
+                                    <div class="text-sm opacity-90">Progress</div>
+                                    <div class="text-lg font-semibold">${completedInSection} / ${sectionProblems.length}</div>
+                                </div>
+                            </div>
+                            <div class="w-full bg-white/20 rounded-full h-2">
+                                <div 
+                                    class="bg-white h-2 rounded-full transition-all duration-500"
+                                    style="width: ${sectionProgress}%"
+                                ></div>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-3">
+                                ${sectionProblems.map(problem => `
+                                    <div class="group flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600/50 transition-all duration-300 hover:shadow-lg">
+                                        <div class="flex items-center space-x-4 flex-1">
+                                            <label class="relative cursor-pointer">
+                                                <input 
+                                                    type="checkbox" 
+                                                    class="sr-only"
+                                                    ${problemStatus[problem.id] ? 'checked' : ''}
+                                                    onchange="toggleProblem('${problem.id}')"
+                                                >
+                                                <div class="w-6 h-6 bg-white dark:bg-gray-600 border-2 border-gray-300 dark:border-gray-500 rounded-lg flex items-center justify-center transition-all duration-300 ${problemStatus[problem.id] ? 'bg-gradient-to-r from-green-500 to-emerald-500 border-green-500' : 'group-hover:border-blue-400'}">
+                                                    <i class="fas fa-check text-white text-sm ${problemStatus[problem.id] ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300"></i>
+                                                </div>
+                                            </label>
+                                            <span class="text-gray-800 dark:text-gray-200 font-medium transition-all duration-300 ${problemStatus[problem.id] ? 'line-through opacity-60' : 'group-hover:text-blue-600 dark:group-hover:text-blue-400'} flex-1">${problem.name}</span>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            ${generatePlatformLinks(problem)}
+                                            <span class="px-3 py-1 text-xs font-semibold rounded-full ${getDifficultyColor(problem.difficulty)} shadow-lg">
+                                                ${problem.difficulty}
+                                            </span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += sectionHtml;
+            });
+        }
+
+        // Toggle problem completion
+        function toggleProblem(problemId) {
+            problemStatus[problemId] = !problemStatus[problemId];
+            localStorage.setItem('problemStatus', JSON.stringify(problemStatus));
+            
+            // Track user progress for admin
+            updateUserProgress();
+            
+            updateStats();
+            // Re-render to update the strikethrough effect
+            const searchTerm = document.getElementById('searchInput').value;
+            if (searchTerm) {
+                searchProblems(searchTerm);
+            } else {
+                renderProblems();
+            }
+        }
+
+        // Update user progress tracking
+        function updateUserProgress() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) {
+                console.log('No current user found');
+                return;
+            }
+            
+            const completed = Object.values(problemStatus).filter(Boolean).length;
+            const total = allProblems.length;
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+            
+            console.log('Updating progress for:', currentUser.email, 'Completed:', completed, 'Total:', total);
+            
+            // Get existing user progress data
+            let userProgress = JSON.parse(localStorage.getItem('userProgress')) || {};
+            
+            // Ensure user entry exists
+            if (!userProgress[currentUser.email]) {
+                userProgress[currentUser.email] = {
+                    name: currentUser.name,
+                    email: currentUser.email,
+                    sheets: {}
+                };
+            }
+            
+            // Update current user's progress
+            userProgress[currentUser.email].sheets['Array'] = {
+                completed: completed,
+                total: total,
+                percentage: percentage,
+                lastUpdated: new Date().toISOString()
+            };
+            
+            localStorage.setItem('userProgress', JSON.stringify(userProgress));
+            console.log('Progress saved:', userProgress[currentUser.email]);
+        }
+
+        // Update statistics
+        function updateStats() {
+            const completed = Object.values(problemStatus).filter(Boolean).length;
+            const total = allProblems.length;
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+            
+            document.getElementById('completedCount').textContent = completed;
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('progressPercentage').textContent = percentage + '%';
+            document.getElementById('progressText').textContent = `${completed} / ${total}`;
+            document.getElementById('progressBar').style.width = percentage + '%';
+        }
+
+        // Search problems
+        function searchProblems(searchTerm) {
+            const filtered = allProblems.filter(problem => 
+                problem.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                problem.difficulty.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                problem.section.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            renderProblems(filtered);
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            const currentUser = localStorage.getItem('currentUser');
+            const isAdmin = localStorage.getItem('isAdmin');
+            
+            if (!currentUser && !isAdmin) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            
+            updateTheme();
+            initializeProblems();
+            renderProblems();
+            updateStats();
+            
+            // Initialize user progress tracking
+            updateUserProgress();
+
+            // Dark mode toggle
+            document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
+
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.trim();
+                if (searchTerm) {
+                    searchProblems(searchTerm);
+                } else {
+                    renderProblems();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

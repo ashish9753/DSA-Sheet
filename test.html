@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Test - User Progress</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto">
+        <h1 class="text-2xl font-bold mb-6">Quick Test - Create User & Progress</h1>
+        
+        <div class="bg-white rounded-lg p-6 shadow-lg space-y-4">
+            <button onclick="createTestData()" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg">
+                1. Create Test User & Progress Data
+            </button>
+            
+            <button onclick="viewData()" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-4 rounded-lg">
+                2. View Current Data
+            </button>
+            
+            <button onclick="goToAdmin()" class="w-full bg-purple-500 hover:bg-purple-600 text-white py-3 px-4 rounded-lg">
+                3. Go to Admin Panel
+            </button>
+            
+            <button onclick="clearData()" class="w-full bg-red-500 hover:bg-red-600 text-white py-3 px-4 rounded-lg">
+                4. Clear All Data
+            </button>
+        </div>
+        
+        <div id="output" class="mt-6 bg-gray-800 text-green-400 p-4 rounded-lg font-mono text-sm hidden"></div>
+    </div>
+
+    <script>
+        function createTestData() {
+            // Create test user
+            const users = [
+                {
+                    id: 12345,
+                    name: "John Doe",
+                    email: "john@example.com",
+                    password: "test123",
+                    registeredAt: new Date().toISOString()
+                }
+            ];
+            
+            // Create user progress
+            const userProgress = {
+                "john@example.com": {
+                    name: "John Doe",
+                    email: "john@example.com",
+                    sheets: {
+                        "Array": {
+                            completed: 15,
+                            total: 50,
+                            percentage: 30,
+                            lastUpdated: new Date().toISOString()
+                        },
+                        "Binary Search": {
+                            completed: 8,
+                            total: 20,
+                            percentage: 40,
+                            lastUpdated: new Date().toISOString()
+                        }
+                    }
+                }
+            };
+            
+            // Save to localStorage
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('userProgress', JSON.stringify(userProgress));
+            
+            showOutput('✅ Test data created successfully!\n\nUser: John Doe (john@example.com)\nArray Progress: 15/50 (30%)\nBinary Progress: 8/20 (40%)');
+        }
+        
+        function viewData() {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const userProgress = JSON.parse(localStorage.getItem('userProgress') || '{}');
+            
+            let output = '📊 Current Data:\n\n';
+            output += `Users (${users.length}):\n`;
+            users.forEach(user => {
+                output += `- ${user.name} (${user.email})\n`;
+            });
+            
+            output += '\nUser Progress:\n';
+            Object.keys(userProgress).forEach(email => {
+                const user = userProgress[email];
+                output += `- ${user.name}:\n`;
+                Object.keys(user.sheets || {}).forEach(sheet => {
+                    const progress = user.sheets[sheet];
+                    output += `  ${sheet}: ${progress.completed}/${progress.total} (${progress.percentage}%)\n`;
+                });
+            });
+            
+            showOutput(output);
+        }
+        
+        function goToAdmin() {
+            localStorage.setItem('isAdmin', 'true');
+            window.location.href = 'admin.html';
+        }
+        
+        function clearData() {
+            if (confirm('Clear all data?')) {
+                localStorage.clear();
+                showOutput('🗑️ All data cleared!');
+            }
+        }
+        
+        function showOutput(text) {
+            const output = document.getElementById('output');
+            output.textContent = text;
+            output.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

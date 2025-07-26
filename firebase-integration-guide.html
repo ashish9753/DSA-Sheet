@@ -1,0 +1,42 @@
+<!-- Firebase Integration Guide -->
+
+## Step 1: Add Firebase Scripts (Add these to your HTML head)
+```html
+<!-- Firebase v9 CDN -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+```
+
+## Step 2: Firebase Config (Replace with YOUR config)
+```javascript
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "your-api-key",
+  authDomain: "your-project.firebaseapp.com", 
+  projectId: "your-project-id",
+  storageBucket: "your-project.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "your-app-id"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+```
+
+## Step 3: Replace localStorage with Firebase
+```javascript
+// Instead of: localStorage.setItem('users', JSON.stringify(users))
+// Use: await db.collection('users').doc(user.id).set(user)
+
+// Instead of: JSON.parse(localStorage.getItem('users'))
+// Use: await db.collection('users').get()
+```
+
+## Benefits:
+✅ ALL users share same database
+✅ Admin sees EVERYONE'S data
+✅ Real-time updates
+✅ Works on GitHub Pages
+✅ FREE tier
+✅ Professional solution

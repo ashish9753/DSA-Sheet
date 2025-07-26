@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Check Data</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">Debug - Check LocalStorage Data</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Users Data -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 text-blue-600">Users Data</h2>
+                <pre id="usersData" class="bg-gray-100 p-4 rounded text-sm overflow-auto max-h-64"></pre>
+            </div>
+            
+            <!-- User Progress Data -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 text-green-600">User Progress Data</h2>
+                <pre id="progressData" class="bg-gray-100 p-4 rounded text-sm overflow-auto max-h-64"></pre>
+            </div>
+            
+            <!-- Array Problem Status -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 text-purple-600">Array Problem Status</h2>
+                <pre id="arrayProblems" class="bg-gray-100 p-4 rounded text-sm overflow-auto max-h-64"></pre>
+            </div>
+            
+            <!-- Current User -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 text-red-600">Current User</h2>
+                <pre id="currentUser" class="bg-gray-100 p-4 rounded text-sm overflow-auto max-h-64"></pre>
+            </div>
+        </div>
+        
+        <div class="mt-6 flex space-x-4">
+            <button onclick="refreshData()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg">
+                Refresh Data
+            </button>
+            <button onclick="clearAllData()" class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg">
+                Clear All Data
+            </button>
+            <button onclick="createTestUser()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg">
+                Create Test User
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function refreshData() {
+            // Users
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            document.getElementById('usersData').textContent = JSON.stringify(users, null, 2);
+            
+            // User Progress
+            const userProgress = JSON.parse(localStorage.getItem('userProgress') || '{}');
+            document.getElementById('progressData').textContent = JSON.stringify(userProgress, null, 2);
+            
+            // Array Problems
+            const arrayProblems = JSON.parse(localStorage.getItem('problemStatus') || '{}');
+            document.getElementById('arrayProblems').textContent = JSON.stringify(arrayProblems, null, 2);
+            
+            // Current User
+            const currentUser = localStorage.getItem('currentUser');
+            document.getElementById('currentUser').textContent = currentUser || 'No current user';
+        }
+        
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data?')) {
+                localStorage.removeItem('users');
+                localStorage.removeItem('userProgress');
+                localStorage.removeItem('problemStatus');
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('isAdmin');
+                refreshData();
+                alert('All data cleared!');
+            }
+        }
+        
+        function createTestUser() {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const testUser = {
+                id: Date.now(),
+                name: 'Test User',
+                email: 'test@example.com',
+                password: 'test123',
+                registeredAt: new Date().toISOString()
+            };
+            
+            users.push(testUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            // Create some test progress
+            const userProgress = JSON.parse(localStorage.getItem('userProgress') || '{}');
+            userProgress['test@example.com'] = {
+                name: 'Test User',
+                email: 'test@example.com',
+                sheets: {
+                    'Array': {
+                        completed: 5,
+                        total: 50,
+                        percentage: 10,
+                        lastUpdated: new Date().toISOString()
+                    }
+                }
+            };
+            localStorage.setItem('userProgress', JSON.stringify(userProgress));
+            
+            refreshData();
+            alert('Test user created with some progress!');
+        }
+        
+        // Load data on page load
+        refreshData();
+    </script>
+</body>
+</html>
