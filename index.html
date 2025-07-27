@@ -739,6 +739,42 @@
         // Check authentication on page load
         checkAuthentication();
         
+        // Check if user just verified their email
+        const urlParams = new URLSearchParams(window.location.search);
+        const justVerified = urlParams.get('verified');
+        const fromVerification = localStorage.getItem('justVerified');
+        
+        if (justVerified === 'true' || fromVerification === 'true') {
+            // Show welcome notification
+            setTimeout(() => {
+                const notification = document.createElement('div');
+                notification.innerHTML = `
+                    <div class="fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg z-50 animate-pulse">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span><strong>Welcome!</strong> Your account is now verified and ready to use! 🎉</span>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(notification);
+                
+                // Remove notification after 5 seconds
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
+                
+                // Clear the flag
+                localStorage.removeItem('justVerified');
+                
+                // Clean URL
+                if (justVerified) {
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            }, 1000);
+        }
+        
         // Dark mode functionality
         const darkModeToggle = document.getElementById('darkModeToggle');
         const sunIcon = document.getElementById('sunIcon');

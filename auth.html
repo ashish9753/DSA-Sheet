@@ -8,6 +8,8 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <link rel="shortcut icon" href="logo.png">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -91,9 +93,32 @@
 
             <button type="submit" 
                 class="w-full bg-white text-purple-600 py-3 px-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-300 transform hover:scale-105">
-                Sign Up
+                Send Verification Email
             </button>
         </form>
+
+        <!-- Email Verification Pending -->
+        <div id="verificationPending" class="space-y-6 hidden">
+            <div class="text-center">
+                <div class="bg-yellow-500/20 rounded-full p-4 mx-auto w-fit mb-4">
+                    <svg class="w-8 h-8 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold text-white mb-2">Verification Email Sent!</h3>
+                <p class="text-gray-200 mb-4">Please check your email and click the verification link to complete your registration.</p>
+                <p class="text-sm text-gray-300">Email sent to: <span id="verificationEmail" class="font-medium"></span></p>
+            </div>
+            
+            <div class="flex space-x-4">
+                <button id="resendEmail" class="flex-1 bg-yellow-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-yellow-600 transition-colors duration-300">
+                    Resend Email
+                </button>
+                <button id="backToSignup" class="flex-1 bg-white/20 text-white py-2 px-4 rounded-lg font-medium hover:bg-white/30 transition-colors duration-300">
+                    Back to Signup
+                </button>
+            </div>
+        </div>
 
         <!-- Toggle between Login and Signup -->
         <div class="mt-6 text-center">
@@ -104,8 +129,13 @@
 
         <!-- Admin Login -->
         <div class="mt-8 pt-6 border-t border-white/20">
-            <button id="adminLoginBtn" class="w-full bg-red-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-600 transition-colors duration-300">
+            <button id="adminLoginBtn" class="w-full bg-red-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-600 transition-colors duration-300 mb-3">
                 Admin Login
+            </button>
+            
+            <!-- Debug EmailJS Button (for testing) -->
+            <button id="testEmailBtn" class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-600 transition-colors duration-300 text-sm">
+                🧪 Test EmailJS Connection
             </button>
         </div>
 
@@ -145,6 +175,85 @@
     </div>
 
     <script>
+        // EmailJS Configuration - ✅ FULLY CONFIGURED!
+        const EMAILJS_CONFIG = {
+            serviceId: 'service_edtklod',          // ✅ Real Gmail service ID
+            templateId: 'template_9eouah7',        // ✅ NEW Template ID (updated!)
+            publicKey: 'EflOAWCAq5ryO5lm7'        // ✅ Real public key (verified!)
+        };
+
+        // Verify configuration
+        console.log('🔧 EmailJS Configuration:');
+        console.log('Service ID:', EMAILJS_CONFIG.serviceId);
+        console.log('Template ID:', EMAILJS_CONFIG.templateId);
+        console.log('Public Key:', EMAILJS_CONFIG.publicKey);
+
+        // Initialize EmailJS and test connection
+        emailjs.init(EMAILJS_CONFIG.publicKey);
+
+        // Test EmailJS Connection Function
+        async function testEmailJSConnection() {
+            console.log('🧪 Testing EmailJS Connection...');
+            
+            // Test if EmailJS is loaded
+            if (typeof emailjs === 'undefined') {
+                console.log('❌ EmailJS library not loaded!');
+                return false;
+            }
+            
+            try {
+                // Ultra-simple test email
+                const testParams = {
+                    name: 'Test User',
+                    email: 'test@example.com',
+                    verification_link: 'https://google.com'
+                };
+                
+                console.log('📧 Testing with params:', testParams);
+                console.log('📧 Service ID:', EMAILJS_CONFIG.serviceId);
+                console.log('📧 Template ID:', EMAILJS_CONFIG.templateId);
+                console.log('📧 Public Key:', EMAILJS_CONFIG.publicKey);
+                
+                // This will test if EmailJS is reachable
+                const result = await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, testParams);
+                console.log('✅ EmailJS connection successful:', result);
+                return true;
+            } catch (error) {
+                console.log('📊 EmailJS Detailed Error Analysis:');
+                console.log('❌ Error Status:', error.status);
+                console.log('❌ Error Text:', error.text);
+                console.log('❌ Full Error:', error);
+                
+                // Specific error handling
+                if (error.status === 404) {
+                    console.log('🔍 404 Error = Service or Template NOT FOUND');
+                    console.log('   ❌ Either service_edtklod does not exist');
+                    console.log('   ❌ Or template_9eouah7 does not exist');
+                    console.log('   🔧 Go to EmailJS dashboard and verify both exist');
+                } else if (error.status === 401) {
+                    console.log('🔍 401 Error = INVALID PUBLIC KEY');
+                    console.log('   ❌ Public key EflOAWCAq5ryO5lm7 is wrong');
+                    console.log('   🔧 Check EmailJS Account settings for correct key');
+                } else if (error.status === 422) {
+                    console.log('🔍 422 Error = TEMPLATE VARIABLE MISMATCH');
+                    console.log('   ❌ Template does not have {{name}}, {{email}}, {{verification_link}}');
+                    console.log('   🔧 Update template variables');
+                } else if (error.status === 400) {
+                    console.log('🔍 400 Error = BAD REQUEST');
+                    console.log('   ❌ Template content or format is invalid');
+                    console.log('   🔧 Check template HTML in EmailJS dashboard');
+                } else {
+                    console.log('🔍 Unknown Error:', error.status);
+                    console.log('   🔧 Check EmailJS dashboard for service status');
+                }
+                
+                return false;
+            }
+        }
+
+        // Run connection test on page load
+        testEmailJSConnection();
+
         // Firebase Configuration - YOUR ACTUAL CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyBbOMWi1qdWOzpm_0KeLE_mOHUGjzk0He4",
@@ -159,6 +268,106 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+
+        // Pending user data for email verification
+        let pendingUser = null;
+
+        // Generate verification token
+        function generateVerificationToken() {
+            return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        }
+
+        // Send verification email with enhanced error handling
+        async function sendVerificationEmail(userData) {
+            const verificationToken = generateVerificationToken();
+            const verificationLink = `${window.location.origin}/verify.html?token=${verificationToken}&email=${encodeURIComponent(userData.email)}`;
+            
+            // Store pending user with verification token
+            const userWithToken = {
+                ...userData,
+                verificationToken: verificationToken,
+                isVerified: false,
+                tokenCreatedAt: new Date().toISOString()
+            };
+            
+            try {
+                await db.collection('pendingUsers').doc(verificationToken).set(userWithToken);
+                console.log('✅ Pending user stored in Firebase');
+            } catch (error) {
+                console.error('❌ Firebase error, using localStorage:', error);
+                localStorage.setItem('pendingUser_' + verificationToken, JSON.stringify(userWithToken));
+            }
+
+            // Try multiple email parameter formats for compatibility
+            const emailParams1 = {
+                name: userData.name,              // Match {{name}} in template
+                email: userData.email,            // Match {{email}} in template
+                verification_link: verificationLink,
+                user_name: userData.name,
+                from_name: 'Programming Series Hub',
+                subject: 'Verify Your Email - Programming Series Hub'
+            };
+
+            const emailParams2 = {
+                to_name: userData.name,
+                to_email: userData.email,
+                verification_link: verificationLink,
+                user_name: userData.name
+            };
+
+            const emailParams3 = {
+                user_name: userData.name,
+                user_email: userData.email,
+                verify_link: verificationLink,
+                verification_url: verificationLink
+            };
+
+            const emailParams4 = {
+                name: userData.name,
+                email: userData.email,
+                link: verificationLink
+            };
+
+            console.log('📧 EmailJS Config Check:');
+            console.log('Service ID:', EMAILJS_CONFIG.serviceId);
+            console.log('Template ID:', EMAILJS_CONFIG.templateId);
+            console.log('Public Key:', EMAILJS_CONFIG.publicKey);
+
+            // Try different parameter formats
+            const paramSets = [emailParams1, emailParams2, emailParams3, emailParams4];
+            
+            for (let i = 0; i < paramSets.length; i++) {
+                try {
+                    console.log(`🚀 Attempt ${i + 1}: Sending email with params:`, paramSets[i]);
+                    const response = await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, paramSets[i]);
+                    console.log('✅ EmailJS Success Response:', response);
+                    return { success: true, token: verificationToken, response: response };
+                } catch (error) {
+                    console.error(`❌ Attempt ${i + 1} failed:`, error);
+                    if (i === paramSets.length - 1) {
+                        // Last attempt failed, show detailed error
+                        console.error('❌ All EmailJS attempts failed. Error Details:', error);
+                        console.error('Error Code:', error.status);
+                        console.error('Error Message:', error.text);
+                        
+                        let errorMessage = 'Failed to send verification email. ';
+                        if (error.status === 400) {
+                            errorMessage += 'Template variables mismatch. Check your EmailJS template.';
+                        } else if (error.status === 401) {
+                            errorMessage += 'Authentication failed. Check your public key.';
+                        } else if (error.status === 404) {
+                            errorMessage += 'Service or template not found.';
+                        } else if (error.status === 422) {
+                            errorMessage += 'Invalid template variables or email format.';
+                        } else {
+                            errorMessage += `Error: ${error.text || error.message || 'Unknown error'}`;
+                        }
+                        
+                        return { success: false, error: error, message: errorMessage };
+                    }
+                }
+            }
+        }
 
         // Firebase Helper Functions
         async function saveUserToFirebase(user) {
@@ -180,8 +389,11 @@
                 if (!snapshot.empty) {
                     const userDoc = snapshot.docs[0];
                     const user = userDoc.data();
-                    if (user.password === password) {
+                    if (user.password === password && user.isVerified) {
                         return user;
+                    } else if (!user.isVerified) {
+                        showError('Please verify your email before logging in');
+                        return null;
                     }
                 }
                 return null;
@@ -189,7 +401,12 @@
                 console.error('Error getting user:', error);
                 // Fallback to localStorage
                 const users = JSON.parse(localStorage.getItem('users') || '[]');
-                return users.find(u => u.email === email && u.password === password) || null;
+                const user = users.find(u => u.email === email && u.password === password);
+                if (user && !user.isVerified) {
+                    showError('Please verify your email before logging in');
+                    return null;
+                }
+                return user || null;
             }
         }
 
@@ -211,6 +428,7 @@
         // Get elements
         const loginForm = document.getElementById('loginForm');
         const signupForm = document.getElementById('signupForm');
+        const verificationPending = document.getElementById('verificationPending');
         const toggleAuth = document.getElementById('toggleAuth');
         const adminLoginBtn = document.getElementById('adminLoginBtn');
         const adminModal = document.getElementById('adminModal');
@@ -218,6 +436,10 @@
         const closeAdminModal = document.getElementById('closeAdminModal');
         const errorMessage = document.getElementById('errorMessage');
         const successMessage = document.getElementById('successMessage');
+        const resendEmail = document.getElementById('resendEmail');
+        const backToSignup = document.getElementById('backToSignup');
+        const verificationEmail = document.getElementById('verificationEmail');
+        const testEmailBtn = document.getElementById('testEmailBtn');
         
         let isLogin = true;
         
@@ -236,12 +458,14 @@
             if (isLogin) {
                 loginForm.classList.add('hidden');
                 signupForm.classList.remove('hidden');
+                verificationPending.classList.add('hidden');
                 toggleAuth.innerHTML = 'Already have an account? <span class="font-semibold">Sign In</span>';
                 document.querySelector('h1').textContent = 'Create Account';
                 document.querySelector('p').textContent = 'Join Programming Series Hub';
                 isLogin = false;
             } else {
                 signupForm.classList.add('hidden');
+                verificationPending.classList.add('hidden');
                 loginForm.classList.remove('hidden');
                 toggleAuth.innerHTML = 'Don\'t have an account? <span class="font-semibold">Sign Up</span>';
                 document.querySelector('h1').textContent = 'Welcome Back';
@@ -268,7 +492,7 @@
                     window.location.href = 'index.html';
                 }, 1500);
             } else {
-                showError('Invalid email or password');
+                showError('Invalid email or password, or email not verified');
             }
         });
         
@@ -288,8 +512,8 @@
                 return;
             }
             
-            // Create new user
-            const newUser = {
+            // Create new user data
+            const newUserData = {
                 id: Date.now(),
                 name: name,
                 email: email,
@@ -297,13 +521,58 @@
                 registeredAt: new Date().toISOString()
             };
             
-            await saveUserToFirebase(newUser);
-            localStorage.setItem('currentUser', JSON.stringify(newUser));
+            // Store pending user
+            pendingUser = newUserData;
             
-            showSuccess('Account created successfully! Redirecting...');
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1500);
+            // Send verification email
+            showSuccess('Sending verification email...');
+            const emailResult = await sendVerificationEmail(newUserData);
+            
+            if (emailResult.success) {
+                // Show verification pending screen
+                signupForm.classList.add('hidden');
+                verificationPending.classList.remove('hidden');
+                verificationEmail.textContent = email;
+                
+                showSuccess('✅ Verification email sent successfully! Please check your inbox (and spam folder).');
+                
+                // Hide toggle button while verification is pending
+                toggleAuth.style.display = 'none';
+            } else {
+                console.error('Detailed EmailJS Error:', emailResult);
+                const errorMsg = emailResult.message || 'Failed to send verification email. Please try again.';
+                showError(`❌ ${errorMsg}`);
+                
+                // Show debugging info in console
+                console.log('🔍 Debugging Info:');
+                console.log('- Check your internet connection');
+                console.log('- Verify EmailJS service is active: https://dashboard.emailjs.com/admin');
+                console.log('- Check template exists: https://dashboard.emailjs.com/admin/templates');
+                console.log('- Verify public key is correct');
+            }
+        });
+
+        // Resend email functionality
+        resendEmail.addEventListener('click', async () => {
+            if (pendingUser) {
+                showSuccess('Resending verification email...');
+                const emailResult = await sendVerificationEmail(pendingUser);
+                
+                if (emailResult.success) {
+                    showSuccess('Verification email resent! Please check your inbox.');
+                } else {
+                    showError('Failed to resend email. Please try again.');
+                }
+            }
+        });
+
+        // Back to signup functionality
+        backToSignup.addEventListener('click', () => {
+            verificationPending.classList.add('hidden');
+            signupForm.classList.remove('hidden');
+            toggleAuth.style.display = 'block';
+            pendingUser = null;
+            hideMessages();
         });
         
         // Admin login
@@ -328,6 +597,18 @@
                 showError('Invalid admin password');
                 adminModal.classList.add('hidden');
                 adminModal.classList.remove('flex');
+            }
+        });
+        
+        // Test EmailJS button
+        testEmailBtn.addEventListener('click', async () => {
+            showSuccess('Testing EmailJS connection...');
+            
+            const testResult = await testEmailJSConnection();
+            if (testResult) {
+                showSuccess('✅ EmailJS is working! You can proceed with signup.');
+            } else {
+                showError('❌ EmailJS connection failed. Check console for details.');
             }
         });
         

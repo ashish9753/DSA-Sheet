@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification - Programming Series Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <link rel="shortcut icon" href="logo.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .verification-container {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .verification-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .verification-error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .verification-pending {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen flex items-center justify-center p-4">
+    <div class="verification-container rounded-2xl p-8 w-full max-w-md shadow-2xl">
+        <!-- Loading State -->
+        <div id="loadingState" class="text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+            <h2 class="text-xl font-semibold text-white mb-2">Verifying your email...</h2>
+            <p class="text-gray-200">Please wait while we confirm your verification.</p>
+        </div>
+
+        <!-- Success State -->
+        <div id="successState" class="text-center hidden">
+            <div class="verification-success rounded-full p-4 mx-auto w-fit mb-6">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-2">🎉 Account Created & Logged In!</h2>
+            <p class="text-gray-200 mb-4">Welcome <span id="verifiedUserName" class="font-semibold text-yellow-300"></span>! Your email has been verified and you're now logged in.</p>
+            
+            <div class="bg-green-500/20 border border-green-500/30 rounded-lg p-4 mb-6">
+                <div class="flex items-center text-green-200 text-sm">
+                    <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span><strong>Auto-redirecting</strong> to Programming Series Hub in <span id="countdown">3</span> seconds...</span>
+                </div>
+            </div>
+            
+            <div class="space-y-4">
+                <a href="index.html" class="block w-full bg-white text-purple-600 py-3 px-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-300 text-center">
+                    🚀 Go to Dashboard Now
+                </a>
+                <div class="text-sm text-gray-300">
+                    Ready to start coding? Access 200+ programming problems!
+                </div>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="text-center hidden">
+            <div class="verification-error rounded-full p-4 mx-auto w-fit mb-6">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-2">Verification Failed</h2>
+            <p id="errorMessage" class="text-gray-200 mb-6">The verification link is invalid or has expired.</p>
+            <div class="space-y-4">
+                <a href="auth.html" class="block w-full bg-white text-purple-600 py-3 px-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-300 text-center">
+                    Back to Signup
+                </a>
+                <div class="text-sm text-gray-300">
+                    Need help? Contact support or try signing up again.
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Choice State -->
+        <div id="pendingState" class="text-center hidden">
+            <div class="verification-pending rounded-full p-4 mx-auto w-fit mb-6">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-2">Complete Your Registration</h2>
+            <p class="text-gray-200 mb-2">Welcome <span id="pendingUserName" class="font-medium"></span>!</p>
+            <p class="text-gray-200 mb-6">Please confirm that you want to create your account with the email: <span id="pendingUserEmail" class="font-medium"></span></p>
+            <div class="space-y-4">
+                <button id="confirmRegistration" class="w-full bg-green-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300">
+                    ✅ Confirm & Create Account
+                </button>
+                <button id="rejectRegistration" class="w-full bg-red-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-red-600 transition-colors duration-300">
+                    ❌ Cancel Registration
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBbOMWi1qdWOzpm_0KeLE_mOHUGjzk0He4",
+            authDomain: "programming-series-hub.firebaseapp.com",
+            projectId: "programming-series-hub",
+            storageBucket: "programming-series-hub.firebasestorage.app",
+            messagingSenderId: "919993604014",
+            appId: "1:919993604014:web:bd0f8f34a5e923ecf31a3f",
+            measurementId: "G-ZJY6P2HHR7"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Get elements
+        const loadingState = document.getElementById('loadingState');
+        const successState = document.getElementById('successState');
+        const errorState = document.getElementById('errorState');
+        const pendingState = document.getElementById('pendingState');
+        const verifiedUserName = document.getElementById('verifiedUserName');
+        const pendingUserName = document.getElementById('pendingUserName');
+        const pendingUserEmail = document.getElementById('pendingUserEmail');
+        const errorMessage = document.getElementById('errorMessage');
+        const confirmRegistration = document.getElementById('confirmRegistration');
+        const rejectRegistration = document.getElementById('rejectRegistration');
+
+        // Global user data
+        let pendingUserData = null;
+
+        // Get URL parameters
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            const results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        // Show specific state
+        function showState(state) {
+            loadingState.classList.add('hidden');
+            successState.classList.add('hidden');
+            errorState.classList.add('hidden');
+            pendingState.classList.add('hidden');
+            
+            document.getElementById(state + 'State').classList.remove('hidden');
+        }
+
+        // Save verified user to Firebase
+        async function saveVerifiedUser(userData) {
+            try {
+                const userToSave = {
+                    ...userData,
+                    isVerified: true,
+                    verifiedAt: new Date().toISOString()
+                };
+                delete userToSave.verificationToken;
+                delete userToSave.tokenCreatedAt;
+
+                await db.collection('users').doc(userData.id.toString()).set(userToSave);
+                console.log('Verified user saved to Firebase');
+                return true;
+            } catch (error) {
+                console.error('Error saving verified user:', error);
+                // Fallback to localStorage
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                users.push({...userData, isVerified: true, verifiedAt: new Date().toISOString()});
+                localStorage.setItem('users', JSON.stringify(users));
+                return true;
+            }
+        }
+
+        // Delete pending user
+        async function deletePendingUser(token) {
+            try {
+                await db.collection('pendingUsers').doc(token).delete();
+                console.log('Pending user deleted from Firebase');
+            } catch (error) {
+                console.error('Error deleting pending user:', error);
+                localStorage.removeItem('pendingUser_' + token);
+            }
+        }
+
+        // Get pending user by token
+        async function getPendingUser(token) {
+            try {
+                const doc = await db.collection('pendingUsers').doc(token).get();
+                if (doc.exists) {
+                    return doc.data();
+                }
+                return null;
+            } catch (error) {
+                console.error('Error getting pending user:', error);
+                // Fallback to localStorage
+                const storedUser = localStorage.getItem('pendingUser_' + token);
+                return storedUser ? JSON.parse(storedUser) : null;
+            }
+        }
+
+        // Main verification logic
+        async function verifyEmail() {
+            const token = getUrlParameter('token');
+            const email = getUrlParameter('email');
+
+            if (!token || !email) {
+                showState('error');
+                errorMessage.textContent = 'Invalid verification link. Missing required parameters.';
+                return;
+            }
+
+            try {
+                // Get pending user data
+                pendingUserData = await getPendingUser(token);
+
+                if (!pendingUserData) {
+                    showState('error');
+                    errorMessage.textContent = 'Verification link is invalid or has already been used.';
+                    return;
+                }
+
+                // Check if token is expired (24 hours)
+                const tokenAge = new Date() - new Date(pendingUserData.tokenCreatedAt);
+                const maxAge = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+                
+                if (tokenAge > maxAge) {
+                    showState('error');
+                    errorMessage.textContent = 'Verification link has expired. Please sign up again.';
+                    await deletePendingUser(token);
+                    return;
+                }
+
+                // Check if email matches
+                if (pendingUserData.email !== email) {
+                    showState('error');
+                    errorMessage.textContent = 'Email verification mismatch. Please use the correct verification link.';
+                    return;
+                }
+
+                // Show pending state with user choice
+                pendingUserName.textContent = pendingUserData.name;
+                pendingUserEmail.textContent = pendingUserData.email;
+                showState('pending');
+
+            } catch (error) {
+                console.error('Verification error:', error);
+                showState('error');
+                errorMessage.textContent = 'An error occurred during verification. Please try again.';
+            }
+        }
+
+        // Confirm registration
+        confirmRegistration.addEventListener('click', async () => {
+            if (!pendingUserData) return;
+
+            loadingState.querySelector('h2').textContent = 'Creating your account...';
+            showState('loading');
+
+            try {
+                // Save user to main users collection
+                const success = await saveVerifiedUser(pendingUserData);
+                
+                if (success) {
+                    // Delete pending user
+                    await deletePendingUser(pendingUserData.verificationToken);
+                    
+                    // 🚀 AUTO-LOGIN: Set user as logged in
+                    const verifiedUser = {
+                        ...pendingUserData,
+                        isVerified: true,
+                        verifiedAt: new Date().toISOString()
+                    };
+                    delete verifiedUser.verificationToken;
+                    delete verifiedUser.tokenCreatedAt;
+                    
+                    // Save to localStorage for immediate login
+                    localStorage.setItem('currentUser', JSON.stringify(verifiedUser));
+                    localStorage.setItem('justVerified', 'true');
+                    
+                    // Show success with auto-redirect message
+                    verifiedUserName.textContent = pendingUserData.name;
+                    showState('success');
+                    
+                    // Start countdown and auto-redirect
+                    let countdown = 3;
+                    const countdownElement = document.getElementById('countdown');
+                    
+                    const countdownInterval = setInterval(() => {
+                        countdown--;
+                        if (countdownElement) {
+                            countdownElement.textContent = countdown;
+                        }
+                        
+                        if (countdown <= 0) {
+                            clearInterval(countdownInterval);
+                            window.location.href = 'index.html';
+                        }
+                    }, 1000);
+                    
+                } else {
+                    throw new Error('Failed to save user');
+                }
+            } catch (error) {
+                console.error('Error confirming registration:', error);
+                showState('error');
+                errorMessage.textContent = 'Failed to create account. Please try again or contact support.';
+            }
+        });
+
+        // Reject registration
+        rejectRegistration.addEventListener('click', async () => {
+            if (!pendingUserData) return;
+
+            loadingState.querySelector('h2').textContent = 'Canceling registration...';
+            showState('loading');
+
+            try {
+                // Delete pending user
+                await deletePendingUser(pendingUserData.verificationToken);
+                
+                // Show error state with rejection message
+                showState('error');
+                errorMessage.textContent = 'Registration canceled. You can sign up again anytime with a different email.';
+            } catch (error) {
+                console.error('Error rejecting registration:', error);
+                showState('error');
+                errorMessage.textContent = 'Error canceling registration. Please try again.';
+            }
+        });
+
+        // Start verification process
+        verifyEmail();
+    </script>
+</body>
+</html>
