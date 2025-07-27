@@ -280,7 +280,7 @@
         // Send verification email with enhanced error handling
         async function sendVerificationEmail(userData) {
             const verificationToken = generateVerificationToken();
-            const verificationLink = `${window.location.origin}/verify.html?token=${verificationToken}&email=${encodeURIComponent(userData.email)}`;
+            const verificationLink = `https://ashish9753.github.io/DSA-Sheet/verify.html?token=${verificationToken}&email=${encodeURIComponent(userData.email)}`;
             
             // Store pending user with verification token
             const userWithToken = {
