@@ -201,6 +201,25 @@
             0%, 100% { text-shadow: 0 0 20px rgba(59, 130, 246, 0.6); }
             50% { text-shadow: 0 0 30px rgba(59, 130, 246, 0.9), 0 0 40px rgba(59, 130, 246, 0.3); }
         }
+        
+        /* Enhanced button styling for better cursor interaction */
+        .clickable-button {
+            cursor: pointer !important;
+            pointer-events: auto !important;
+            position: relative !important;
+            z-index: 100 !important;
+            user-select: none !important;
+        }
+        
+        .clickable-button:hover {
+            cursor: pointer !important;
+            transform: translateY(-2px) scale(1.02) !important;
+        }
+        
+        .clickable-button:active {
+            cursor: pointer !important;
+            transform: translateY(0px) scale(0.98) !important;
+        }
     </style>
 </head>
 <body class="gradient-bg min-h-screen flex items-center justify-center p-4 transition-colors duration-300" id="body">
@@ -292,17 +311,20 @@
             <p class="text-gray-200 mb-2">Welcome <span id="pendingUserName" class="font-medium"></span>!</p>
             <p class="text-gray-200 mb-6">Please confirm that you want to create your account with the email: <span id="pendingUserEmail" class="font-medium"></span></p>
             <div class="space-y-4">
-                <button id="confirmRegistration" class="w-full bg-green-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-green-600 active:bg-green-700 transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer" onclick="console.log('Confirm button clicked directly!')">
+                <button id="confirmRegistration" class="clickable-button w-full bg-green-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-green-600 active:bg-green-700 transition-all duration-300" onclick="handleConfirmRegistration(); console.log('Confirm button clicked via onclick!');">
                     ✅ Confirm & Create Account
                 </button>
-                <button id="rejectRegistration" class="w-full bg-red-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-red-600 active:bg-red-700 transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer" onclick="console.log('Reject button clicked directly!')">
+                <button id="rejectRegistration" class="clickable-button w-full bg-red-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-red-600 active:bg-red-700 transition-all duration-300" onclick="handleRejectRegistration(); console.log('Reject button clicked via onclick!');">
                     ❌ Cancel Registration
                 </button>
                 <div class="text-xs text-gray-300 mt-2">
                     Click confirm to create your account and get automatically logged in.
                 </div>
-                <div class="text-xs text-yellow-300 mt-1" id="debugInfo">
-                    Debug: Buttons are ready for clicking
+                <div class="text-xs text-green-300 mt-1 font-medium" id="debugInfo">
+                    🟢 Debug: Enhanced cursor & click detection ready
+                </div>
+                <div class="text-xs text-blue-300 mt-1" id="clickInstructions">
+                    💡 Tip: If buttons don't respond, check browser console (F12) for click logs
                 </div>
             </div>
         </div>
@@ -490,57 +512,110 @@
                     rejectVisible: rejectBtn ? rejectBtn.offsetParent !== null : false
                 });
 
-                // Also use event delegation on the document for backup
-                document.addEventListener('click', function(e) {
-                    if (e.target && e.target.id === 'confirmRegistration') {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log('Confirm clicked via delegation');
-                        handleConfirmRegistration();
-                    }
-                    if (e.target && e.target.id === 'rejectRegistration') {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log('Reject clicked via delegation');
-                        handleRejectRegistration();
-                    }
-                });
+                // Force cursor pointer style on buttons
+                if (confirmBtn) {
+                    confirmBtn.style.cursor = 'pointer';
+                    confirmBtn.style.pointerEvents = 'auto';
+                    confirmBtn.style.zIndex = '9999';
+                    console.log('Confirm button styled for clicking');
+                }
+                
+                if (rejectBtn) {
+                    rejectBtn.style.cursor = 'pointer';
+                    rejectBtn.style.pointerEvents = 'auto';
+                    rejectBtn.style.zIndex = '9999';
+                    console.log('Reject button styled for clicking');
+                }
 
-                // Direct event listeners
+                // Multiple event binding methods for maximum compatibility
+                
+                // Method 1: Direct onclick property (most reliable)
                 if (confirmBtn) {
                     confirmBtn.onclick = function(e) {
                         e.preventDefault();
                         e.stopPropagation();
-                        console.log('Confirm clicked via onclick');
+                        console.log('✅ Confirm clicked via onclick property');
                         handleConfirmRegistration();
                     };
-                    
-                    confirmBtn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log('Confirm clicked via addEventListener');
-                        handleConfirmRegistration();
-                    });
-                    console.log('Confirm button listeners attached');
                 }
 
                 if (rejectBtn) {
                     rejectBtn.onclick = function(e) {
                         e.preventDefault();
                         e.stopPropagation();
-                        console.log('Reject clicked via onclick');
+                        console.log('❌ Reject clicked via onclick property');
                         handleRejectRegistration();
                     };
-                    
+                }
+
+                // Method 2: addEventListener (standard method)
+                if (confirmBtn) {
+                    confirmBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('✅ Confirm clicked via addEventListener');
+                        handleConfirmRegistration();
+                    }, true); // Use capture phase
+                }
+
+                if (rejectBtn) {
                     rejectBtn.addEventListener('click', function(e) {
                         e.preventDefault();
                         e.stopPropagation();
-                        console.log('Reject clicked via addEventListener');
+                        console.log('❌ Reject clicked via addEventListener');
                         handleRejectRegistration();
-                    });
-                    console.log('Reject button listeners attached');
+                    }, true); // Use capture phase
                 }
-            }, 100);
+
+                // Method 3: Event delegation on document (backup method)
+                document.addEventListener('click', function(e) {
+                    if (e.target && e.target.id === 'confirmRegistration') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('✅ Confirm clicked via document delegation');
+                        handleConfirmRegistration();
+                    }
+                    if (e.target && e.target.id === 'rejectRegistration') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('❌ Reject clicked via document delegation');
+                        handleRejectRegistration();
+                    }
+                }, true);
+
+                // Method 4: Mouse events for additional coverage
+                if (confirmBtn) {
+                    confirmBtn.addEventListener('mousedown', function(e) {
+                        console.log('✅ Confirm mousedown detected');
+                        this.style.transform = 'scale(0.95)';
+                    });
+                    confirmBtn.addEventListener('mouseup', function(e) {
+                        console.log('✅ Confirm mouseup detected');
+                        this.style.transform = 'scale(1)';
+                    });
+                }
+
+                if (rejectBtn) {
+                    rejectBtn.addEventListener('mousedown', function(e) {
+                        console.log('❌ Reject mousedown detected');
+                        this.style.transform = 'scale(0.95)';
+                    });
+                    rejectBtn.addEventListener('mouseup', function(e) {
+                        console.log('❌ Reject mouseup detected');
+                        this.style.transform = 'scale(1)';
+                    });
+                }
+
+                console.log('✅ All button listeners successfully attached!');
+                
+                // Update debug info
+                const debugInfo = document.getElementById('debugInfo');
+                if (debugInfo) {
+                    debugInfo.textContent = 'Debug: All 4 event methods attached - buttons ready!';
+                    debugInfo.style.color = '#10b981'; // Green color
+                }
+
+            }, 150); // Increased timeout for better reliability
         }
 
         // Handle confirm registration
