@@ -292,14 +292,17 @@
             <p class="text-gray-200 mb-2">Welcome <span id="pendingUserName" class="font-medium"></span>!</p>
             <p class="text-gray-200 mb-6">Please confirm that you want to create your account with the email: <span id="pendingUserEmail" class="font-medium"></span></p>
             <div class="space-y-4">
-                <button id="confirmRegistration" class="w-full bg-green-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-green-600 active:bg-green-700 transition-all duration-300 transform hover:scale-105 active:scale-95">
+                <button id="confirmRegistration" class="w-full bg-green-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-green-600 active:bg-green-700 transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer" onclick="console.log('Confirm button clicked directly!')">
                     ✅ Confirm & Create Account
                 </button>
-                <button id="rejectRegistration" class="w-full bg-red-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-red-600 active:bg-red-700 transition-all duration-300 transform hover:scale-105 active:scale-95">
+                <button id="rejectRegistration" class="w-full bg-red-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-red-600 active:bg-red-700 transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer" onclick="console.log('Reject button clicked directly!')">
                     ❌ Cancel Registration
                 </button>
                 <div class="text-xs text-gray-300 mt-2">
                     Click confirm to create your account and get automatically logged in.
+                </div>
+                <div class="text-xs text-yellow-300 mt-1" id="debugInfo">
+                    Debug: Buttons are ready for clicking
                 </div>
             </div>
         </div>
@@ -460,6 +463,9 @@
                 pendingUserName.textContent = pendingUserData.name;
                 pendingUserEmail.textContent = pendingUserData.email;
                 showState('pending');
+                
+                // Set up button event listeners AFTER showing the pending state
+                setupButtonListeners();
 
             } catch (error) {
                 console.error('Verification error:', error);
@@ -468,106 +474,165 @@
             }
         }
 
-        // Confirm registration - Fixed with proper error handling and debugging
-        if (confirmRegistration) {
-            confirmRegistration.addEventListener('click', async (e) => {
-                e.preventDefault();
-                console.log('Confirm registration clicked', pendingUserData);
+        // Setup button listeners - called after pending state is shown
+        function setupButtonListeners() {
+            console.log('Setting up button listeners...');
+            
+            // Use setTimeout to ensure DOM is fully rendered
+            setTimeout(() => {
+                const confirmBtn = document.getElementById('confirmRegistration');
+                const rejectBtn = document.getElementById('rejectRegistration');
                 
-                if (!pendingUserData) {
-                    console.error('No pending user data found');
-                    showState('error');
-                    errorMessage.textContent = 'No user data found. Please try the verification link again.';
-                    return;
-                }
+                console.log('Buttons found:', { 
+                    confirm: !!confirmBtn, 
+                    reject: !!rejectBtn,
+                    confirmVisible: confirmBtn ? confirmBtn.offsetParent !== null : false,
+                    rejectVisible: rejectBtn ? rejectBtn.offsetParent !== null : false
+                });
 
-                // Show loading immediately
-                loadingState.querySelector('h2').textContent = 'Creating your account...';
-                showState('loading');
-
-                try {
-                    // Save user to main users collection
-                    const success = await saveVerifiedUser(pendingUserData);
-                    
-                    if (success) {
-                        // Delete pending user
-                        await deletePendingUser(pendingUserData.verificationToken);
-                        
-                        // 🚀 AUTO-LOGIN: Set user as logged in
-                        const verifiedUser = {
-                            ...pendingUserData,
-                            isVerified: true,
-                            verifiedAt: new Date().toISOString()
-                        };
-                        delete verifiedUser.verificationToken;
-                        delete verifiedUser.tokenCreatedAt;
-                        
-                        // Save to localStorage for immediate login
-                        localStorage.setItem('currentUser', JSON.stringify(verifiedUser));
-                        localStorage.setItem('justVerified', 'true');
-                        
-                        // Show success with auto-redirect message
-                        verifiedUserName.textContent = pendingUserData.name;
-                        showState('success');
-                        
-                        // Start countdown and auto-redirect
-                        let countdown = 3;
-                        const countdownElement = document.getElementById('countdown');
-                        
-                        const countdownInterval = setInterval(() => {
-                            countdown--;
-                            if (countdownElement) {
-                                countdownElement.textContent = countdown;
-                            }
-                            
-                            if (countdown <= 0) {
-                                clearInterval(countdownInterval);
-                                window.location.href = 'index.html';
-                            }
-                        }, 1000);
-                        
-                    } else {
-                        throw new Error('Failed to save user');
+                // Also use event delegation on the document for backup
+                document.addEventListener('click', function(e) {
+                    if (e.target && e.target.id === 'confirmRegistration') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('Confirm clicked via delegation');
+                        handleConfirmRegistration();
                     }
-                } catch (error) {
-                    console.error('Error confirming registration:', error);
-                    showState('error');
-                    errorMessage.textContent = 'Failed to create account. Please try again or contact support.';
+                    if (e.target && e.target.id === 'rejectRegistration') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('Reject clicked via delegation');
+                        handleRejectRegistration();
+                    }
+                });
+
+                // Direct event listeners
+                if (confirmBtn) {
+                    confirmBtn.onclick = function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('Confirm clicked via onclick');
+                        handleConfirmRegistration();
+                    };
+                    
+                    confirmBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('Confirm clicked via addEventListener');
+                        handleConfirmRegistration();
+                    });
+                    console.log('Confirm button listeners attached');
                 }
-            });
-        } else {
-            console.error('Confirm registration button not found');
+
+                if (rejectBtn) {
+                    rejectBtn.onclick = function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('Reject clicked via onclick');
+                        handleRejectRegistration();
+                    };
+                    
+                    rejectBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('Reject clicked via addEventListener');
+                        handleRejectRegistration();
+                    });
+                    console.log('Reject button listeners attached');
+                }
+            }, 100);
         }
 
-        // Reject registration - Fixed with proper error handling
-        if (rejectRegistration) {
-            rejectRegistration.addEventListener('click', async (e) => {
-                e.preventDefault();
-                console.log('Reject registration clicked');
+        // Handle confirm registration
+        async function handleConfirmRegistration() {
+            console.log('Handle confirm registration called', pendingUserData);
+            
+            if (!pendingUserData) {
+                console.error('No pending user data found');
+                showState('error');
+                errorMessage.textContent = 'No user data found. Please try the verification link again.';
+                return;
+            }
+
+            // Show loading immediately
+            loadingState.querySelector('h2').textContent = 'Creating your account...';
+            showState('loading');
+
+            try {
+                // Save user to main users collection
+                const success = await saveVerifiedUser(pendingUserData);
                 
-                if (!pendingUserData) {
-                    console.error('No pending user data found');
-                    return;
-                }
-
-                loadingState.querySelector('h2').textContent = 'Canceling registration...';
-                showState('loading');
-
-                try {
+                if (success) {
                     // Delete pending user
                     await deletePendingUser(pendingUserData.verificationToken);
                     
-                    // Show error state with rejection message
-                    showState('error');
-                    errorMessage.textContent = 'Registration canceled. You can sign up again anytime with a different email.';
-                } catch (error) {
-                    console.error('Error rejecting registration:', error);
-                    showState('error');
-                    errorMessage.textContent = 'Error canceling registration. Please try again.';
+                    // 🚀 AUTO-LOGIN: Set user as logged in
+                    const verifiedUser = {
+                        ...pendingUserData,
+                        isVerified: true,
+                        verifiedAt: new Date().toISOString()
+                    };
+                    delete verifiedUser.verificationToken;
+                    delete verifiedUser.tokenCreatedAt;
+                    
+                    // Save to localStorage for immediate login
+                    localStorage.setItem('currentUser', JSON.stringify(verifiedUser));
+                    localStorage.setItem('justVerified', 'true');
+                    
+                    // Show success with auto-redirect message
+                    verifiedUserName.textContent = pendingUserData.name;
+                    showState('success');
+                    
+                    // Start countdown and auto-redirect
+                    let countdown = 3;
+                    const countdownElement = document.getElementById('countdown');
+                    
+                    const countdownInterval = setInterval(() => {
+                        countdown--;
+                        if (countdownElement) {
+                            countdownElement.textContent = countdown;
+                        }
+                        
+                        if (countdown <= 0) {
+                            clearInterval(countdownInterval);
+                            window.location.href = 'index.html';
+                        }
+                    }, 1000);
+                    
+                } else {
+                    throw new Error('Failed to save user');
                 }
-            });
-        } else {
-            console.error('Reject registration button not found');
+            } catch (error) {
+                console.error('Error confirming registration:', error);
+                showState('error');
+                errorMessage.textContent = 'Failed to create account. Please try again or contact support.';
+            }
+        }
+
+        // Handle reject registration
+        async function handleRejectRegistration() {
+            console.log('Handle reject registration called');
+            
+            if (!pendingUserData) {
+                console.error('No pending user data found');
+                return;
+            }
+
+            loadingState.querySelector('h2').textContent = 'Canceling registration...';
+            showState('loading');
+
+            try {
+                // Delete pending user
+                await deletePendingUser(pendingUserData.verificationToken);
+                
+                // Show error state with rejection message
+                showState('error');
+                errorMessage.textContent = 'Registration canceled. You can sign up again anytime with a different email.';
+            } catch (error) {
+                console.error('Error rejecting registration:', error);
+                showState('error');
+                errorMessage.textContent = 'Error canceling registration. Please try again.';
+            }
         }
 
         // Start verification process - Ensure DOM is loaded
