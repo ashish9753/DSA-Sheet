@@ -14,8 +14,112 @@
             darkMode: 'class',
         }
     </script>
+    <style>
+        /* Floating particles animation */
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .particle {
+            position: absolute;
+            background: linear-gradient(45deg, #4b5563, #6b7280, #9ca3af);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+            opacity: 0.1;
+        }
+        
+        .particle:nth-child(odd) {
+            animation-duration: 20s;
+            background: linear-gradient(45deg, #6b7280, #9ca3af, #4b5563);
+        }
+        
+        .particle:nth-child(3n) {
+            animation-duration: 25s;
+            background: linear-gradient(45deg, #9ca3af, #d1d5db, #6b7280);
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.1;
+            }
+            90% {
+                opacity: 0.1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Glassmorphism effect */
+        .glass {
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Card hover animations - simplified */
+        .card-hover {
+            transition: all 0.2s ease;
+        }
+        
+        /* Pulse animation for completed items - reduced */
+        @keyframes pulse-success {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+            70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        
+        .pulse-success {
+            animation: pulse-success 1.5s ease-out;
+        }
+        
+        /* Slide in animations */
+        @keyframes slideInUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .animate-slideInUp {
+            animation: slideInUp 0.6s ease-out;
+        }
+        
+        /* Gradient text animation */
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .gradient-animate {
+            background: linear-gradient(-45deg, #3b82f6, #8b5cf6, #ec4899, #06b6d4);
+            background-size: 400% 400%;
+            animation: gradient-shift 3s ease infinite;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-gray-50 via-cyan-50 to-blue-50 dark:from-gray-900 dark:via-cyan-900 dark:to-blue-900 min-h-screen transition-all duration-300">
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black dark:from-gray-900 dark:via-gray-800 dark:to-black light:from-gray-50 light:via-blue-50 light:to-purple-50 min-h-screen transition-all duration-500 relative overflow-x-hidden">
+    <!-- Floating Particles -->
+    <div class="floating-particles" id="particles"></div>
+    
     <!-- Authentication Check -->
     <script>
         // Check authentication first
@@ -27,72 +131,69 @@
         }
     </script>
 
-    <div class="container mx-auto px-4 py-8">
+    <div class="container mx-auto px-4 py-8 relative z-10">
         <!-- Header -->
-        <div class="mb-8">
+        <div class="mb-8 animate-slideInUp">
             <div class="flex justify-between items-center mb-4">
                 <div>
-                    <h1 class="text-4xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent mb-2">
-                        DSA Recursion Sheet
+                    <h1 class="text-4xl font-bold gradient-animate mb-3">
+                        DSA Recursion Sheet.
                     </h1>
-                    <p class="text-gray-700 dark:text-gray-300 text-base">Master recursion patterns and backtracking problems — <a href="https://www.linkedin.com/in/ashish2208/" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-2 py-1 rounded shadow transition">Ashish Sharma</a></p>
+                    <p class="text-gray-400 dark:text-gray-400 light:text-black text-base">Master Recursion & Backtracking with structured practice — <a href="https://www.linkedin.com/in/ashish2208/" class="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-semibold px-3 py-1 rounded-full shadow-lg transition-all duration-300 hover:scale-105">Ashish Sharma</a></p>
                 </div>
-                <div class="flex space-x-4">
-                    <a href="index.html" class="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg transition-colors duration-300">
-                        ← Back to Hub
+                <!-- Navigation and Dark Mode Toggle -->
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="px-5 py-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl transition-all duration-300 flex items-center shadow-lg text-sm">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Hub
                     </a>
-                    <!-- Dark Mode Toggle -->
                     <button 
                         id="darkModeToggle"
-                        class="p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700"
+                        class="p-3 rounded-full bg-white/10 dark:bg-gray-800/50 light:bg-white backdrop-blur-lg shadow-xl transition-all duration-300 border border-white/20 dark:border-gray-700 light:border-gray-200"
                     >
-                        <i class="fas fa-moon text-gray-600 dark:text-yellow-400 text-xl" id="darkModeIcon"></i>
+                        <i class="fas fa-moon text-white dark:text-yellow-400 light:text-gray-600 text-lg" id="darkModeIcon"></i>
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- Search and Stats -->
-        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 mb-6">
+        <div class="glass bg-white/10 dark:bg-gray-800/30 light:bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700/50 light:border-gray-200 p-6 mb-8 animate-slideInUp">
             <div class="flex flex-col md:flex-row gap-6 items-center justify-between">
                 <div class="relative flex-1 max-w-md">
                     <input 
                         type="text" 
                         id="searchInput" 
-                        placeholder="Search problems..." 
-                        class="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300"
+                        placeholder="Search Recursion problems..." 
+                        class="w-full pl-12 pr-4 py-3 bg-white/20 dark:bg-gray-700/50 light:bg-gray-50 border border-white/30 dark:border-gray-600/50 light:border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent text-gray-200 dark:text-gray-200 light:text-gray-900 placeholder-gray-400 dark:placeholder-gray-400 light:placeholder-gray-500 transition-all duration-300 backdrop-blur-lg text-sm"
                     >
-                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-400 light:text-black"></i>
                 </div>
-                <div class="flex gap-4 text-sm">
-                    <div class="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl shadow-lg">
-                        <i class="fas fa-check mr-2"></i>
-                        Completed: <span id="completedCount" class="font-semibold">0</span>
+                <div class="flex gap-3 text-xs">
+                    <div class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl shadow-xl transition-all duration-300">
+                        <i class="fas fa-check mr-1"></i>
+                        Completed: <span id="completedCount" class="font-bold">0</span>
                     </div>
-                    <div class="px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl shadow-lg">
-                        <i class="fas fa-clock mr-2"></i>
-                        Remaining: <span id="remainingCount" class="font-semibold">0</span>
+                    <div class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl shadow-xl transition-all duration-300">
+                        <i class="fas fa-repeat mr-1"></i>
+                        Total: <span id="totalCount" class="font-bold">0</span>
                     </div>
-                    <div class="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl shadow-lg">
-                        <i class="fas fa-layer-group mr-2"></i>
-                        Total: <span id="totalCount" class="font-semibold">0</span>
-                    </div>
-                    <div class="px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl shadow-lg">
-                        <i class="fas fa-percentage mr-2"></i>
-                        <span id="progressPercentage">0%</span>
+                    <div class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-xl shadow-xl transition-all duration-300">
+                        <i class="fas fa-percentage mr-1"></i>
+                        <span id="progressPercentage" class="font-bold">0%</span>
                     </div>
                 </div>
             </div>
             <!-- Progress Bar -->
-            <div class="mt-4">
-                <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
-                    <span>Overall Progress</span>
-                    <span id="progressText">0 / 0</span>
+            <div class="mt-5">
+                <div class="flex justify-between text-xs text-gray-400 dark:text-gray-400 light:text-black mb-2">
+                    <span class="font-medium">Recursion Mastery Progress</span>
+                    <span id="progressText" class="font-bold">0 / 0</span>
                 </div>
-                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                <div class="w-full bg-white/20 dark:bg-gray-700/50 light:bg-gray-200 rounded-full h-3 overflow-hidden">
                     <div 
                         id="progressBar" 
-                        class="bg-gradient-to-r from-cyan-500 to-blue-500 h-3 rounded-full transition-all duration-500 ease-out"
+                        class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 h-3 rounded-full transition-all duration-1000 ease-out shadow-lg"
                         style="width: 0%"
                     ></div>
                 </div>
@@ -167,28 +268,6 @@
         // Check every 30 seconds if user still exists
         setInterval(verifyUserExists, 30000);
 
-        // Theme management
-        let isDarkMode = localStorage.getItem('recursionDarkMode') === 'true' || false;
-        
-        function toggleDarkMode() {
-            isDarkMode = !isDarkMode;
-            localStorage.setItem('recursionDarkMode', isDarkMode);
-            updateTheme();
-        }
-
-        function updateTheme() {
-            const html = document.documentElement;
-            const icon = document.getElementById('darkModeIcon');
-            
-            if (isDarkMode) {
-                html.classList.add('dark');
-                icon.className = 'fas fa-sun text-yellow-400 text-xl';
-            } else {
-                html.classList.remove('dark');
-                icon.className = 'fas fa-moon text-gray-600 text-xl';
-            }
-        }
-
         // In-memory storage for problem completion status
         let problemStatus = JSON.parse(localStorage.getItem('recursionProblemStatus')) || {};
         let allProblems = [];
@@ -202,20 +281,20 @@
                 { name: "Sort a stack using recursion", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/sort-a-stack-using-recursion/" },
                 { name: "Reverse a stack using recursion", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/reverse-a-stack-using-recursion/" }
             ],
-            "Day 2: Subsequences & Strings": [
-                { name: "Generate all binary strings", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/generate-all-binary-strings-without-consecutive-1s/" },
-                { name: "Generate Paranthesis", difficulty: "Medium", leetcode: "https://leetcode.com/problems/generate-parentheses/", gfg: "https://www.geeksforgeeks.org/print-all-combinations-of-balanced-parentheses/" },
+            "Day 2: Subsequences & Subsets": [
+                { name: "Generate all binary strings", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/generate-binary-strings-without-consecutive-1s/" },
+                { name: "Generate Parenthesis", difficulty: "Medium", leetcode: "https://leetcode.com/problems/generate-parentheses/", gfg: "https://www.geeksforgeeks.org/print-all-combinations-of-balanced-parentheses/" },
                 { name: "Print all subsequences/Power Set", difficulty: "Medium", leetcode: "https://leetcode.com/problems/subsets/", gfg: "https://www.geeksforgeeks.org/power-set/" },
-                { name: "Learn All Patterns of Subsequences (Theory)", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/generating-all-possible-subsequences-using-recursion/" },
-                { name: "Count all subsequences with sum K", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/count-of-subsequences-having-sum-equal-to-x/" },
+                { name: "Learn All Patterns of Subsequences (Theory)", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/subsequence/" },
+                { name: "Count all subsequences with sum K", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/count-of-subsequences-with-sum-equal-to-x/" },
                 { name: "Check if there exists a subsequence with sum K", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/given-an-array-a-and-a-number-x-check-for-pair-in-a-with-sum-as-x/" }
             ],
-            "Day 3: Combinations & Subsets": [
+            "Day 3: Combination & Subset Problems": [
                 { name: "Combination Sum", difficulty: "Medium", leetcode: "https://leetcode.com/problems/combination-sum/", gfg: "https://www.geeksforgeeks.org/combinational-sum/" },
                 { name: "Combination Sum-II", difficulty: "Medium", leetcode: "https://leetcode.com/problems/combination-sum-ii/", gfg: "https://www.geeksforgeeks.org/combinational-sum-ii/" },
-                { name: "Subset Sum-I", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/subset-sum-problem-dp-25/" },
-                { name: "Subset Sum-II", difficulty: "Medium", leetcode: "https://leetcode.com/problems/subsets-ii/", gfg: "https://www.geeksforgeeks.org/finding-all-subsets-of-a-given-set-in-java/" },
-                { name: "Combination Sum - III", difficulty: "Hard", leetcode: "https://leetcode.com/problems/combination-sum-iii/", gfg: "https://www.geeksforgeeks.org/combinational-sum-iii/" },
+                { name: "Subset Sum-I", difficulty: "Medium", leetcode: "https://leetcode.com/problems/subsets/", gfg: "https://www.geeksforgeeks.org/backtracking-to-find-all-subsets/" },
+                { name: "Subset Sum-II", difficulty: "Medium", leetcode: "https://leetcode.com/problems/subsets-ii/", gfg: "https://www.geeksforgeeks.org/find-distinct-subsets-given-set/" },
+                { name: "Combination Sum - III", difficulty: "Hard", leetcode: "https://leetcode.com/problems/combination-sum-iii/", gfg: "https://www.geeksforgeeks.org/combination-sum-iii/" },
                 { name: "Letter Combinations of a Phone number", difficulty: "Medium", leetcode: "https://leetcode.com/problems/letter-combinations-of-a-phone-number/", gfg: "https://www.geeksforgeeks.org/iterative-letter-combinations-of-a-phone-number/" },
                 { name: "Palindrome Partitioning", difficulty: "Medium", leetcode: "https://leetcode.com/problems/palindrome-partitioning/", gfg: "https://www.geeksforgeeks.org/palindrome-partitioning-dp-17/" }
             ],
@@ -225,7 +304,7 @@
                 { name: "Rat in a Maze", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/rat-in-a-maze-backtracking-2/" },
                 { name: "Word Break", difficulty: "Medium", leetcode: "https://leetcode.com/problems/word-break/", gfg: "https://www.geeksforgeeks.org/word-break-problem-dp-32/" },
                 { name: "M Coloring Problem", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/m-coloring-problem-backtracking-5/" },
-                { name: "Sudoko Solver", difficulty: "Hard", leetcode: "https://leetcode.com/problems/sudoku-solver/", gfg: "https://www.geeksforgeeks.org/sudoku-backtracking-7/" },
+                { name: "Sudoku Solver", difficulty: "Hard", leetcode: "https://leetcode.com/problems/sudoku-solver/", gfg: "https://www.geeksforgeeks.org/sudoku-backtracking-7/" },
                 { name: "Expression Add Operators", difficulty: "Hard", leetcode: "https://leetcode.com/problems/expression-add-operators/", gfg: "https://www.geeksforgeeks.org/expression-add-operators/" }
             ]
         };
@@ -265,10 +344,10 @@
         // Get section gradient
         function getSectionGradient(section) {
             const gradients = [
-                'from-cyan-500 to-blue-600',
-                'from-blue-500 to-indigo-600',
-                'from-indigo-500 to-purple-600',
-                'from-purple-500 to-pink-600'
+                'from-purple-500 to-indigo-600',
+                'from-indigo-500 to-blue-600',
+                'from-blue-500 to-cyan-600',
+                'from-cyan-500 to-teal-600'
             ];
             const index = Object.keys(problemData).indexOf(section) % gradients.length;
             return gradients[index];
@@ -327,54 +406,53 @@
             Object.keys(groupedProblems).forEach(section => {
                 const sectionProblems = groupedProblems[section];
                 const completedInSection = sectionProblems.filter(p => problemStatus[p.id]).length;
-                const remainingInSection = sectionProblems.length - completedInSection;
                 const sectionProgress = (completedInSection / sectionProblems.length) * 100;
                 
                 const sectionHtml = `
-                    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-2xl transition-all duration-300">
-                        <div class="bg-gradient-to-r ${getSectionGradient(section)} text-white p-6">
-                            <div class="flex justify-between items-center mb-3">
-                                <h2 class="text-2xl font-bold">${section}</h2>
-                                <div class="text-right">
-                                    <div class="text-sm opacity-90">Progress</div>
-                                    <div class="text-lg font-semibold">${completedInSection} / ${sectionProblems.length}</div>
-                                    <div class="text-xs opacity-75">${remainingInSection} remaining</div>
+                    <div class="glass bg-white/10 dark:bg-gray-800/30 light:bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700/50 light:border-gray-200 overflow-hidden transition-all duration-500 animate-slideInUp">
+                        <div class="bg-gradient-to-r ${getSectionGradient(section)} text-white p-6 relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform translate-x-full transition-transform duration-1000"></div>
+                            <div class="relative z-10">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h2 class="text-2xl font-bold tracking-tight">${section}</h2>
+                                    <div class="text-right">
+                                        <div class="text-sm opacity-90 font-medium">Progress</div>
+                                        <div class="text-xl font-bold">${completedInSection} / ${sectionProblems.length}</div>
+                                    </div>
+                                </div>
+                                <div class="w-full bg-white/20 backdrop-blur-sm rounded-full h-3 overflow-hidden">
+                                    <div 
+                                        class="bg-gradient-to-r from-white via-white/90 to-white h-3 rounded-full transition-all duration-1000 ease-out shadow-lg"
+                                        style="width: ${sectionProgress}%"
+                                    ></div>
                                 </div>
                             </div>
-                            <div class="w-full bg-white/20 rounded-full h-2">
-                                <div 
-                                    class="bg-white h-2 rounded-full transition-all duration-500"
-                                    style="width: ${sectionProgress}%"
-                                ></div>
-                            </div>
                         </div>
-                        <div class="p-6">
-                            <div class="space-y-3">
-                                ${sectionProblems.map(problem => `
-                                    <div class="group flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600/50 transition-all duration-300 hover:shadow-lg">
-                                        <div class="flex items-center space-x-4 flex-1">
-                                            <label class="relative cursor-pointer">
-                                                <input 
-                                                    type="checkbox" 
-                                                    class="sr-only"
-                                                    ${problemStatus[problem.id] ? 'checked' : ''}
-                                                    onchange="toggleProblem('${problem.id}')"
-                                                >
-                                                <div class="w-6 h-6 bg-white dark:bg-gray-600 border-2 border-gray-300 dark:border-gray-500 rounded-lg flex items-center justify-center transition-all duration-300 ${problemStatus[problem.id] ? 'bg-gradient-to-r from-green-500 to-emerald-500 border-green-500' : 'group-hover:border-cyan-400'}">
-                                                    <i class="fas fa-check text-white text-sm ${problemStatus[problem.id] ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300"></i>
-                                                </div>
-                                            </label>
-                                            <span class="text-gray-800 dark:text-gray-200 font-medium transition-all duration-300 ${problemStatus[problem.id] ? 'line-through opacity-60' : 'group-hover:text-cyan-600 dark:group-hover:text-cyan-400'} flex-1">${problem.name}</span>
-                                        </div>
-                                        <div class="flex items-center space-x-3">
-                                            ${generatePlatformLinks(problem)}
-                                            <span class="px-3 py-1 text-xs font-semibold rounded-full ${getDifficultyColor(problem.difficulty)} shadow-lg">
-                                                ${problem.difficulty}
-                                            </span>
-                                        </div>
+                        <div class="p-6 space-y-3">
+                            ${sectionProblems.map(problem => `
+                                <div class="group flex items-center justify-between p-4 glass bg-white/20 dark:bg-gray-700/30 light:bg-white/90 border border-white/30 dark:border-gray-600/50 light:border-gray-300 rounded-2xl transition-all duration-300 backdrop-blur-lg">
+                                    <div class="flex items-center space-x-4 flex-1">
+                                        <label class="relative cursor-pointer">
+                                            <input 
+                                                type="checkbox" 
+                                                class="sr-only"
+                                                ${problemStatus[problem.id] ? 'checked' : ''}
+                                                onchange="toggleProblem('${problem.id}')"
+                                            >
+                                            <div class="w-6 h-6 bg-white/40 dark:bg-gray-600/60 light:bg-white border-2 border-white/50 dark:border-gray-500/70 light:border-gray-300 rounded-xl flex items-center justify-center transition-all duration-300 ${problemStatus[problem.id] ? 'bg-gradient-to-r from-emerald-500 to-teal-500 border-emerald-500 shadow-lg shadow-emerald-500/25' : ''} backdrop-blur-sm">
+                                                <i class="fas fa-check text-white text-sm ${problemStatus[problem.id] ? 'opacity-100 animate-pulse-success' : 'opacity-0'} transition-all duration-300"></i>
+                                            </div>
+                                        </label>
+                                        <span class="text-gray-200 dark:text-gray-200 light:text-gray-900 font-medium transition-all duration-300 ${problemStatus[problem.id] ? 'line-through opacity-60' : ''} flex-1 text-sm">${problem.name}</span>
                                     </div>
-                                `).join('')}
-                            </div>
+                                    <div class="flex items-center space-x-3">
+                                        ${generatePlatformLinks(problem)}
+                                        <span class="px-3 py-1 text-xs font-bold rounded-xl ${getDifficultyColor(problem.difficulty)} shadow-lg backdrop-blur-sm border border-white/20">
+                                            ${problem.difficulty}
+                                        </span>
+                                    </div>
+                                </div>
+                            `).join('')}
                         </div>
                     </div>
                 `;
@@ -444,11 +522,9 @@
         function updateStats() {
             const completed = Object.values(problemStatus).filter(Boolean).length;
             const total = allProblems.length;
-            const remaining = total - completed;
             const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
             
             document.getElementById('completedCount').textContent = completed;
-            document.getElementById('remainingCount').textContent = remaining;
             document.getElementById('totalCount').textContent = total;
             document.getElementById('progressPercentage').textContent = percentage + '%';
             document.getElementById('progressText').textContent = `${completed} / ${total}`;
@@ -465,8 +541,84 @@
             renderProblems(filtered);
         }
 
+        // Create floating particles animation
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            if (!particlesContainer) return;
+            
+            particlesContainer.innerHTML = '';
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.cssText = `
+                    position: absolute;
+                    width: ${Math.random() * 4 + 2}px;
+                    height: ${Math.random() * 4 + 2}px;
+                    background: ${Math.random() > 0.5 ? '#3b82f6' : '#8b5cf6'};
+                    border-radius: 50%;
+                    left: ${Math.random() * 100}%;
+                    top: ${Math.random() * 100}%;
+                    opacity: ${Math.random() * 0.5 + 0.2};
+                    animation: float ${Math.random() * 6 + 4}s ease-in-out infinite;
+                    animation-delay: ${Math.random() * 2}s;
+                    pointer-events: none;
+                `;
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Theme management
+        function setTheme(theme) {
+            const html = document.documentElement;
+            const themeToggle = document.getElementById('darkModeToggle');
+            const themeIcon = document.getElementById('darkModeIcon');
+            
+            if (theme === 'dark') {
+                html.classList.remove('light');
+                html.classList.add('dark');
+                themeIcon.className = 'fas fa-sun text-yellow-400 text-lg';
+                localStorage.setItem('recursionDarkMode', 'true');
+            } else {
+                html.classList.remove('dark');
+                html.classList.add('light');
+                themeIcon.className = 'fas fa-moon text-gray-600 text-lg';
+                localStorage.setItem('recursionDarkMode', 'false');
+            }
+            
+            updateFooterElements();
+        }
+
+        // Update footer elements based on theme
+        function updateFooterElements() {
+            const footerLinks = document.querySelectorAll('footer a');
+            const footerText = document.querySelectorAll('footer p, footer span, footer div');
+            
+            footerLinks.forEach(link => {
+                if (document.documentElement.classList.contains('light')) {
+                    link.classList.add('light:text-blue-600', 'light:hover:text-blue-700');
+                } else {
+                    link.classList.remove('light:text-blue-600', 'light:hover:text-blue-700');
+                }
+            });
+        }
+
+        // Initialize theme
+        function updateTheme() {
+            const isDarkMode = localStorage.getItem('recursionDarkMode') !== 'false';
+            setTheme(isDarkMode ? 'dark' : 'light');
+        }
+
+        // Toggle dark mode
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.contains('dark');
+            setTheme(isDark ? 'light' : 'dark');
+        }
+
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
             updateTheme();
             initializeProblems();
             renderProblems();
@@ -489,5 +641,85 @@
             });
         });
     </script>
+
+    <!-- Footer -->
+    <footer class="glass bg-gradient-to-r from-gray-900/90 via-black/90 to-gray-900/90 dark:from-gray-900/90 dark:via-black/90 dark:to-gray-900/90 light:from-white/90 light:via-gray-50/90 light:to-white/90 backdrop-blur-2xl border-t border-white/10 dark:border-white/10 light:border-gray-200/50 text-white dark:text-white light:text-black mt-20 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-purple-900/10 via-indigo-900/10 to-blue-900/10 dark:from-purple-900/10 dark:via-indigo-900/10 dark:to-blue-900/10 light:from-purple-100/20 light:via-indigo-100/20 light:to-blue-100/20"></div>
+        
+        <!-- Floating particles for footer -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute top-10 left-10 w-2 h-2 bg-purple-500/30 rounded-full animate-bounce" style="animation-delay: 0s;"></div>
+            <div class="absolute top-20 right-20 w-1 h-1 bg-indigo-500/40 rounded-full animate-bounce" style="animation-delay: 1s;"></div>
+            <div class="absolute bottom-10 left-1/4 w-3 h-3 bg-blue-500/20 rounded-full animate-bounce" style="animation-delay: 2s;"></div>
+            <div class="absolute bottom-20 right-1/3 w-1 h-1 bg-purple-400/50 rounded-full animate-bounce" style="animation-delay: 3s;"></div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-16 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <!-- About Section -->
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-bold bg-gradient-to-r from-purple-400 via-indigo-400 to-blue-400 bg-clip-text text-transparent animate-gradient-shift">
+                        Recursion Mastery
+                    </h3>
+                    <p class="text-gray-300 dark:text-gray-300 light:text-black leading-relaxed text-sm">
+                        Master recursion, backtracking, and divide-and-conquer techniques with our comprehensive problem collection from basic to advanced levels.
+                    </p>
+                    <a href="index.html" class="inline-flex items-center px-4 py-2 glass bg-white/10 dark:bg-white/10 light:bg-black/10 hover:bg-white/20 dark:hover:bg-white/20 light:hover:bg-black/20 rounded-xl transition-all duration-300 hover:scale-105 backdrop-blur-lg border border-white/20 dark:border-white/20 light:border-black/20 text-sm group">
+                        <i class="fas fa-arrow-left mr-2 group-hover:-translate-x-1 transition-transform duration-300"></i>
+                        Back to Hub
+                    </a>
+                </div>
+
+                <!-- Quick Navigation -->
+                <div class="space-y-6">
+                    <h4 class="text-xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">Other Topics</h4>
+                    <ul class="space-y-3">
+                        <li><a href="Array.html" class="flex items-center p-2 glass bg-white/5 dark:bg-white/5 light:bg-black/5 hover:bg-white/10 dark:hover:bg-white/10 light:hover:bg-black/10 rounded-lg transition-all duration-300 hover:scale-105 backdrop-blur-sm text-sm group">
+                            <i class="fas fa-list mr-3 text-blue-400 group-hover:scale-110 transition-transform duration-300"></i>
+                            <span class="text-gray-300 dark:text-gray-300 light:text-black group-hover:text-blue-400 dark:group-hover:text-blue-400 light:group-hover:text-blue-600">Array Problems</span>
+                        </a></li>
+                        <li><a href="LinkedList.html" class="flex items-center p-2 glass bg-white/5 dark:bg-white/5 light:bg-black/5 hover:bg-white/10 dark:hover:bg-white/10 light:hover:bg-black/10 rounded-lg transition-all duration-300 hover:scale-105 backdrop-blur-sm text-sm group">
+                            <i class="fas fa-link mr-3 text-green-400 group-hover:scale-110 transition-transform duration-300"></i>
+                            <span class="text-gray-300 dark:text-gray-300 light:text-black group-hover:text-green-400 dark:group-hover:text-green-400 light:group-hover:text-green-600">LinkedList</span>
+                        </a></li>
+                        <li><a href="Tree.html" class="flex items-center p-2 glass bg-white/5 dark:bg-white/5 light:bg-black/5 hover:bg-white/10 dark:hover:bg-white/10 light:hover:bg-black/10 rounded-lg transition-all duration-300 hover:scale-105 backdrop-blur-sm text-sm group">
+                            <i class="fas fa-tree mr-3 text-purple-400 group-hover:scale-110 transition-transform duration-300"></i>
+                            <span class="text-gray-300 dark:text-gray-300 light:text-black group-hover:text-purple-400 dark:group-hover:text-purple-400 light:group-hover:text-purple-600">Trees & BST</span>
+                        </a></li>
+                        <li><a href="DP.html" class="flex items-center p-2 glass bg-white/5 dark:bg-white/5 light:bg-black/5 hover:bg-white/10 dark:hover:bg-white/10 light:hover:bg-black/10 rounded-lg transition-all duration-300 hover:scale-105 backdrop-blur-sm text-sm group">
+                            <i class="fas fa-chart-line mr-3 text-pink-400 group-hover:scale-110 transition-transform duration-300"></i>
+                            <span class="text-gray-300 dark:text-gray-300 light:text-black group-hover:text-pink-400 dark:group-hover:text-pink-400 light:group-hover:text-pink-600">Dynamic Programming</span>
+                        </a></li>
+                    </ul>
+                </div>
+
+                <!-- Connect Section -->
+                <div class="space-y-6">
+                    <h4 class="text-xl font-bold bg-gradient-to-r from-indigo-400 to-blue-400 bg-clip-text text-transparent">Connect</h4>
+                    <div class="flex space-x-4">
+                        <a href="https://www.linkedin.com/in/ashish2208/" class="flex items-center justify-center w-12 h-12 glass bg-gradient-to-r from-purple-500/20 to-indigo-600/20 hover:from-purple-500/30 hover:to-indigo-600/30 rounded-xl transition-all duration-300 hover:scale-110 hover:rotate-6 backdrop-blur-lg border border-purple-500/30 group">
+                            <i class="fab fa-linkedin text-purple-400 text-lg group-hover:text-white transition-colors duration-300"></i>
+                        </a>
+                        <a href="#" class="flex items-center justify-center w-12 h-12 glass bg-gradient-to-r from-gray-500/20 to-gray-600/20 hover:from-gray-500/30 hover:to-gray-600/30 rounded-xl transition-all duration-300 hover:scale-110 hover:rotate-6 backdrop-blur-lg border border-gray-500/30 group">
+                            <i class="fab fa-github text-gray-400 text-lg group-hover:text-white transition-colors duration-300"></i>
+                        </a>
+                    </div>
+                    <div class="glass bg-white/5 dark:bg-white/5 light:bg-black/5 backdrop-blur-lg rounded-xl p-4 border border-white/10 dark:border-white/10 light:border-black/10">
+                        <p class="text-gray-300 dark:text-gray-300 light:text-black text-sm leading-relaxed">
+                            Built with passion by 
+                            <span class="font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">Ashish Sharma</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="border-t border-white/10 dark:border-white/10 light:border-black/10 mt-12 pt-8 text-center">
+                <p class="text-gray-400 dark:text-gray-400 light:text-black text-sm font-medium">
+                    &copy; 2025 Programming Series Hub. Crafted for coding excellence.
+                </p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>

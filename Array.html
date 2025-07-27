@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DSA Problem Tracker</title>
+    <title>DSA Array Problem Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <!-- Firebase SDK -->
@@ -14,72 +14,186 @@
             darkMode: 'class',
         }
     </script>
+    <style>
+        /* Floating particles animation */
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .particle {
+            position: absolute;
+            background: linear-gradient(45deg, #4b5563, #6b7280, #9ca3af);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+            opacity: 0.1;
+        }
+        
+        .particle:nth-child(odd) {
+            animation-duration: 20s;
+            background: linear-gradient(45deg, #6b7280, #9ca3af, #4b5563);
+        }
+        
+        .particle:nth-child(3n) {
+            animation-duration: 25s;
+            background: linear-gradient(45deg, #9ca3af, #d1d5db, #6b7280);
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.1;
+            }
+            90% {
+                opacity: 0.1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Glassmorphism effect */
+        .glass {
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Card hover animations - simplified */
+        .card-hover {
+            transition: all 0.2s ease;
+        }
+        
+        /* Pulse animation for completed items - reduced */
+        @keyframes pulse-success {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+            70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        
+        .pulse-success {
+            animation: pulse-success 1.5s ease-out;
+        }
+        
+        /* Slide in animations */
+        @keyframes slideInUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .animate-slideInUp {
+            animation: slideInUp 0.6s ease-out;
+        }
+        
+        /* Gradient text animation */
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .gradient-animate {
+            background: linear-gradient(-45deg, #3b82f6, #8b5cf6, #ec4899, #06b6d4);
+            background-size: 400% 400%;
+            animation: gradient-shift 3s ease infinite;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 min-h-screen transition-all duration-300">
-    <div class="container mx-auto px-4 py-8">
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black dark:from-gray-900 dark:via-gray-800 dark:to-black light:from-gray-50 light:via-blue-50 light:to-purple-50 min-h-screen transition-all duration-500 relative overflow-x-hidden">
+    <!-- Floating Particles -->
+    <div class="floating-particles" id="particles"></div>
+    
+    <!-- Authentication Check -->
+    <script>
+        // Check authentication first
+        const currentUser = localStorage.getItem('currentUser');
+        const isAdmin = localStorage.getItem('isAdmin');
+        
+        if (!currentUser && !isAdmin) {
+            window.location.href = 'auth.html';
+        }
+    </script>
+
+    <div class="container mx-auto px-4 py-8 relative z-10">
         <!-- Header -->
-        <div class="mb-8">
+        <div class="mb-8 animate-slideInUp">
             <div class="flex justify-between items-center mb-4">
                 <div>
-                    <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                    <h1 class="text-4xl font-bold gradient-animate mb-3">
                         DSA Array Sheet.
                     </h1>
-                    <p class="text-gray-700 dark:text-gray-300 text-base">Track your progress through coding problems with style — <a href="https://www.linkedin.com/in/ashish2208/" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-2 py-1 rounded shadow transition">Ashish Sharma</a></p>
-
+                    <p class="text-gray-400 dark:text-gray-400 light:text-black text-base">Master Array problems with structured practice — <a href="https://www.linkedin.com/in/ashish2208/" class="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-semibold px-3 py-1 rounded-full shadow-lg transition-all duration-300 hover:scale-105">Ashish Sharma</a></p>
                 </div>
                 <!-- Navigation and Dark Mode Toggle -->
                 <div class="flex items-center space-x-4">
-                    <a href="index.html" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-300 flex items-center">
+                    <a href="index.html" class="px-5 py-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl transition-all duration-300 flex items-center shadow-lg text-sm">
                         <i class="fas fa-arrow-left mr-2"></i>
                         Back to Hub
                     </a>
                     <button 
                         id="darkModeToggle"
-                        class="p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700"
+                        class="p-3 rounded-full bg-white/10 dark:bg-gray-800/50 light:bg-white backdrop-blur-lg shadow-xl transition-all duration-300 border border-white/20 dark:border-gray-700 light:border-gray-200"
                     >
-                        <i class="fas fa-moon text-gray-600 dark:text-yellow-400 text-xl" id="darkModeIcon"></i>
+                        <i class="fas fa-moon text-white dark:text-yellow-400 light:text-gray-600 text-lg" id="darkModeIcon"></i>
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- Search and Stats -->
-        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 mb-6">
+        <div class="glass bg-white/10 dark:bg-gray-800/30 light:bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700/50 light:border-gray-200 p-6 mb-8 animate-slideInUp">
             <div class="flex flex-col md:flex-row gap-6 items-center justify-between">
                 <div class="relative flex-1 max-w-md">
                     <input 
                         type="text" 
                         id="searchInput" 
-                        placeholder="Search problems..." 
-                        class="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300"
+                        placeholder="Search Array problems..." 
+                        class="w-full pl-12 pr-4 py-3 bg-white/20 dark:bg-gray-700/50 light:bg-gray-50 border border-white/30 dark:border-gray-600/50 light:border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent text-gray-200 dark:text-gray-200 light:text-gray-900 placeholder-gray-400 dark:placeholder-gray-400 light:placeholder-gray-500 transition-all duration-300 backdrop-blur-lg text-sm"
                     >
-                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-400 light:text-black"></i>
                 </div>
-                <div class="flex gap-4 text-sm">
-                    <div class="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl shadow-lg">
-                        <i class="fas fa-check mr-2"></i>
-                        Completed: <span id="completedCount" class="font-semibold">0</span>
+                <div class="flex gap-3 text-xs">
+                    <div class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl shadow-xl transition-all duration-300">
+                        <i class="fas fa-check mr-1"></i>
+                        Completed: <span id="completedCount" class="font-bold">0</span>
                     </div>
-                    <div class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl shadow-lg">
-                        <i class="fas fa-list mr-2"></i>
-                        Total: <span id="totalCount" class="font-semibold">0</span>
+                    <div class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl shadow-xl transition-all duration-300">
+                        <i class="fas fa-link mr-1"></i>
+                        Total: <span id="totalCount" class="font-bold">0</span>
                     </div>
-                    <div class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg">
-                        <i class="fas fa-percentage mr-2"></i>
-                        <span id="progressPercentage">0%</span>
+                    <div class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-xl shadow-xl transition-all duration-300">
+                        <i class="fas fa-percentage mr-1"></i>
+                        <span id="progressPercentage" class="font-bold">0%</span>
                     </div>
                 </div>
             </div>
             <!-- Progress Bar -->
-            <div class="mt-4">
-                <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
-                    <span>Overall Progress</span>
-                    <span id="progressText">0 / 0</span>
+            <div class="mt-5">
+                <div class="flex justify-between text-xs text-gray-400 dark:text-gray-400 light:text-black mb-2">
+                    <span class="font-medium">Array Mastery Progress</span>
+                    <span id="progressText" class="font-bold">0 / 0</span>
                 </div>
-                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                <div class="w-full bg-white/20 dark:bg-gray-700/50 light:bg-gray-200 rounded-full h-3 overflow-hidden">
                     <div 
                         id="progressBar" 
-                        class="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all duration-500 ease-out"
+                        class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 h-3 rounded-full transition-all duration-1000 ease-out shadow-lg"
                         style="width: 0%"
                     ></div>
                 </div>
@@ -108,67 +222,88 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Theme management
-        let isDarkMode = localStorage.getItem('darkMode') === 'true' || false;
-        
-        function toggleDarkMode() {
-            isDarkMode = !isDarkMode;
-            localStorage.setItem('darkMode', isDarkMode);
-            updateTheme();
-        }
-
-        function updateTheme() {
-            const html = document.documentElement;
-            const icon = document.getElementById('darkModeIcon');
+        // Auto-logout if user is deleted from Firebase
+        async function verifyUserExists() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const isAdmin = localStorage.getItem('isAdmin');
             
-            if (isDarkMode) {
-                html.classList.add('dark');
-                icon.className = 'fas fa-sun text-yellow-400 text-xl';
-            } else {
-                html.classList.remove('dark');
-                icon.className = 'fas fa-moon text-gray-600 text-xl';
+            // Skip verification for admin users
+            if (isAdmin === 'true') {
+                return true;
+            }
+            
+            if (!currentUser || !currentUser.id) {
+                return true; // Let normal auth flow handle this
+            }
+            
+            try {
+                // Check if user still exists in Firebase using their ID (not email)
+                const userDoc = await db.collection('users').doc(currentUser.id.toString()).get();
+                
+                if (!userDoc.exists) {
+                    // User has been deleted from Firebase, logout immediately
+                    console.log('User deleted by admin, logging out...');
+                    localStorage.removeItem('currentUser');
+                    localStorage.removeItem('userProgress');
+                    localStorage.removeItem('arrayProblemStatus');
+                    localStorage.removeItem('arrayDarkMode');
+                    
+                    // Show notification and redirect
+                    alert('Your account has been removed by the administrator. You will be redirected to the login page.');
+                    window.location.href = 'auth.html';
+                    return false;
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('Error verifying user:', error);
+                // On error, allow user to continue (Firebase might be temporarily unavailable)
+                return true;
             }
         }
 
+        // Run verification on page load and periodically
+        verifyUserExists();
+        
+        // Check every 30 seconds if user still exists
+        setInterval(verifyUserExists, 30000);
+
         // In-memory storage for problem completion status
-        let problemStatus = JSON.parse(localStorage.getItem('problemStatus')) || {};
+        let problemStatus = JSON.parse(localStorage.getItem('arrayProblemStatus')) || {};
         let allProblems = [];
 
-        // Problem data structure with platform links
+        // Array Problem data structure - 46 problems across 5 days
         const problemData = {
             "Day 1: Basic": [
-                { name: "Largest Element in an Array", difficulty: "Easy", leetcode: "https://leetcode.com/problems/largest-number/", gfg: "https://www.geeksforgeeks.org/c-program-find-largest-element-array/" },
-                { name: "Check if the array is sorted", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/program-check-array-sorted-not-iterative-recursive/" },
+                { name: "Largest Element in an Array", difficulty: "Easy", leetcode: "https://leetcode.com/problems/find-largest-element-in-array/", gfg: "https://www.geeksforgeeks.org/c-program-find-largest-element-array/" },
+                { name: "Check if the array is sorted", difficulty: "Easy", leetcode: "https://leetcode.com/problems/check-if-array-is-sorted-and-rotated/", gfg: "https://www.geeksforgeeks.org/program-check-array-sorted-not-iterative-recursive/" },
                 { name: "Second Largest Element in an Array without sorting", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-second-largest-element-array/" },
                 { name: "Linear Search", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/linear-search/" },
                 { name: "Left Rotate an array by one place", difficulty: "Easy", leetcode: "https://leetcode.com/problems/rotate-array/", gfg: "https://www.geeksforgeeks.org/array-rotation/" },
-                { name: "Single Number (Every element appears twice except one)", difficulty: "Easy", leetcode: "https://leetcode.com/problems/single-number/", gfg: "" },
-                { name: "Two Sum (Find indices of two numbers that add up to target)", difficulty: "Easy", leetcode: "https://leetcode.com/problems/two-sum/", gfg: "" }
-
-
+                { name: "Single Number (Every element appears twice except one)", difficulty: "Easy", leetcode: "https://leetcode.com/problems/single-number/", gfg: "https://www.geeksforgeeks.org/find-element-appears-once-array-every-element-appears-twice/" },
+                { name: "Two Sum (Find indices of two numbers that add up to target)", difficulty: "Easy", leetcode: "https://leetcode.com/problems/two-sum/", gfg: "https://www.geeksforgeeks.org/pair-with-given-sum-in-a-sorted-array/" }
             ],
             "Day 2: Easy": [
-                { name: "Maximum Consecutive Ones", difficulty: "Easy", leetcode: "https://leetcode.com/problems/max-consecutive-ones/", gfg: "https://www.geeksforgeeks.org/count-maximum-consecutive-ones-in-binary-string/" },
+                { name: "Maximum Consecutive Ones", difficulty: "Easy", leetcode: "https://leetcode.com/problems/max-consecutive-ones/", gfg: "https://www.geeksforgeeks.org/maximum-consecutive-1s-binary-array/" },
                 { name: "Move Zeros to end", difficulty: "Easy", leetcode: "https://leetcode.com/problems/move-zeroes/", gfg: "https://www.geeksforgeeks.org/move-zeroes-end-array/" },
                 { name: "Left rotate an array by D places", difficulty: "Easy", leetcode: "https://leetcode.com/problems/rotate-array/", gfg: "https://www.geeksforgeeks.org/array-rotation/" },
                 { name: "Remove duplicates from Sorted array", difficulty: "Easy", leetcode: "https://leetcode.com/problems/remove-duplicates-from-sorted-array/", gfg: "https://www.geeksforgeeks.org/remove-duplicates-sorted-array/" },
                 { name: "Find missing number in an array", difficulty: "Easy", leetcode: "https://leetcode.com/problems/missing-number/", gfg: "https://www.geeksforgeeks.org/find-the-missing-number/" },
-                { name: "Find the number that appears once, and other numbers twice.", difficulty: "Medium", leetcode: "https://leetcode.com/problems/single-number/", gfg: "https://www.geeksforgeeks.org/find-the-element-that-appears-once/" },
+                { name: "Find the number that appears once, and other numbers twice", difficulty: "Medium", leetcode: "https://leetcode.com/problems/single-number/", gfg: "https://www.geeksforgeeks.org/find-element-appears-once-array-every-element-appears-twice/" },
                 { name: "Find the Union", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-union-and-intersection-of-two-unsorted-arrays/" },
-                { name: "2Sum Problem", difficulty: "Medium", leetcode: "https://leetcode.com/problems/two-sum/", gfg: "https://www.geeksforgeeks.org/given-an-array-a-and-a-number-x-check-for-pair-in-a-with-sum-as-x/" },
-                { name: "Sort Colors (Dutch National Flag Problem)", difficulty: "Medium", leetcode: "https://leetcode.com/problems/sort-colors/", gfg: "" }
-
+                { name: "2Sum Problem", difficulty: "Medium", leetcode: "https://leetcode.com/problems/two-sum/", gfg: "https://www.geeksforgeeks.org/pair-with-given-sum-in-a-sorted-array/" },
+                { name: "Sort Colors (Dutch National Flag Problem)", difficulty: "Medium", leetcode: "https://leetcode.com/problems/sort-colors/", gfg: "https://www.geeksforgeeks.org/sort-an-array-of-0s-1s-and-2s/" }
             ],
             "Day 3: Medium": [
                 { name: "Search in a 2 D matrix", difficulty: "Medium", leetcode: "https://leetcode.com/problems/search-a-2d-matrix/", gfg: "https://www.geeksforgeeks.org/search-in-row-wise-and-column-wise-sorted-matrix/" },
                 { name: "Leaders in an Array problem", difficulty: "Easy", leetcode: "", gfg: "https://www.geeksforgeeks.org/leaders-in-an-array/" },
                 { name: "Print the matrix in spiral manner", difficulty: "Medium", leetcode: "https://leetcode.com/problems/spiral-matrix/", gfg: "https://www.geeksforgeeks.org/print-a-given-matrix-in-spiral-form/" },
-                { name: "Rotate Matrix by 90 degrees", difficulty: "Medium", leetcode: "https://leetcode.com/problems/rotate-image/", gfg: "https://www.geeksforgeeks.org/rotate-a-matrix-by-90-degree-in-clockwise-direction/" },
-                { name: "Stock Buy and Sell", difficulty: "Easy", leetcode: "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/", gfg: "https://www.geeksforgeeks.org/best-time-to-buy-and-sell-stock/" },
-                { name: "Rearrange the array in alternating positive and negative items", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/rearrange-array-alternating-positive-negative-items-o1-extra-space/" },
+                { name: "Rotate Matrix by 90 degrees", difficulty: "Medium", leetcode: "https://leetcode.com/problems/rotate-image/", gfg: "https://www.geeksforgeeks.org/rotate-a-matrix-by-90-degree-in-clockwise-direction-without-using-any-extra-space/" },
+                { name: "Stock Buy and Sell", difficulty: "Easy", leetcode: "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/", gfg: "https://www.geeksforgeeks.org/stock-buy-sell/" },
+                { name: "Rearrange the array in alternating positive and negative items", difficulty: "Medium", leetcode: "https://leetcode.com/problems/rearrange-array-elements-by-sign/", gfg: "https://www.geeksforgeeks.org/rearrange-array-alternating-positive-negative-items-o1-extra-space/" },
                 { name: "Find the duplicate in an array of N+1 integers", difficulty: "Medium", leetcode: "https://leetcode.com/problems/find-the-duplicate-number/", gfg: "https://www.geeksforgeeks.org/find-duplicates-in-on-time-and-constant-extra-space/" },
                 { name: "Kadane's Algorithm, maximum subarray sum", difficulty: "Easy", leetcode: "https://leetcode.com/problems/maximum-subarray/", gfg: "https://www.geeksforgeeks.org/largest-sum-contiguous-subarray/" },
-                { name: "Print subarray with maximum subarray sum (extended version of above problem)", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/print-the-maximum-subarray-sum/" },
+                { name: "Print subarray with maximum subarray sum (extended version of above problem)", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/largest-sum-contiguous-subarray/" },
                 { name: "Grid Unique Paths", difficulty: "Medium", leetcode: "https://leetcode.com/problems/unique-paths/", gfg: "https://www.geeksforgeeks.org/count-possible-paths-top-left-bottom-right-nxm-matrix/" },
                 { name: "Sort an array of 0's, 1's and 2's", difficulty: "Medium", leetcode: "https://leetcode.com/problems/sort-colors/", gfg: "https://www.geeksforgeeks.org/sort-an-array-of-0s-1s-and-2s/" },
                 { name: "Pascal's Triangle", difficulty: "Medium", leetcode: "https://leetcode.com/problems/pascals-triangle/", gfg: "https://www.geeksforgeeks.org/pascal-triangle/" }
@@ -177,23 +312,23 @@
                 { name: "Majority Element (>n/2 times)", difficulty: "Easy", leetcode: "https://leetcode.com/problems/majority-element/", gfg: "https://www.geeksforgeeks.org/majority-element/" },
                 { name: "Next Permutation", difficulty: "Medium", leetcode: "https://leetcode.com/problems/next-permutation/", gfg: "https://www.geeksforgeeks.org/find-next-greater-number-set-digits/" },
                 { name: "Set Matrix Zeros", difficulty: "Medium", leetcode: "https://leetcode.com/problems/set-matrix-zeroes/", gfg: "https://www.geeksforgeeks.org/a-boolean-matrix-question/" },
-                { name: "Majority Element (n/3 times)", difficulty: "Medium", leetcode: "https://leetcode.com/problems/majority-element-ii/", gfg: "https://www.geeksforgeeks.org/given-an-array-of-of-size-n-finds-all-the-elements-that-appear-more-than-nk-times/" },
+                { name: "Majority Element (n/3 times)", difficulty: "Medium", leetcode: "https://leetcode.com/problems/majority-element-ii/", gfg: "https://www.geeksforgeeks.org/majority-element/" },
                 { name: "Merge Overlapping Subintervals", difficulty: "Medium", leetcode: "https://leetcode.com/problems/merge-intervals/", gfg: "https://www.geeksforgeeks.org/merging-intervals/" },
-                { name: "Merge two sorted arrays without extra space", difficulty: "Medium", leetcode: "https://leetcode.com/problems/merge-sorted-array/", gfg: "https://www.geeksforgeeks.org/merge-two-sorted-arrays-o1-extra-space/" },
+                { name: "Merge two sorted arrays without extra space", difficulty: "Medium", leetcode: "https://leetcode.com/problems/merge-sorted-array/", gfg: "https://www.geeksforgeeks.org/merge-two-sorted-arrays/" },
                 { name: "Longest Consecutive Sequence in an Array", difficulty: "Medium", leetcode: "https://leetcode.com/problems/longest-consecutive-sequence/", gfg: "https://www.geeksforgeeks.org/longest-consecutive-subsequence/" },
                 { name: "Longest subarray with given sum K(positives)", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/longest-sub-array-sum-k/" },
-                { name: "Longest subarray with sum K (Positives + Negatives)", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/longest-subarray-sum-k-set-2/" },
+                { name: "Longest subarray with sum K (Positives + Negatives)", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/longest-sub-array-sum-k/" },
                 { name: "Count subarrays with given sum", difficulty: "Easy", leetcode: "https://leetcode.com/problems/subarray-sum-equals-k/", gfg: "https://www.geeksforgeeks.org/number-subarrays-sum-exactly-equal-k/" },
-                { name: "Count number of subarrays with given xor K", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/count-number-of-subarrays-with-given-xor/" }
+                { name: "Count number of subarrays with given xor K", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/count-number-of-subarrays-having-xor-of-elements-as-k/" }
             ],
             "Day 5: Expert": [
                 { name: "3-Sum Problem", difficulty: "Medium", leetcode: "https://leetcode.com/problems/3sum/", gfg: "https://www.geeksforgeeks.org/find-a-triplet-that-sum-to-a-given-value/" },
                 { name: "4-Sum Problem", difficulty: "Hard", leetcode: "https://leetcode.com/problems/4sum/", gfg: "https://www.geeksforgeeks.org/find-four-numbers-with-sum-equal-to-given-sum/" },
                 { name: "Find the repeating and missing number", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/find-a-repeating-and-a-missing-number/" },
                 { name: "Maximum Product Subarray", difficulty: "Easy", leetcode: "https://leetcode.com/problems/maximum-product-subarray/", gfg: "https://www.geeksforgeeks.org/maximum-product-subarray/" },
-                { name: "Merge Sort", difficulty: "Medium", leetcode: "https://leetcode.com/problems/sort-an-array/", gfg: "https://www.geeksforgeeks.org/merge-sort/" },
+                { name: "Merge Sort", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/merge-sort/" },
                 { name: "Count Inversions", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/counting-inversions/" },
-                { name: "Reverse Pairs", difficulty: "Hard", leetcode: "https://leetcode.com/problems/reverse-pairs/", gfg: "https://www.geeksforgeeks.org/counting-inversions/" }
+                { name: "Reverse Pairs", difficulty: "Hard", leetcode: "https://leetcode.com/problems/reverse-pairs/", gfg: "https://www.geeksforgeeks.org/count-reverse-pairs-array/" }
             ]
         };
 
@@ -232,11 +367,11 @@
         // Get section gradient
         function getSectionGradient(section) {
             const gradients = [
-                'from-blue-500 to-purple-600',
-                'from-purple-500 to-pink-600',
+                'from-blue-500 to-cyan-600',
+                'from-purple-500 to-indigo-600',
                 'from-pink-500 to-rose-600',
-                'from-indigo-500 to-blue-600',
-                'from-cyan-500 to-teal-600'
+                'from-orange-500 to-red-600',
+                'from-teal-500 to-green-600'
             ];
             const index = Object.keys(problemData).indexOf(section) % gradients.length;
             return gradients[index];
@@ -254,15 +389,19 @@
                         <i class="fab fa-leetcode text-lg"></i>
                     </a>
                 `;
-            } else if (problem.gfg) {
+            }
+            
+            if (problem.gfg) {
                 linksHtml += `
                     <a href="${problem.gfg}" target="_blank" 
-                       class="p-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+                       class="p-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 ml-2"
                        title="Open in GeeksforGeeks">
                         <i class="fas fa-code text-lg"></i>
                     </a>
                 `;
-            } else {
+            }
+            
+            if (!problem.leetcode && !problem.gfg) {
                 linksHtml += `
                     <div class="p-2 bg-red-500 text-white rounded-lg opacity-50 cursor-not-allowed" 
                          title="No link available">
@@ -294,49 +433,50 @@
                 const sectionProgress = (completedInSection / sectionProblems.length) * 100;
                 
                 const sectionHtml = `
-                    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-2xl transition-all duration-300">
-                        <div class="bg-gradient-to-r ${getSectionGradient(section)} text-white p-6">
-                            <div class="flex justify-between items-center mb-3">
-                                <h2 class="text-2xl font-bold">${section}</h2>
-                                <div class="text-right">
-                                    <div class="text-sm opacity-90">Progress</div>
-                                    <div class="text-lg font-semibold">${completedInSection} / ${sectionProblems.length}</div>
+                    <div class="glass bg-white/10 dark:bg-gray-800/30 light:bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700/50 light:border-gray-200 overflow-hidden transition-all duration-500 animate-slideInUp">
+                        <div class="bg-gradient-to-r ${getSectionGradient(section)} text-white p-6 relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform translate-x-full transition-transform duration-1000"></div>
+                            <div class="relative z-10">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h2 class="text-2xl font-bold tracking-tight">${section}</h2>
+                                    <div class="text-right">
+                                        <div class="text-sm opacity-90 font-medium">Progress</div>
+                                        <div class="text-xl font-bold">${completedInSection} / ${sectionProblems.length}</div>
+                                    </div>
+                                </div>
+                                <div class="w-full bg-white/20 backdrop-blur-sm rounded-full h-3 overflow-hidden">
+                                    <div 
+                                        class="bg-gradient-to-r from-white via-white/90 to-white h-3 rounded-full transition-all duration-1000 ease-out shadow-lg"
+                                        style="width: ${sectionProgress}%"
+                                    ></div>
                                 </div>
                             </div>
-                            <div class="w-full bg-white/20 rounded-full h-2">
-                                <div 
-                                    class="bg-white h-2 rounded-full transition-all duration-500"
-                                    style="width: ${sectionProgress}%"
-                                ></div>
-                            </div>
                         </div>
-                        <div class="p-6">
-                            <div class="space-y-3">
-                                ${sectionProblems.map(problem => `
-                                    <div class="group flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600/50 transition-all duration-300 hover:shadow-lg">
-                                        <div class="flex items-center space-x-4 flex-1">
-                                            <label class="relative cursor-pointer">
-                                                <input 
-                                                    type="checkbox" 
-                                                    class="sr-only"
-                                                    ${problemStatus[problem.id] ? 'checked' : ''}
-                                                    onchange="toggleProblem('${problem.id}')"
-                                                >
-                                                <div class="w-6 h-6 bg-white dark:bg-gray-600 border-2 border-gray-300 dark:border-gray-500 rounded-lg flex items-center justify-center transition-all duration-300 ${problemStatus[problem.id] ? 'bg-gradient-to-r from-green-500 to-emerald-500 border-green-500' : 'group-hover:border-blue-400'}">
-                                                    <i class="fas fa-check text-white text-sm ${problemStatus[problem.id] ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300"></i>
-                                                </div>
-                                            </label>
-                                            <span class="text-gray-800 dark:text-gray-200 font-medium transition-all duration-300 ${problemStatus[problem.id] ? 'line-through opacity-60' : 'group-hover:text-blue-600 dark:group-hover:text-blue-400'} flex-1">${problem.name}</span>
-                                        </div>
-                                        <div class="flex items-center space-x-3">
-                                            ${generatePlatformLinks(problem)}
-                                            <span class="px-3 py-1 text-xs font-semibold rounded-full ${getDifficultyColor(problem.difficulty)} shadow-lg">
-                                                ${problem.difficulty}
-                                            </span>
-                                        </div>
+                        <div class="p-6 space-y-3">
+                            ${sectionProblems.map(problem => `
+                                <div class="group flex items-center justify-between p-4 glass bg-white/20 dark:bg-gray-700/30 light:bg-white/90 border border-white/30 dark:border-gray-600/50 light:border-gray-300 rounded-2xl transition-all duration-300 backdrop-blur-lg">
+                                    <div class="flex items-center space-x-4 flex-1">
+                                        <label class="relative cursor-pointer">
+                                            <input 
+                                                type="checkbox" 
+                                                class="sr-only"
+                                                ${problemStatus[problem.id] ? 'checked' : ''}
+                                                onchange="toggleProblem('${problem.id}')"
+                                            >
+                                            <div class="w-6 h-6 bg-white/40 dark:bg-gray-600/60 light:bg-white border-2 border-white/50 dark:border-gray-500/70 light:border-gray-300 rounded-xl flex items-center justify-center transition-all duration-300 ${problemStatus[problem.id] ? 'bg-gradient-to-r from-emerald-500 to-teal-500 border-emerald-500 shadow-lg shadow-emerald-500/25' : ''} backdrop-blur-sm">
+                                                <i class="fas fa-check text-white text-sm ${problemStatus[problem.id] ? 'opacity-100 animate-pulse-success' : 'opacity-0'} transition-all duration-300"></i>
+                                            </div>
+                                        </label>
+                                        <span class="text-gray-200 dark:text-gray-200 light:text-gray-900 font-medium transition-all duration-300 ${problemStatus[problem.id] ? 'line-through opacity-60' : ''} flex-1 text-sm">${problem.name}</span>
                                     </div>
-                                `).join('')}
-                            </div>
+                                    <div class="flex items-center space-x-3">
+                                        ${generatePlatformLinks(problem)}
+                                        <span class="px-3 py-1 text-xs font-bold rounded-xl ${getDifficultyColor(problem.difficulty)} shadow-lg backdrop-blur-sm border border-white/20">
+                                            ${problem.difficulty}
+                                        </span>
+                                    </div>
+                                </div>
+                            `).join('')}
                         </div>
                     </div>
                 `;
@@ -347,7 +487,7 @@
         // Toggle problem completion
         function toggleProblem(problemId) {
             problemStatus[problemId] = !problemStatus[problemId];
-            localStorage.setItem('problemStatus', JSON.stringify(problemStatus));
+            localStorage.setItem('arrayProblemStatus', JSON.stringify(problemStatus));
             
             // Track user progress for admin
             updateUserProgress();
@@ -365,35 +505,28 @@
         // Update user progress tracking
         async function updateUserProgress() {
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            if (!currentUser) {
-                console.log('No current user found');
-                return;
-            }
+            if (!currentUser) return;
             
             const completed = Object.values(problemStatus).filter(Boolean).length;
             const total = allProblems.length;
             const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
             
-            console.log('Updating progress for:', currentUser.email, 'Completed:', completed, 'Total:', total);
-            
             // Get existing user progress data
             let userProgress = JSON.parse(localStorage.getItem('userProgress')) || {};
             
-            // Ensure user entry exists
-            if (!userProgress[currentUser.email]) {
-                userProgress[currentUser.email] = {
-                    name: currentUser.name,
-                    email: currentUser.email,
-                    sheets: {}
-                };
-            }
-            
             // Update current user's progress
-            userProgress[currentUser.email].sheets['Array'] = {
-                completed: completed,
-                total: total,
-                percentage: percentage,
-                lastUpdated: new Date().toISOString()
+            userProgress[currentUser.email] = {
+                name: currentUser.name,
+                email: currentUser.email,
+                sheets: {
+                    ...userProgress[currentUser.email]?.sheets,
+                    'Array': {
+                        completed: completed,
+                        total: total,
+                        percentage: percentage,
+                        lastUpdated: new Date().toISOString()
+                    }
+                }
             };
             
             // Save to localStorage (backup)
@@ -402,13 +535,11 @@
             // Save to Firebase for real-time admin access
             try {
                 await db.collection('userProgress').doc(currentUser.email).set(userProgress[currentUser.email]);
-                console.log('Progress saved to Firebase successfully');
+                console.log('Array progress saved to Firebase successfully');
             } catch (error) {
-                console.error('Error saving progress to Firebase:', error);
+                console.error('Error saving Array progress to Firebase:', error);
                 // Firebase error is not critical, localStorage backup exists
             }
-            
-            console.log('Progress saved:', userProgress[currentUser.email]);
         }
 
         // Update statistics
@@ -434,17 +565,84 @@
             renderProblems(filtered);
         }
 
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check authentication first
-            const currentUser = localStorage.getItem('currentUser');
-            const isAdmin = localStorage.getItem('isAdmin');
+        // Create floating particles animation
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            if (!particlesContainer) return;
             
-            if (!currentUser && !isAdmin) {
-                window.location.href = 'auth.html';
-                return;
+            particlesContainer.innerHTML = '';
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.cssText = `
+                    position: absolute;
+                    width: ${Math.random() * 4 + 2}px;
+                    height: ${Math.random() * 4 + 2}px;
+                    background: ${Math.random() > 0.5 ? '#3b82f6' : '#22c55e'};
+                    border-radius: 50%;
+                    left: ${Math.random() * 100}%;
+                    top: ${Math.random() * 100}%;
+                    opacity: ${Math.random() * 0.5 + 0.2};
+                    animation: float ${Math.random() * 6 + 4}s ease-in-out infinite;
+                    animation-delay: ${Math.random() * 2}s;
+                    pointer-events: none;
+                `;
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Theme management
+        function setTheme(theme) {
+            const html = document.documentElement;
+            const themeToggle = document.getElementById('darkModeToggle');
+            const themeIcon = document.getElementById('darkModeIcon');
+            
+            if (theme === 'dark') {
+                html.classList.remove('light');
+                html.classList.add('dark');
+                themeIcon.className = 'fas fa-sun text-yellow-400 text-lg';
+                localStorage.setItem('arrayDarkMode', 'true');
+            } else {
+                html.classList.remove('dark');
+                html.classList.add('light');
+                themeIcon.className = 'fas fa-moon text-gray-600 text-lg';
+                localStorage.setItem('arrayDarkMode', 'false');
             }
             
+            updateFooterElements();
+        }
+
+        // Update footer elements based on theme
+        function updateFooterElements() {
+            const footerLinks = document.querySelectorAll('footer a');
+            const footerText = document.querySelectorAll('footer p, footer span, footer div');
+            
+            footerLinks.forEach(link => {
+                if (document.documentElement.classList.contains('light')) {
+                    link.classList.add('light:text-blue-600', 'light:hover:text-blue-700');
+                } else {
+                    link.classList.remove('light:text-blue-600', 'light:hover:text-blue-700');
+                }
+            });
+        }
+
+        // Initialize theme
+        function updateTheme() {
+            const isDarkMode = localStorage.getItem('arrayDarkMode') !== 'false';
+            setTheme(isDarkMode ? 'dark' : 'light');
+        }
+
+        // Toggle dark mode
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.contains('dark');
+            setTheme(isDark ? 'light' : 'dark');
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
             updateTheme();
             initializeProblems();
             renderProblems();
@@ -467,5 +665,89 @@
             });
         });
     </script>
+
+    <!-- Footer -->
+    <footer class="glass bg-gradient-to-r from-gray-900/90 via-black/90 to-gray-900/90 dark:from-gray-900/90 dark:via-black/90 dark:to-gray-900/90 light:from-white/90 light:via-gray-50/90 light:to-white/90 backdrop-blur-2xl border-t border-white/10 dark:border-white/10 light:border-gray-200/50 text-white dark:text-white light:text-black mt-20 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-900/10 via-purple-900/10 to-pink-900/10 dark:from-blue-900/10 dark:via-purple-900/10 dark:to-pink-900/10 light:from-blue-100/20 light:via-purple-100/20 light:to-pink-100/20"></div>
+        
+        <!-- Floating particles for footer -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute top-10 left-10 w-2 h-2 bg-blue-500/30 rounded-full animate-bounce" style="animation-delay: 0s;"></div>
+            <div class="absolute top-20 right-20 w-1 h-1 bg-purple-500/40 rounded-full animate-bounce" style="animation-delay: 1s;"></div>
+            <div class="absolute bottom-10 left-1/4 w-3 h-3 bg-pink-500/20 rounded-full animate-bounce" style="animation-delay: 2s;"></div>
+            <div class="absolute bottom-20 right-1/3 w-1 h-1 bg-blue-400/50 rounded-full animate-bounce" style="animation-delay: 3s;"></div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-16 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <!-- About Section -->
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-gradient-shift">
+                        Array Mastery
+                    </h3>
+                    <p class="text-gray-300 dark:text-gray-300 light:text-black leading-relaxed text-sm">
+                        Master array algorithms, data manipulation, and optimization techniques with our comprehensive problem collection covering all difficulty levels.
+                    </p>
+                    <a href="index.html" class="inline-flex items-center px-4 py-2 glass bg-white/10 dark:bg-white/10 light:bg-black/10 hover:bg-white/20 dark:hover:bg-white/20 light:hover:bg-black/20 rounded-xl transition-all duration-300 hover:scale-105 backdrop-blur-lg border border-white/20 dark:border-white/20 light:border-black/20 text-sm group">
+                        <i class="fas fa-arrow-left mr-2 group-hover:-translate-x-1 transition-transform duration-300"></i>
+                        Back to Hub
+                    </a>
+                </div>
+
+                <!-- Quick Navigation -->
+                <div class="space-y-6">
+                    <h4 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Other Topics</h4>
+                    <ul class="space-y-3">
+                        <li><a href="Binary.html" class="flex items-center p-2 glass bg-white/5 dark:bg-white/5 light:bg-black/5 hover:bg-white/10 dark:hover:bg-white/10 light:hover:bg-black/10 rounded-lg transition-all duration-300 hover:scale-105 backdrop-blur-sm text-sm group">
+                            <i class="fas fa-search mr-3 text-orange-400 group-hover:scale-110 transition-transform duration-300"></i>
+                            <span class="text-gray-300 dark:text-gray-300 light:text-black group-hover:text-orange-400 dark:group-hover:text-orange-400 light:group-hover:text-orange-600">Binary Search</span>
+                        </a></li>
+                        <li><a href="LinkedList.html" class="flex items-center p-2 glass bg-white/5 dark:bg-white/5 light:bg-black/5 hover:bg-white/10 dark:hover:bg-white/10 light:hover:bg-black/10 rounded-lg transition-all duration-300 hover:scale-105 backdrop-blur-sm text-sm group">
+                            <i class="fas fa-link mr-3 text-green-400 group-hover:scale-110 transition-transform duration-300"></i>
+                            <span class="text-gray-300 dark:text-gray-300 light:text-black group-hover:text-green-400 dark:group-hover:text-green-400 light:group-hover:text-green-600">LinkedList</span>
+                        </a></li>
+                        <li><a href="Tree.html" class="flex items-center p-2 glass bg-white/5 dark:bg-white/5 light:bg-black/5 hover:bg-white/10 dark:hover:bg-white/10 light:hover:bg-black/10 rounded-lg transition-all duration-300 hover:scale-105 backdrop-blur-sm text-sm group">
+                            <i class="fas fa-tree mr-3 text-teal-400 group-hover:scale-110 transition-transform duration-300"></i>
+                            <span class="text-gray-300 dark:text-gray-300 light:text-black group-hover:text-teal-400 dark:group-hover:text-teal-400 light:group-hover:text-teal-600">Trees & BST</span>
+                        </a></li>
+                        <li><a href="Recursion.html" class="flex items-center p-2 glass bg-white/5 dark:bg-white/5 light:bg-black/5 hover:bg-white/10 dark:hover:bg-white/10 light:hover:bg-black/10 rounded-lg transition-all duration-300 hover:scale-105 backdrop-blur-sm text-sm group">
+                            <i class="fas fa-repeat mr-3 text-purple-400 group-hover:scale-110 transition-transform duration-300"></i>
+                            <span class="text-gray-300 dark:text-gray-300 light:text-black group-hover:text-purple-400 dark:group-hover:text-purple-400 light:group-hover:text-purple-600">Recursion</span>
+                        </a></li>
+                        <li><a href="DP.html" class="flex items-center p-2 glass bg-white/5 dark:bg-white/5 light:bg-black/5 hover:bg-white/10 dark:hover:bg-white/10 light:hover:bg-black/10 rounded-lg transition-all duration-300 hover:scale-105 backdrop-blur-sm text-sm group">
+                            <i class="fas fa-chart-line mr-3 text-pink-400 group-hover:scale-110 transition-transform duration-300"></i>
+                            <span class="text-gray-300 dark:text-gray-300 light:text-black group-hover:text-pink-400 dark:group-hover:text-pink-400 light:group-hover:text-pink-600">Dynamic Programming</span>
+                        </a></li>
+                    </ul>
+                </div>
+
+                <!-- Connect Section -->
+                <div class="space-y-6">
+                    <h4 class="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Connect</h4>
+                    <div class="flex space-x-4">
+                        <a href="https://www.linkedin.com/in/ashish2208/" class="flex items-center justify-center w-12 h-12 glass bg-gradient-to-r from-blue-500/20 to-purple-600/20 hover:from-blue-500/30 hover:to-purple-600/30 rounded-xl transition-all duration-300 hover:scale-110 hover:rotate-6 backdrop-blur-lg border border-blue-500/30 group">
+                            <i class="fab fa-linkedin text-blue-400 text-lg group-hover:text-white transition-colors duration-300"></i>
+                        </a>
+                        <a href="#" class="flex items-center justify-center w-12 h-12 glass bg-gradient-to-r from-gray-500/20 to-gray-600/20 hover:from-gray-500/30 hover:to-gray-600/30 rounded-xl transition-all duration-300 hover:scale-110 hover:rotate-6 backdrop-blur-lg border border-gray-500/30 group">
+                            <i class="fab fa-github text-gray-400 text-lg group-hover:text-white transition-colors duration-300"></i>
+                        </a>
+                    </div>
+                    <div class="glass bg-white/5 dark:bg-white/5 light:bg-black/5 backdrop-blur-lg rounded-xl p-4 border border-white/10 dark:border-white/10 light:border-black/10">
+                        <p class="text-gray-300 dark:text-gray-300 light:text-black text-sm leading-relaxed">
+                            Built with passion by 
+                            <span class="font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Ashish Sharma</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="border-t border-white/10 dark:border-white/10 light:border-black/10 mt-12 pt-8 text-center">
+                <p class="text-gray-400 dark:text-gray-400 light:text-black text-sm font-medium">
+                    &copy; 2025 Programming Series Hub. Crafted for coding excellence.
+                </p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>

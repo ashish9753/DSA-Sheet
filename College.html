@@ -14,8 +14,112 @@
             darkMode: 'class',
         }
     </script>
+    <style>
+        /* Floating particles animation */
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .particle {
+            position: absolute;
+            background: linear-gradient(45deg, #4b5563, #6b7280, #9ca3af);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+            opacity: 0.1;
+        }
+        
+        .particle:nth-child(odd) {
+            animation-duration: 20s;
+            background: linear-gradient(45deg, #6b7280, #9ca3af, #4b5563);
+        }
+        
+        .particle:nth-child(3n) {
+            animation-duration: 25s;
+            background: linear-gradient(45deg, #9ca3af, #d1d5db, #6b7280);
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.1;
+            }
+            90% {
+                opacity: 0.1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Glassmorphism effect */
+        .glass {
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Card hover animations - simplified */
+        .card-hover {
+            transition: all 0.2s ease;
+        }
+        
+        /* Pulse animation for completed items - reduced */
+        @keyframes pulse-success {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+            70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        
+        .pulse-success {
+            animation: pulse-success 1.5s ease-out;
+        }
+        
+        /* Slide in animations */
+        @keyframes slideInUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .animate-slideInUp {
+            animation: slideInUp 0.6s ease-out;
+        }
+        
+        /* Gradient text animation */
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .gradient-animate {
+            background: linear-gradient(-45deg, #3b82f6, #8b5cf6, #ec4899, #06b6d4);
+            background-size: 400% 400%;
+            animation: gradient-shift 3s ease infinite;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-gray-50 via-orange-50 to-red-50 dark:from-gray-900 dark:via-orange-900 dark:to-red-900 min-h-screen transition-all duration-300">
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black dark:from-gray-900 dark:via-gray-800 dark:to-black light:from-gray-50 light:via-blue-50 light:to-purple-50 min-h-screen transition-all duration-500 relative overflow-x-hidden">
+    <!-- Floating Particles -->
+    <div class="floating-particles" id="particles"></div>
+    
     <!-- Authentication Check -->
     <script>
         // Check authentication first
@@ -27,68 +131,69 @@
         }
     </script>
 
-    <div class="container mx-auto px-4 py-8">
+    <div class="container mx-auto px-4 py-8 relative z-10">
         <!-- Header -->
-        <div class="mb-8">
+        <div class="mb-8 animate-slideInUp">
             <div class="flex justify-between items-center mb-4">
                 <div>
-                    <h1 class="text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-2">
-                        DSA College Sheet
+                    <h1 class="text-4xl font-bold gradient-animate mb-3">
+                        DSA College Problems Sheet.
                     </h1>
-                    <p class="text-gray-700 dark:text-gray-300 text-base">Master college-level DSA problems for placements — <a href="https://www.linkedin.com/in/ashish2208/" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-2 py-1 rounded shadow transition">Ashish Sharma</a></p>
+                    <p class="text-gray-400 dark:text-gray-400 light:text-black text-base">Master essential college-level problems with structured practice — <a href="https://www.linkedin.com/in/ashish2208/" class="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-semibold px-3 py-1 rounded-full shadow-lg transition-all duration-300 hover:scale-105">Ashish Sharma</a></p>
                 </div>
-                <div class="flex space-x-4">
-                    <a href="index.html" class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors duration-300">
-                        ← Back to Hub
+                <!-- Navigation and Dark Mode Toggle -->
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="px-5 py-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl transition-all duration-300 flex items-center shadow-lg text-sm">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Hub
                     </a>
-                    <!-- Dark Mode Toggle -->
                     <button 
                         id="darkModeToggle"
-                        class="p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700"
+                        class="p-3 rounded-full bg-white/10 dark:bg-gray-800/50 light:bg-white backdrop-blur-lg shadow-xl transition-all duration-300 border border-white/20 dark:border-gray-700 light:border-gray-200"
                     >
-                        <i class="fas fa-moon text-gray-600 dark:text-yellow-400 text-xl" id="darkModeIcon"></i>
+                        <i class="fas fa-moon text-white dark:text-yellow-400 light:text-gray-600 text-lg" id="darkModeIcon"></i>
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- Search and Stats -->
-        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 mb-6">
+        <div class="glass bg-white/10 dark:bg-gray-800/30 light:bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700/50 light:border-gray-200 p-6 mb-8 animate-slideInUp">
             <div class="flex flex-col md:flex-row gap-6 items-center justify-between">
                 <div class="relative flex-1 max-w-md">
                     <input 
                         type="text" 
                         id="searchInput" 
-                        placeholder="Search college problems..." 
-                        class="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300"
+                        placeholder="Search College problems..." 
+                        class="w-full pl-12 pr-4 py-3 bg-white/20 dark:bg-gray-700/50 light:bg-gray-50 border border-white/30 dark:border-gray-600/50 light:border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent text-gray-200 dark:text-gray-200 light:text-gray-900 placeholder-gray-400 dark:placeholder-gray-400 light:placeholder-gray-500 transition-all duration-300 backdrop-blur-lg text-sm"
                     >
-                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-400 light:text-black"></i>
                 </div>
-                <div class="flex gap-4 text-sm">
-                    <div class="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl shadow-lg">
-                        <i class="fas fa-check mr-2"></i>
-                        Completed: <span id="completedCount" class="font-semibold">0</span>
+                <div class="flex gap-3 text-xs">
+                    <div class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl shadow-xl transition-all duration-300">
+                        <i class="fas fa-check mr-1"></i>
+                        Completed: <span id="completedCount" class="font-bold">0</span>
                     </div>
-                    <div class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl shadow-lg">
-                        <i class="fas fa-graduation-cap mr-2"></i>
-                        Total: <span id="totalCount" class="font-semibold">0</span>
+                    <div class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl shadow-xl transition-all duration-300">
+                        <i class="fas fa-graduation-cap mr-1"></i>
+                        Total: <span id="totalCount" class="font-bold">0</span>
                     </div>
-                    <div class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg">
-                        <i class="fas fa-percentage mr-2"></i>
-                        <span id="progressPercentage">0%</span>
+                    <div class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-xl shadow-xl transition-all duration-300">
+                        <i class="fas fa-percentage mr-1"></i>
+                        <span id="progressPercentage" class="font-bold">0%</span>
                     </div>
                 </div>
             </div>
             <!-- Progress Bar -->
-            <div class="mt-4">
-                <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
-                    <span>College DSA Mastery Progress</span>
-                    <span id="progressText">0 / 0</span>
+            <div class="mt-5">
+                <div class="flex justify-between text-xs text-gray-400 dark:text-gray-400 light:text-black mb-2">
+                    <span class="font-medium">College DSA Mastery Progress</span>
+                    <span id="progressText" class="font-bold">0 / 0</span>
                 </div>
-                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                <div class="w-full bg-white/20 dark:bg-gray-700/50 light:bg-gray-200 rounded-full h-3 overflow-hidden">
                     <div 
                         id="progressBar" 
-                        class="bg-gradient-to-r from-orange-500 to-red-500 h-3 rounded-full transition-all duration-500 ease-out"
+                        class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 h-3 rounded-full transition-all duration-1000 ease-out shadow-lg"
                         style="width: 0%"
                     ></div>
                 </div>
@@ -100,6 +205,48 @@
             <!-- Sections will be populated here -->
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="glass bg-gradient-to-r from-black/95 via-gray-950/95 to-black/95 dark:from-black/98 dark:via-gray-950/98 dark:to-black/98 light:from-white/90 light:via-gray-50/90 light:to-white/90 backdrop-blur-2xl border-t border-white/5 dark:border-white/5 light:border-gray-200/50 text-white dark:text-white light:text-black mt-20 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-gray-950/30 via-black/40 to-gray-950/30 dark:from-gray-950/40 dark:via-black/50 dark:to-gray-950/40 light:from-blue-100/20 light:via-purple-100/20 light:to-pink-100/20"></div>
+        
+        <div class="container mx-auto px-4 py-16 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                        College DSA Problems
+                    </h3>
+                    <p class="text-gray-300 leading-relaxed text-sm">
+                        Essential college-level Data Structures & Algorithms problems covering all major topics for coding interviews and competitive programming.
+                    </p>
+                </div>
+                <div class="space-y-6">
+                    <h4 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Quick Links</h4>
+                    <ul class="space-y-3">
+                        <li><a href="index.html" class="flex items-center p-2 glass bg-black/20 dark:bg-black/30 hover:bg-black/30 dark:hover:bg-black/40 rounded-lg transition-all duration-300 hover:scale-105 backdrop-blur-sm text-sm group">
+                            <i class="fas fa-home mr-3 text-blue-400 group-hover:scale-110 transition-transform duration-300"></i>
+                            <span class="text-gray-300 group-hover:text-blue-400">Back to Hub</span>
+                        </a></li>
+                    </ul>
+                </div>
+                <div class="space-y-6">
+                    <h4 class="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Features</h4>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li class="flex items-center"><i class="fas fa-check mr-2 text-green-400"></i>53 Essential Problems</li>
+                        <li class="flex items-center"><i class="fas fa-check mr-2 text-green-400"></i>8 Core Topics</li>
+                        <li class="flex items-center"><i class="fas fa-check mr-2 text-green-400"></i>Progress Tracking</li>
+                        <li class="flex items-center"><i class="fas fa-check mr-2 text-green-400"></i>Interview Prep</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-white/10 mt-12 pt-8 text-center">
+                <p class="text-gray-400 text-sm">
+                    © 2024 Programming Series Hub. Created by <span class="font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Ashish Sharma</span>
+                </p>
+            </div>
+        </div>
+    </footer>
 
     <script>
         // Firebase Configuration - YOUR ACTUAL CONFIG
@@ -163,33 +310,11 @@
         // Check every 30 seconds if user still exists
         setInterval(verifyUserExists, 30000);
 
-        // Theme management
-        let isDarkMode = localStorage.getItem('collegeDarkMode') === 'true' || false;
-        
-        function toggleDarkMode() {
-            isDarkMode = !isDarkMode;
-            localStorage.setItem('collegeDarkMode', isDarkMode);
-            updateTheme();
-        }
-
-        function updateTheme() {
-            const html = document.documentElement;
-            const icon = document.getElementById('darkModeIcon');
-            
-            if (isDarkMode) {
-                html.classList.add('dark');
-                icon.className = 'fas fa-sun text-yellow-400 text-xl';
-            } else {
-                html.classList.remove('dark');
-                icon.className = 'fas fa-moon text-gray-600 text-xl';
-            }
-        }
-
         // In-memory storage for problem completion status
         let problemStatus = JSON.parse(localStorage.getItem('collegeProblemStatus')) || {};
         let allProblems = [];
 
-        // College DSA Problem data structure - 53 problems across 8 categories
+        // College DSA Problem data structure - 53 problems across 8 topics
         const problemData = {
             "Arrays & Mathematics": [
                 { name: "Kadane's Algorithm", difficulty: "Medium", leetcode: "https://leetcode.com/problems/maximum-subarray/", gfg: "https://www.geeksforgeeks.org/largest-sum-contiguous-subarray/" },
@@ -254,166 +379,126 @@
                 { name: "BFS", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/breadth-first-search-or-bfs-for-a-graph/" },
                 { name: "DFS", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/" },
                 { name: "Detect Cycle in Undirected Graph", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/detect-cycle-undirected-graph/" },
-                { name: "Topological Sort", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/topological-sorting/" },
-                { name: "Dijkstra's Algorithm", difficulty: "Medium", leetcode: "https://leetcode.com/problems/network-delay-time/", gfg: "https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/" },
+                { name: "Topological Sort", difficulty: "Medium", leetcode: "https://leetcode.com/problems/course-schedule-ii/", gfg: "https://www.geeksforgeeks.org/topological-sorting/" },
+                { name: "Dijkstra's Algorithm", difficulty: "Medium", leetcode: "", gfg: "https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/" },
                 { name: "Minimum Spanning Tree - Kruskal", difficulty: "Hard", leetcode: "", gfg: "https://www.geeksforgeeks.org/kruskals-minimum-spanning-tree-algorithm-greedy-algo-2/" },
                 { name: "Word Ladder", difficulty: "Hard", leetcode: "https://leetcode.com/problems/word-ladder/", gfg: "https://www.geeksforgeeks.org/word-ladder-length-of-shortest-chain-to-reach-a-target-word/" },
                 { name: "Number of Islands", difficulty: "Medium", leetcode: "https://leetcode.com/problems/number-of-islands/", gfg: "https://www.geeksforgeeks.org/find-number-of-islands/" }
             ]
         };
 
-        // Initialize problem list
-        function initializeProblems() {
+        // Initialize particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.width = particle.style.height = (Math.random() * 3 + 2) + 'px';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (Math.random() * 20 + 15) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Generate problems for each topic and store them globally
+        function generateAllProblems() {
             allProblems = [];
-            Object.keys(problemData).forEach(section => {
-                problemData[section].forEach(problem => {
+            Object.entries(problemData).forEach(([topicName, problems]) => {
+                problems.forEach((problem, index) => {
+                    const problemId = `${topicName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${index}`;
                     allProblems.push({
-                        section: section,
+                        id: problemId,
                         name: problem.name,
                         difficulty: problem.difficulty,
+                        topic: topicName,
                         leetcode: problem.leetcode,
-                        gfg: problem.gfg,
-                        id: generateId(problem.name)
+                        gfg: problem.gfg
                     });
                 });
             });
         }
 
-        // Generate unique ID for each problem
-        function generateId(name) {
-            return name.toLowerCase().replace(/[^a-z0-9]/g, '_');
-        }
+        // Create problem card HTML
+        function createProblemCard(problem) {
+            const isCompleted = problemStatus[problem.id] || false;
+            const difficultyColors = {
+                'Easy': 'from-green-500 to-emerald-500',
+                'Medium': 'from-yellow-500 to-orange-500',
+                'Hard': 'from-red-500 to-pink-500'
+            };
 
-        // Get difficulty color
-        function getDifficultyColor(difficulty) {
-            switch(difficulty) {
-                case 'Easy': return 'bg-gradient-to-r from-green-500 to-emerald-500 text-white';
-                case 'Medium': return 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white';
-                case 'Hard': return 'bg-gradient-to-r from-red-500 to-pink-500 text-white';
-                default: return 'bg-gradient-to-r from-gray-500 to-gray-600 text-white';
-            }
-        }
-
-        // Get section gradient
-        function getSectionGradient(section) {
-            const gradients = [
-                'from-orange-500 to-red-600',
-                'from-red-500 to-pink-600',
-                'from-pink-500 to-purple-600',
-                'from-purple-500 to-indigo-600',
-                'from-indigo-500 to-blue-600',
-                'from-blue-500 to-cyan-600',
-                'from-cyan-500 to-teal-600',
-                'from-teal-500 to-green-600'
-            ];
-            const index = Object.keys(problemData).indexOf(section) % gradients.length;
-            return gradients[index];
-        }
-
-        // Generate platform links HTML
-        function generatePlatformLinks(problem) {
-            let linksHtml = '';
-            
-            if (problem.leetcode) {
-                linksHtml += `
-                    <a href="${problem.leetcode}" target="_blank" 
-                       class="p-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
-                       title="Open in LeetCode">
-                        <i class="fab fa-leetcode text-lg"></i>
-                    </a>
-                `;
-            }
-            
-            if (problem.gfg) {
-                linksHtml += `
-                    <a href="${problem.gfg}" target="_blank" 
-                       class="p-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 ml-2"
-                       title="Open in GeeksforGeeks">
-                        <i class="fas fa-code text-lg"></i>
-                    </a>
-                `;
-            }
-            
-            if (!problem.leetcode && !problem.gfg) {
-                linksHtml += `
-                    <div class="p-2 bg-red-500 text-white rounded-lg opacity-50 cursor-not-allowed" 
-                         title="No link available">
-                        <i class="fas fa-times text-lg"></i>
-                    </div>
-                `;
-            }
-            
-            return linksHtml;
-        }
-
-        // Render problems
-        function renderProblems(problems = allProblems) {
-            const container = document.getElementById('problemSections');
-            container.innerHTML = '';
-
-            // Group problems by section
-            const groupedProblems = {};
-            problems.forEach(problem => {
-                if (!groupedProblems[problem.section]) {
-                    groupedProblems[problem.section] = [];
-                }
-                groupedProblems[problem.section].push(problem);
-            });
-
-            Object.keys(groupedProblems).forEach(section => {
-                const sectionProblems = groupedProblems[section];
-                const completedInSection = sectionProblems.filter(p => problemStatus[p.id]).length;
-                const sectionProgress = (completedInSection / sectionProblems.length) * 100;
-                
-                const sectionHtml = `
-                    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-2xl transition-all duration-300">
-                        <div class="bg-gradient-to-r ${getSectionGradient(section)} text-white p-6">
-                            <div class="flex justify-between items-center mb-3">
-                                <h2 class="text-2xl font-bold">${section}</h2>
-                                <div class="text-right">
-                                    <div class="text-sm opacity-90">Progress</div>
-                                    <div class="text-lg font-semibold">${completedInSection} / ${sectionProblems.length}</div>
+            return `
+                <div class="glass bg-white/10 dark:bg-gray-800/30 light:bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/50 light:border-gray-200 p-5 card-hover transition-all duration-300 ${isCompleted ? 'ring-2 ring-green-500/50' : ''}" 
+                     data-problem-id="${problem.id}">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-start space-x-3 flex-1">
+                            <button 
+                                onclick="toggleProblem('${problem.id}')"
+                                class="mt-1 w-5 h-5 rounded border-2 ${isCompleted ? 'bg-green-500 border-green-500' : 'border-gray-400 dark:border-gray-500 light:border-gray-400'} flex items-center justify-center transition-all duration-200 hover:scale-110 flex-shrink-0"
+                            >
+                                ${isCompleted ? '<i class="fas fa-check text-white text-xs"></i>' : ''}
+                            </button>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-sm font-medium text-gray-200 dark:text-gray-200 light:text-gray-900 mb-2 leading-relaxed">${problem.name}</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    ${problem.leetcode ? `<a href="${problem.leetcode}" target="_blank" class="inline-flex items-center px-2 py-1 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs rounded-lg hover:from-yellow-600 hover:to-orange-600 transition-all duration-200 shadow-lg">
+                                        <i class="fab fa-leetcode mr-1"></i>LeetCode
+                                    </a>` : ''}
+                                    ${problem.gfg ? `<a href="${problem.gfg}" target="_blank" class="inline-flex items-center px-2 py-1 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-200 shadow-lg">
+                                        <i class="fas fa-code mr-1"></i>GFG
+                                    </a>` : ''}
                                 </div>
                             </div>
-                            <div class="w-full bg-white/20 rounded-full h-2">
-                                <div 
-                                    class="bg-white h-2 rounded-full transition-all duration-500"
-                                    style="width: ${sectionProgress}%"
-                                ></div>
-                            </div>
                         </div>
-                        <div class="p-6">
-                            <div class="space-y-3">
-                                ${sectionProblems.map(problem => `
-                                    <div class="group flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600/50 transition-all duration-300 hover:shadow-lg">
-                                        <div class="flex items-center space-x-4 flex-1">
-                                            <label class="relative cursor-pointer">
-                                                <input 
-                                                    type="checkbox" 
-                                                    class="sr-only"
-                                                    ${problemStatus[problem.id] ? 'checked' : ''}
-                                                    onchange="toggleProblem('${problem.id}')"
-                                                >
-                                                <div class="w-6 h-6 bg-white dark:bg-gray-600 border-2 border-gray-300 dark:border-gray-500 rounded-lg flex items-center justify-center transition-all duration-300 ${problemStatus[problem.id] ? 'bg-gradient-to-r from-green-500 to-emerald-500 border-green-500' : 'group-hover:border-orange-400'}">
-                                                    <i class="fas fa-check text-white text-sm ${problemStatus[problem.id] ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300"></i>
-                                                </div>
-                                            </label>
-                                            <span class="text-gray-800 dark:text-gray-200 font-medium transition-all duration-300 ${problemStatus[problem.id] ? 'line-through opacity-60' : 'group-hover:text-orange-600 dark:group-hover:text-orange-400'} flex-1">${problem.name}</span>
-                                        </div>
-                                        <div class="flex items-center space-x-3">
-                                            ${generatePlatformLinks(problem)}
-                                            <span class="px-3 py-1 text-xs font-semibold rounded-full ${getDifficultyColor(problem.difficulty)} shadow-lg">
-                                                ${problem.difficulty}
-                                            </span>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
+                        <span class="ml-3 px-2 py-1 bg-gradient-to-r ${difficultyColors[problem.difficulty]} text-white text-xs rounded-full font-medium shadow-lg flex-shrink-0">
+                            ${problem.difficulty}
+                        </span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Create section HTML
+        function createSection(topicName, problems) {
+            const completedCount = problems.filter(p => problemStatus[p.id]).length;
+            const totalCount = problems.length;
+            const percentage = Math.round((completedCount / totalCount) * 100);
+            
+            const sectionId = topicName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+            
+            return `
+                <div class="glass bg-white/10 dark:bg-gray-800/30 light:bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700/50 light:border-gray-200 p-6 animate-slideInUp problem-section" data-topic="${sectionId}">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                        <div class="mb-4 md:mb-0">
+                            <h2 class="text-2xl font-bold text-gray-100 dark:text-gray-100 light:text-gray-900 mb-2">${topicName}</h2>
+                            <p class="text-gray-300 dark:text-gray-300 light:text-gray-700 text-sm">${problems.length} essential problems</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm text-gray-300 dark:text-gray-300 light:text-gray-700 mb-1">Progress</div>
+                            <div class="text-2xl font-bold text-gray-100 dark:text-gray-100 light:text-gray-900">${completedCount}/${totalCount}</div>
+                            <div class="text-sm text-purple-400 dark:text-purple-400 light:text-purple-600 font-medium">${percentage}%</div>
                         </div>
                     </div>
-                `;
-                container.innerHTML += sectionHtml;
-            });
+                    
+                    <!-- Progress Bar -->
+                    <div class="mb-6">
+                        <div class="w-full bg-white/20 dark:bg-gray-700/50 light:bg-gray-200 rounded-full h-2 overflow-hidden">
+                            <div 
+                                class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 h-2 rounded-full transition-all duration-1000 ease-out"
+                                style="width: ${percentage}%"
+                            ></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Problems Grid -->
+                    <div class="space-y-4">
+                        ${problems.map(problem => createProblemCard(problem)).join('')}
+                    </div>
+                </div>
+            `;
         }
 
         // Toggle problem completion
@@ -421,64 +506,36 @@
             problemStatus[problemId] = !problemStatus[problemId];
             localStorage.setItem('collegeProblemStatus', JSON.stringify(problemStatus));
             
-            // Track user progress for admin
-            updateUserProgress();
-            
-            updateStats();
-            // Re-render to update the strikethrough effect
-            const searchTerm = document.getElementById('searchInput').value;
-            if (searchTerm) {
-                searchProblems(searchTerm);
-            } else {
-                renderProblems();
+            // Add pulse animation
+            const problemCard = document.querySelector(`[data-problem-id="${problemId}"]`);
+            if (problemStatus[problemId]) {
+                problemCard.classList.add('pulse-success');
+                setTimeout(() => problemCard.classList.remove('pulse-success'), 1500);
             }
+            
+            renderProblems();
+            updateStats();
+            
+            // Save to Firebase
+            saveProgressToFirebase();
         }
 
-        // Update user progress tracking
-        async function updateUserProgress() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            if (!currentUser) return;
+        // Render all problems
+        function renderProblems() {
+            const container = document.getElementById('problemSections');
+            const html = Object.entries(problemData).map(([topicName, problems]) => {
+                const topicProblems = allProblems.filter(p => p.topic === topicName);
+                return createSection(topicName, topicProblems);
+            }).join('');
             
-            const completed = Object.values(problemStatus).filter(Boolean).length;
-            const total = allProblems.length;
-            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
-            
-            // Get existing user progress data
-            let userProgress = JSON.parse(localStorage.getItem('userProgress')) || {};
-            
-            // Update current user's progress
-            userProgress[currentUser.email] = {
-                name: currentUser.name,
-                email: currentUser.email,
-                sheets: {
-                    ...userProgress[currentUser.email]?.sheets,
-                    'College': {
-                        completed: completed,
-                        total: total,
-                        percentage: percentage,
-                        lastUpdated: new Date().toISOString()
-                    }
-                }
-            };
-            
-            // Save to localStorage (backup)
-            localStorage.setItem('userProgress', JSON.stringify(userProgress));
-            
-            // Save to Firebase for real-time admin access
-            try {
-                await db.collection('userProgress').doc(currentUser.email).set(userProgress[currentUser.email]);
-                console.log('College progress saved to Firebase successfully');
-            } catch (error) {
-                console.error('Error saving College progress to Firebase:', error);
-                // Firebase error is not critical, localStorage backup exists
-            }
+            container.innerHTML = html;
         }
 
         // Update statistics
         function updateStats() {
-            const completed = Object.values(problemStatus).filter(Boolean).length;
+            const completed = allProblems.filter(p => problemStatus[p.id]).length;
             const total = allProblems.length;
-            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+            const percentage = Math.round((completed / total) * 100);
             
             document.getElementById('completedCount').textContent = completed;
             document.getElementById('totalCount').textContent = total;
@@ -487,39 +544,137 @@
             document.getElementById('progressBar').style.width = percentage + '%';
         }
 
-        // Search problems
-        function searchProblems(searchTerm) {
-            const filtered = allProblems.filter(problem => 
-                problem.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                problem.difficulty.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                problem.section.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-            renderProblems(filtered);
+        // Search functionality
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const sections = document.querySelectorAll('.problem-section');
+                
+                sections.forEach(section => {
+                    const problemCards = section.querySelectorAll('[data-problem-id]');
+                    let hasVisibleProblems = false;
+                    
+                    problemCards.forEach(card => {
+                        const problemName = card.querySelector('h4').textContent.toLowerCase();
+                        if (problemName.includes(searchTerm)) {
+                            card.style.display = 'block';
+                            hasVisibleProblems = true;
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                    
+                    section.style.display = hasVisibleProblems || searchTerm === '' ? 'block' : 'none';
+                });
+            });
+        }
+
+        // Dark mode toggle
+        function setupDarkMode() {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const darkModeIcon = document.getElementById('darkModeIcon');
+            const body = document.body;
+            const html = document.documentElement;
+            
+            // Load saved dark mode preference
+            const isDarkMode = localStorage.getItem('collegeDarkMode') !== 'false';
+            
+            function updateDarkMode(isDark) {
+                if (isDark) {
+                    html.classList.add('dark');
+                    html.classList.remove('light');
+                    body.classList.add('dark');
+                    body.classList.remove('light');
+                    darkModeIcon.className = 'fas fa-sun text-white dark:text-yellow-400 light:text-gray-600 text-lg';
+                } else {
+                    html.classList.remove('dark');
+                    html.classList.add('light');
+                    body.classList.remove('dark');
+                    body.classList.add('light');
+                    darkModeIcon.className = 'fas fa-moon text-white dark:text-yellow-400 light:text-gray-600 text-lg';
+                }
+                localStorage.setItem('collegeDarkMode', isDark);
+            }
+            
+            // Apply saved preference
+            updateDarkMode(isDarkMode);
+            
+            // Toggle on click
+            darkModeToggle.addEventListener('click', () => {
+                const currentlyDark = html.classList.contains('dark');
+                updateDarkMode(!currentlyDark);
+            });
+        }
+
+        // Save progress to Firebase
+        async function saveProgressToFirebase() {
+            try {
+                const currentUser = localStorage.getItem('currentUser');
+                if (!currentUser) return;
+
+                const user = JSON.parse(currentUser);
+                const userEmail = user.email;
+                
+                const completed = allProblems.filter(p => problemStatus[p.id]).length;
+                const total = allProblems.length;
+                const percentage = Math.round((completed / total) * 100);
+                
+                await db.collection('userProgress').doc(userEmail).set({
+                    sheets: {
+                        College: {
+                            completed: completed,
+                            total: total,
+                            percentage: percentage,
+                            problems: problemStatus,
+                            lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                        }
+                    }
+                }, { merge: true });
+                
+            } catch (error) {
+                console.error('Error saving progress to Firebase:', error);
+            }
+        }
+
+        // Load progress from Firebase
+        async function loadProgressFromFirebase() {
+            try {
+                const currentUser = localStorage.getItem('currentUser');
+                if (!currentUser) return;
+
+                const user = JSON.parse(currentUser);
+                const userEmail = user.email;
+                
+                const doc = await db.collection('userProgress').doc(userEmail).get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    if (data.sheets && data.sheets.College && data.sheets.College.problems) {
+                        problemStatus = data.sheets.College.problems;
+                        localStorage.setItem('collegeProblemStatus', JSON.stringify(problemStatus));
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading progress from Firebase:', error);
+            }
         }
 
         // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            updateTheme();
-            initializeProblems();
+        async function init() {
+            createParticles();
+            generateAllProblems();
+            await loadProgressFromFirebase();
             renderProblems();
             updateStats();
+            setupSearch();
+            setupDarkMode();
             
-            // Initialize user progress tracking
-            updateUserProgress();
+            // Auto-save to Firebase every 30 seconds
+            setInterval(saveProgressToFirebase, 30000);
+        }
 
-            // Dark mode toggle
-            document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
-
-            // Search functionality
-            document.getElementById('searchInput').addEventListener('input', function(e) {
-                const searchTerm = e.target.value.trim();
-                if (searchTerm) {
-                    searchProblems(searchTerm);
-                } else {
-                    renderProblems();
-                }
-            });
-        });
+        // Run when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
