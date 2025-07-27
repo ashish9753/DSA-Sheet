@@ -292,12 +292,15 @@
             <p class="text-gray-200 mb-2">Welcome <span id="pendingUserName" class="font-medium"></span>!</p>
             <p class="text-gray-200 mb-6">Please confirm that you want to create your account with the email: <span id="pendingUserEmail" class="font-medium"></span></p>
             <div class="space-y-4">
-                <button id="confirmRegistration" class="w-full bg-green-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300">
+                <button id="confirmRegistration" class="w-full bg-green-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-green-600 active:bg-green-700 transition-all duration-300 transform hover:scale-105 active:scale-95">
                     ✅ Confirm & Create Account
                 </button>
-                <button id="rejectRegistration" class="w-full bg-red-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-red-600 transition-colors duration-300">
+                <button id="rejectRegistration" class="w-full bg-red-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-red-600 active:bg-red-700 transition-all duration-300 transform hover:scale-105 active:scale-95">
                     ❌ Cancel Registration
                 </button>
+                <div class="text-xs text-gray-300 mt-2">
+                    Click confirm to create your account and get automatically logged in.
+                </div>
             </div>
         </div>
     </div>
@@ -402,22 +405,29 @@
             }
         }
 
-        // Main verification logic
+        // Main verification logic - Enhanced with better error handling
         async function verifyEmail() {
+            console.log('Starting email verification process...');
             const token = getUrlParameter('token');
             const email = getUrlParameter('email');
+            
+            console.log('URL parameters:', { token, email });
 
             if (!token || !email) {
+                console.error('Missing required parameters:', { token: !!token, email: !!email });
                 showState('error');
                 errorMessage.textContent = 'Invalid verification link. Missing required parameters.';
                 return;
             }
 
             try {
+                console.log('Fetching pending user data...');
                 // Get pending user data
                 pendingUserData = await getPendingUser(token);
+                console.log('Pending user data retrieved:', !!pendingUserData);
 
                 if (!pendingUserData) {
+                    console.error('No pending user found for token:', token);
                     showState('error');
                     errorMessage.textContent = 'Verification link is invalid or has already been used.';
                     return;
@@ -427,7 +437,10 @@
                 const tokenAge = new Date() - new Date(pendingUserData.tokenCreatedAt);
                 const maxAge = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
                 
+                console.log('Token age check:', { tokenAge, maxAge, isExpired: tokenAge > maxAge });
+                
                 if (tokenAge > maxAge) {
+                    console.error('Token expired');
                     showState('error');
                     errorMessage.textContent = 'Verification link has expired. Please sign up again.';
                     await deletePendingUser(token);
@@ -436,11 +449,13 @@
 
                 // Check if email matches
                 if (pendingUserData.email !== email) {
+                    console.error('Email mismatch:', { provided: email, expected: pendingUserData.email });
                     showState('error');
                     errorMessage.textContent = 'Email verification mismatch. Please use the correct verification link.';
                     return;
                 }
 
+                console.log('Verification successful, showing pending state');
                 // Show pending state with user choice
                 pendingUserName.textContent = pendingUserData.name;
                 pendingUserEmail.textContent = pendingUserData.email;
@@ -453,87 +468,123 @@
             }
         }
 
-        // Confirm registration
-        confirmRegistration.addEventListener('click', async () => {
-            if (!pendingUserData) return;
-
-            loadingState.querySelector('h2').textContent = 'Creating your account...';
-            showState('loading');
-
-            try {
-                // Save user to main users collection
-                const success = await saveVerifiedUser(pendingUserData);
+        // Confirm registration - Fixed with proper error handling and debugging
+        if (confirmRegistration) {
+            confirmRegistration.addEventListener('click', async (e) => {
+                e.preventDefault();
+                console.log('Confirm registration clicked', pendingUserData);
                 
-                if (success) {
+                if (!pendingUserData) {
+                    console.error('No pending user data found');
+                    showState('error');
+                    errorMessage.textContent = 'No user data found. Please try the verification link again.';
+                    return;
+                }
+
+                // Show loading immediately
+                loadingState.querySelector('h2').textContent = 'Creating your account...';
+                showState('loading');
+
+                try {
+                    // Save user to main users collection
+                    const success = await saveVerifiedUser(pendingUserData);
+                    
+                    if (success) {
+                        // Delete pending user
+                        await deletePendingUser(pendingUserData.verificationToken);
+                        
+                        // 🚀 AUTO-LOGIN: Set user as logged in
+                        const verifiedUser = {
+                            ...pendingUserData,
+                            isVerified: true,
+                            verifiedAt: new Date().toISOString()
+                        };
+                        delete verifiedUser.verificationToken;
+                        delete verifiedUser.tokenCreatedAt;
+                        
+                        // Save to localStorage for immediate login
+                        localStorage.setItem('currentUser', JSON.stringify(verifiedUser));
+                        localStorage.setItem('justVerified', 'true');
+                        
+                        // Show success with auto-redirect message
+                        verifiedUserName.textContent = pendingUserData.name;
+                        showState('success');
+                        
+                        // Start countdown and auto-redirect
+                        let countdown = 3;
+                        const countdownElement = document.getElementById('countdown');
+                        
+                        const countdownInterval = setInterval(() => {
+                            countdown--;
+                            if (countdownElement) {
+                                countdownElement.textContent = countdown;
+                            }
+                            
+                            if (countdown <= 0) {
+                                clearInterval(countdownInterval);
+                                window.location.href = 'index.html';
+                            }
+                        }, 1000);
+                        
+                    } else {
+                        throw new Error('Failed to save user');
+                    }
+                } catch (error) {
+                    console.error('Error confirming registration:', error);
+                    showState('error');
+                    errorMessage.textContent = 'Failed to create account. Please try again or contact support.';
+                }
+            });
+        } else {
+            console.error('Confirm registration button not found');
+        }
+
+        // Reject registration - Fixed with proper error handling
+        if (rejectRegistration) {
+            rejectRegistration.addEventListener('click', async (e) => {
+                e.preventDefault();
+                console.log('Reject registration clicked');
+                
+                if (!pendingUserData) {
+                    console.error('No pending user data found');
+                    return;
+                }
+
+                loadingState.querySelector('h2').textContent = 'Canceling registration...';
+                showState('loading');
+
+                try {
                     // Delete pending user
                     await deletePendingUser(pendingUserData.verificationToken);
                     
-                    // 🚀 AUTO-LOGIN: Set user as logged in
-                    const verifiedUser = {
-                        ...pendingUserData,
-                        isVerified: true,
-                        verifiedAt: new Date().toISOString()
-                    };
-                    delete verifiedUser.verificationToken;
-                    delete verifiedUser.tokenCreatedAt;
-                    
-                    // Save to localStorage for immediate login
-                    localStorage.setItem('currentUser', JSON.stringify(verifiedUser));
-                    localStorage.setItem('justVerified', 'true');
-                    
-                    // Show success with auto-redirect message
-                    verifiedUserName.textContent = pendingUserData.name;
-                    showState('success');
-                    
-                    // Start countdown and auto-redirect
-                    let countdown = 3;
-                    const countdownElement = document.getElementById('countdown');
-                    
-                    const countdownInterval = setInterval(() => {
-                        countdown--;
-                        if (countdownElement) {
-                            countdownElement.textContent = countdown;
-                        }
-                        
-                        if (countdown <= 0) {
-                            clearInterval(countdownInterval);
-                            window.location.href = 'index.html';
-                        }
-                    }, 1000);
-                    
-                } else {
-                    throw new Error('Failed to save user');
+                    // Show error state with rejection message
+                    showState('error');
+                    errorMessage.textContent = 'Registration canceled. You can sign up again anytime with a different email.';
+                } catch (error) {
+                    console.error('Error rejecting registration:', error);
+                    showState('error');
+                    errorMessage.textContent = 'Error canceling registration. Please try again.';
                 }
-            } catch (error) {
-                console.error('Error confirming registration:', error);
-                showState('error');
-                errorMessage.textContent = 'Failed to create account. Please try again or contact support.';
-            }
+            });
+        } else {
+            console.error('Reject registration button not found');
+        }
+
+        // Start verification process - Ensure DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, starting verification...');
+            verifyEmail();
         });
-
-        // Reject registration
-        rejectRegistration.addEventListener('click', async () => {
-            if (!pendingUserData) return;
-
-            loadingState.querySelector('h2').textContent = 'Canceling registration...';
-            showState('loading');
-
-            try {
-                // Delete pending user
-                await deletePendingUser(pendingUserData.verificationToken);
-                
-                // Show error state with rejection message
-                showState('error');
-                errorMessage.textContent = 'Registration canceled. You can sign up again anytime with a different email.';
-            } catch (error) {
-                console.error('Error rejecting registration:', error);
-                showState('error');
-                errorMessage.textContent = 'Error canceling registration. Please try again.';
-            }
-        });
-
-        // Start verification process
-        verifyEmail();
+        
+        // Also start immediately in case DOMContentLoaded already fired
+        if (document.readyState === 'loading') {
+            // Document is still loading, wait for DOMContentLoaded
+            console.log('Document still loading, waiting for DOMContentLoaded...');
+        } else {
+            // Document is ready, start verification
+            console.log('Document ready, starting verification immediately...');
+            verifyEmail();
+        }
 
         // Dark mode functionality
         const darkModeToggle = document.getElementById('darkModeToggle');
