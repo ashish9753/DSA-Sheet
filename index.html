@@ -1094,6 +1094,8 @@
                     updateProgressDisplay(sheetInfo.id, sheetProgress, sheetInfo.totalProblems);
                 });
                 
+                console.log('Progress loaded from Firebase:', progressData);
+                
             } catch (error) {
                 console.error('Error loading user progress:', error);
                 // Fallback to localStorage if Firebase fails
@@ -1116,8 +1118,38 @@
                     const sheetProgress = userProgress.sheets[sheetName];
                     updateProgressDisplay(sheetInfo.id, sheetProgress, sheetInfo.totalProblems);
                 });
+                
+                console.log('Progress loaded from localStorage:', userProgress);
+                
             } catch (error) {
                 console.error('Error loading progress from localStorage:', error);
+            }
+        }
+
+        // Force refresh all progress from Firebase
+        async function refreshAllProgress() {
+            try {
+                const currentUser = localStorage.getItem('currentUser');
+                if (!currentUser) return;
+
+                const user = JSON.parse(currentUser);
+                const userEmail = user.email;
+                
+                // Force fresh fetch from Firebase
+                const progressDoc = await db.collection('userProgress').doc(userEmail).get();
+                const progressData = progressDoc.exists ? progressDoc.data() : { sheets: {} };
+                
+                console.log('Refreshing all progress from Firebase:', progressData);
+                
+                // Update progress display for each sheet
+                Object.entries(progressSheets).forEach(([sheetName, sheetInfo]) => {
+                    const sheetProgress = progressData.sheets[sheetName];
+                    updateProgressDisplay(sheetInfo.id, sheetProgress, sheetInfo.totalProblems);
+                    console.log(`Updated ${sheetName} progress:`, sheetProgress);
+                });
+                
+            } catch (error) {
+                console.error('Error refreshing progress:', error);
             }
         }
 
@@ -1126,14 +1158,31 @@
             const completed = progressData ? progressData.completed : 0;
             const percentage = progressData ? progressData.percentage : 0;
             
+            // Debug logging for binary search specifically
+            if (sheetId === 'binary') {
+                console.log('🔍 Binary Search Progress Update:', {
+                    sheetId,
+                    progressData,
+                    completed,
+                    percentage,
+                    totalProblems
+                });
+            }
+            
             // Update DOM elements
             const percentageElement = document.getElementById(`${sheetId}Percentage`);
             const progressBarElement = document.getElementById(`${sheetId}ProgressBar`);
             const completedElement = document.getElementById(`${sheetId}Completed`);
             const totalElement = document.getElementById(`${sheetId}Total`);
             
-            if (percentageElement) percentageElement.textContent = `${percentage}%`;
-            if (progressBarElement) progressBarElement.style.width = `${percentage}%`;
+            if (percentageElement) {
+                percentageElement.textContent = `${percentage}%`;
+                console.log(`Updated ${sheetId} percentage element to: ${percentage}%`);
+            }
+            if (progressBarElement) {
+                progressBarElement.style.width = `${percentage}%`;
+                console.log(`Updated ${sheetId} progress bar width to: ${percentage}%`);
+            }
             if (completedElement) completedElement.textContent = `${completed} completed`;
             if (totalElement) totalElement.textContent = `of ${totalProblems} problems`;
         }
@@ -1154,8 +1203,12 @@
                 document.getElementById('userName').textContent = user.name;
                 document.getElementById('welcomeMessage').classList.remove('hidden');
                 
-                // Load user progress after authentication
-                loadUserProgress();
+                // Load user progress after authentication with a slight delay
+                setTimeout(() => {
+                    loadUserProgress();
+                    // Also refresh progress after 2 seconds to ensure latest data
+                    setTimeout(refreshAllProgress, 2000);
+                }, 500);
             }
             
             // Show admin button if user is admin
@@ -1172,6 +1225,22 @@
         
         // Check authentication on page load
         checkAuthentication();
+        
+        // Add page visibility change listener to refresh progress when user returns
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                // Page became visible, refresh progress
+                setTimeout(refreshAllProgress, 1000);
+            }
+        });
+        
+        // Add periodic progress refresh every 30 seconds
+        setInterval(refreshAllProgress, 30000);
+        
+        // Add window focus event to refresh progress
+        window.addEventListener('focus', function() {
+            setTimeout(refreshAllProgress, 500);
+        });
         
         // Check if user just verified their email
         const urlParams = new URLSearchParams(window.location.search);
