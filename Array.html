@@ -489,6 +489,9 @@
             problemStatus[problemId] = !problemStatus[problemId];
             localStorage.setItem('arrayProblemStatus', JSON.stringify(problemStatus));
             
+            // Save detailed status to Firebase for cross-browser sync
+            saveDetailedStatusToFirebase();
+            
             // Track user progress for admin
             updateUserProgress();
             
@@ -641,10 +644,14 @@
         }
 
         // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             createParticles();
             updateTheme();
             initializeProblems();
+            
+            // Load user progress from Firebase first (cross-browser sync)
+            await loadUserProgressFromFirebase();
+            
             renderProblems();
             updateStats();
             
