@@ -310,9 +310,29 @@
         // Check every 30 seconds if user still exists
         setInterval(verifyUserExists, 30000);
 
-        // In-memory storage for problem completion status
-        let problemStatus = JSON.parse(localStorage.getItem('collegeProblemStatus')) || {};
+        // Firebase-only, no localStorage - Cross-browser sync
+        let problemStatus = {};
         let allProblems = [];
+
+        // Load problem status from Firebase on page load
+        async function loadProblemStatusFromFirebase() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) return;
+            
+            try {
+                const doc = await db.collection('userProblemStatus').doc(`${currentUser.email}_Collage`).get();
+                if (doc.exists) {
+                    problemStatus = doc.data().status || {};
+                    console.log('Collage problem status loaded from Firebase');
+                } else {
+                    problemStatus = {};
+                    console.log('No existing Collage problem status found, starting fresh');
+                }
+            } catch (error) {
+                console.error('Error loading Collage problem status from Firebase:', error);
+                problemStatus = {};
+            }
+        }
 
         // College DSA Problem data structure - 53 problems across 8 topics
         const problemData = {
@@ -502,9 +522,23 @@
         }
 
         // Toggle problem completion
-        function toggleProblem(problemId) {
+        // Toggle problem completion
+        async function toggleProblem(problemId) {
             problemStatus[problemId] = !problemStatus[problemId];
-            localStorage.setItem('collegeProblemStatus', JSON.stringify(problemStatus));
+            
+            // Firebase-only save - no localStorage
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (currentUser) {
+                try {
+                    await db.collection('userProblemStatus').doc(`${currentUser.email}_Collage`).set({
+                        status: problemStatus,
+                        lastUpdated: new Date().toISOString()
+                    });
+                    console.log('Collage problem status saved to Firebase');
+                } catch (error) {
+                    console.error('Error saving Collage problem status to Firebase:', error);
+                }
+            }
             
             // Add pulse animation
             const problemCard = document.querySelector(`[data-problem-id="${problemId}"]`);
@@ -516,8 +550,8 @@
             renderProblems();
             updateStats();
             
-            // Save to Firebase
-            saveProgressToFirebase();
+            // Track user progress for admin
+            updateUserProgress();
         }
 
         // Render all problems
@@ -608,54 +642,36 @@
         }
 
         // Save progress to Firebase
-        async function saveProgressToFirebase() {
-            try {
-                const currentUser = localStorage.getItem('currentUser');
-                if (!currentUser) return;
-
-                const user = JSON.parse(currentUser);
-                const userEmail = user.email;
-                
-                const completed = allProblems.filter(p => problemStatus[p.id]).length;
-                const total = allProblems.length;
-                const percentage = Math.round((completed / total) * 100);
-                
-                await db.collection('userProgress').doc(userEmail).set({
-                    sheets: {
-                        College: {
-                            completed: completed,
-                            total: total,
-                            percentage: percentage,
-                            problems: problemStatus,
-                            lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-                        }
-                    }
-                }, { merge: true });
-                
-            } catch (error) {
-                console.error('Error saving progress to Firebase:', error);
-            }
-        }
-
-        // Load progress from Firebase
-        async function loadProgressFromFirebase() {
-            try {
-                const currentUser = localStorage.getItem('currentUser');
-                if (!currentUser) return;
-
-                const user = JSON.parse(currentUser);
-                const userEmail = user.email;
-                
-                const doc = await db.collection('userProgress').doc(userEmail).get();
-                if (doc.exists) {
-                    const data = doc.data();
-                    if (data.sheets && data.sheets.College && data.sheets.College.problems) {
-                        problemStatus = data.sheets.College.problems;
-                        localStorage.setItem('collegeProblemStatus', JSON.stringify(problemStatus));
+        // Update user progress tracking
+        async function updateUserProgress() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) return;
+            
+            const completed = Object.values(problemStatus).filter(Boolean).length;
+            const total = allProblems.length;
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+            
+            // Firebase-only progress tracking
+            const progressData = {
+                name: currentUser.name,
+                email: currentUser.email,
+                sheets: {
+                    'Collage': {
+                        completed: completed,
+                        total: total,
+                        percentage: percentage,
+                        lastUpdated: new Date().toISOString()
                     }
                 }
+            };
+            
+            // Save to Firebase for real-time admin access
+            try {
+                await db.collection('userProgress').doc(currentUser.email).set(progressData, { merge: true });
+                console.log('Collage progress saved to Firebase successfully');
             } catch (error) {
-                console.error('Error loading progress from Firebase:', error);
+                console.error('Error saving Collage progress to Firebase:', error);
+            }
             }
         }
 
@@ -663,14 +679,17 @@
         async function init() {
             createParticles();
             generateAllProblems();
-            await loadProgressFromFirebase();
+            
+            // Load problem status from Firebase first
+            await loadProblemStatusFromFirebase();
+            
             renderProblems();
             updateStats();
             setupSearch();
             setupDarkMode();
             
-            // Auto-save to Firebase every 30 seconds
-            setInterval(saveProgressToFirebase, 30000);
+            // Initialize user progress tracking
+            updateUserProgress();
         }
 
         // Run when DOM is loaded

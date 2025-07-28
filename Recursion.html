@@ -481,9 +481,23 @@
         }
 
         // Toggle problem completion
-        function toggleProblem(problemId) {
+        // Toggle problem completion
+        async function toggleProblem(problemId) {
             problemStatus[problemId] = !problemStatus[problemId];
-            localStorage.setItem('recursionProblemStatus', JSON.stringify(problemStatus));
+            
+            // Firebase-only save - no localStorage
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (currentUser) {
+                try {
+                    await db.collection('userProblemStatus').doc(`${currentUser.email}_Recursion`).set({
+                        status: problemStatus,
+                        lastUpdated: new Date().toISOString()
+                    });
+                    console.log('Recursion problem status saved to Firebase');
+                } catch (error) {
+                    console.error('Error saving Recursion problem status to Firebase:', error);
+                }
+            }
             
             // Track user progress for admin
             updateUserProgress();
@@ -507,15 +521,11 @@
             const total = allProblems.length;
             const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
             
-            // Get existing user progress data
-            let userProgress = JSON.parse(localStorage.getItem('userProgress')) || {};
-            
-            // Update current user's progress
-            userProgress[currentUser.email] = {
+            // Firebase-only progress tracking
+            const progressData = {
                 name: currentUser.name,
                 email: currentUser.email,
                 sheets: {
-                    ...userProgress[currentUser.email]?.sheets,
                     'Recursion': {
                         completed: completed,
                         total: total,
@@ -525,15 +535,13 @@
                 }
             };
             
-            // Save to localStorage (backup)
-            localStorage.setItem('userProgress', JSON.stringify(userProgress));
-            
             // Save to Firebase for real-time admin access
             try {
-                await db.collection('userProgress').doc(currentUser.email).set(userProgress[currentUser.email]);
+                await db.collection('userProgress').doc(currentUser.email).set(progressData, { merge: true });
                 console.log('Recursion progress saved to Firebase successfully');
             } catch (error) {
                 console.error('Error saving Recursion progress to Firebase:', error);
+            }
                 // Firebase error is not critical, localStorage backup exists
             }
         }
@@ -637,10 +645,14 @@
         }
 
         // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             createParticles();
             updateTheme();
             initializeProblems();
+            
+            // Load problem status from Firebase first
+            await loadProblemStatusFromFirebase();
+            
             renderProblems();
             updateStats();
             
