@@ -244,8 +244,6 @@
                     // User has been deleted from Firebase, logout immediately
                     console.log('User deleted by admin, logging out...');
                     localStorage.removeItem('currentUser');
-                    localStorage.removeItem('userProgress');
-                    localStorage.removeItem('binaryProblemStatus');
                     localStorage.removeItem('binaryDarkMode');
                     
                     // Show notification and redirect
@@ -268,9 +266,29 @@
         // Check every 30 seconds if user still exists
         setInterval(verifyUserExists, 30000);
 
-        // In-memory storage for problem completion status
-        let problemStatus = JSON.parse(localStorage.getItem('binaryProblemStatus')) || {};
+        // Firebase-only, no localStorage - Cross-browser sync
+        let problemStatus = {};
         let allProblems = [];
+
+        // Load problem status from Firebase on page load
+        async function loadProblemStatusFromFirebase() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) return;
+            
+            try {
+                const doc = await db.collection('userProblemStatus').doc(`${currentUser.email}_Binary`).get();
+                if (doc.exists) {
+                    problemStatus = doc.data().status || {};
+                    console.log('Binary problem status loaded from Firebase');
+                } else {
+                    problemStatus = {};
+                    console.log('No existing Binary problem status found, starting fresh');
+                }
+            } catch (error) {
+                console.error('Error loading Binary problem status from Firebase:', error);
+                problemStatus = {};
+            }
+        }
 
         // Binary Search Problem data structure - 32 problems across 5 days
         const problemData = {
@@ -448,12 +466,23 @@
         }
 
         // Toggle problem completion
-        function toggleProblem(problemId) {
+        // Toggle problem completion
+        async function toggleProblem(problemId) {
             problemStatus[problemId] = !problemStatus[problemId];
-            localStorage.setItem('binaryProblemStatus', JSON.stringify(problemStatus));
             
-            // Save detailed status to Firebase for cross-browser sync
-            saveDetailedStatusToFirebase();
+            // Firebase-only save - no localStorage
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (currentUser) {
+                try {
+                    await db.collection('userProblemStatus').doc(`${currentUser.email}_Binary`).set({
+                        status: problemStatus,
+                        lastUpdated: new Date().toISOString()
+                    });
+                    console.log('Binary problem status saved to Firebase');
+                } catch (error) {
+                    console.error('Error saving Binary problem status to Firebase:', error);
+                }
+            }
             
             // Track user progress for admin
             updateUserProgress();
@@ -477,15 +506,11 @@
             const total = allProblems.length;
             const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
             
-            // Get existing user progress data
-            let userProgress = JSON.parse(localStorage.getItem('userProgress')) || {};
-            
-            // Update current user's progress
-            userProgress[currentUser.email] = {
+            // Firebase-only progress tracking
+            const progressData = {
                 name: currentUser.name,
                 email: currentUser.email,
                 sheets: {
-                    ...userProgress[currentUser.email]?.sheets,
                     'Binary': {
                         completed: completed,
                         total: total,
@@ -495,74 +520,12 @@
                 }
             };
             
-            // Save to localStorage (backup)
-            localStorage.setItem('userProgress', JSON.stringify(userProgress));
-            
             // Save to Firebase for real-time admin access
             try {
-                await db.collection('userProgress').doc(currentUser.email).set(userProgress[currentUser.email]);
+                await db.collection('userProgress').doc(currentUser.email).set(progressData, { merge: true });
                 console.log('Binary Search progress saved to Firebase successfully');
             } catch (error) {
                 console.error('Error saving Binary Search progress to Firebase:', error);
-                // Firebase error is not critical, localStorage backup exists
-            }
-        }
-
-        // Load user progress from Firebase (cross-browser sync)
-        async function loadUserProgressFromFirebase() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            if (!currentUser) return;
-            
-            try {
-                console.log('Loading user progress from Firebase for cross-browser sync...');
-                
-                // First, try to get user's specific problem status from Firebase
-                const userProgressDoc = await db.collection('userProgress').doc(currentUser.email).get();
-                
-                if (userProgressDoc.exists) {
-                    const userData = userProgressDoc.data();
-                    console.log('User progress found in Firebase:', userData);
-                    
-                    // Check if we have detailed problem status stored
-                    const problemStatusDoc = await db.collection('userProblemStatus').doc(currentUser.email).get();
-                    
-                    if (problemStatusDoc.exists) {
-                        const detailedStatus = problemStatusDoc.data();
-                        if (detailedStatus.binaryProblemStatus) {
-                            // Load the detailed problem status from Firebase
-                            problemStatus = detailedStatus.binaryProblemStatus;
-                            
-                            // Update localStorage with Firebase data
-                            localStorage.setItem('binaryProblemStatus', JSON.stringify(problemStatus));
-                            
-                            console.log('✅ Binary problem status loaded from Firebase:', problemStatus);
-                        }
-                    }
-                } else {
-                    console.log('No existing progress found in Firebase for this user');
-                }
-                
-            } catch (error) {
-                console.error('Error loading user progress from Firebase:', error);
-                // Fall back to localStorage if Firebase fails
-                console.log('Falling back to localStorage data');
-            }
-        }
-
-        // Save detailed problem status to Firebase (for cross-browser sync)
-        async function saveDetailedStatusToFirebase() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            if (!currentUser) return;
-            
-            try {
-                await db.collection('userProblemStatus').doc(currentUser.email).set({
-                    binaryProblemStatus: problemStatus,
-                    lastUpdated: new Date().toISOString()
-                }, { merge: true });
-                
-                console.log('✅ Detailed Binary problem status saved to Firebase');
-            } catch (error) {
-                console.error('Error saving detailed status to Firebase:', error);
             }
         }
 
@@ -670,8 +633,8 @@
             updateTheme();
             initializeProblems();
             
-            // Load user progress from Firebase first (cross-browser sync)
-            await loadUserProgressFromFirebase();
+            // Load problem status from Firebase first
+            await loadProblemStatusFromFirebase();
             
             renderProblems();
             updateStats();

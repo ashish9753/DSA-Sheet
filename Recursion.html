@@ -268,9 +268,29 @@
         // Check every 30 seconds if user still exists
         setInterval(verifyUserExists, 30000);
 
-        // In-memory storage for problem completion status
-        let problemStatus = JSON.parse(localStorage.getItem('recursionProblemStatus')) || {};
+        // Firebase-only, no localStorage - Cross-browser sync
+        let problemStatus = {};
         let allProblems = [];
+
+        // Load problem status from Firebase on page load
+        async function loadProblemStatusFromFirebase() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) return;
+            
+            try {
+                const doc = await db.collection('userProblemStatus').doc(`${currentUser.email}_Recursion`).get();
+                if (doc.exists) {
+                    problemStatus = doc.data().status || {};
+                    console.log('Recursion problem status loaded from Firebase');
+                } else {
+                    problemStatus = {};
+                    console.log('No existing Recursion problem status found, starting fresh');
+                }
+            } catch (error) {
+                console.error('Error loading Recursion problem status from Firebase:', error);
+                problemStatus = {};
+            }
+        }
 
         // Recursion Problem data structure - 25 problems across 4 days
         const problemData = {
