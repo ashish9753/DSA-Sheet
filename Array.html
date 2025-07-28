@@ -244,8 +244,7 @@
                     // User has been deleted from Firebase, logout immediately
                     console.log('User deleted by admin, logging out...');
                     localStorage.removeItem('currentUser');
-                    localStorage.removeItem('userProgress');
-                    localStorage.removeItem('arrayProblemStatus');
+                    localStorage.removeItem('isAdmin');
                     localStorage.removeItem('arrayDarkMode');
                     
                     // Show notification and redirect
@@ -268,8 +267,8 @@
         // Check every 30 seconds if user still exists
         setInterval(verifyUserExists, 30000);
 
-        // In-memory storage for problem completion status
-        let problemStatus = JSON.parse(localStorage.getItem('arrayProblemStatus')) || {};
+        // In-memory storage for problem completion status (Firebase-only, no localStorage)
+        let problemStatus = {};
         let allProblems = [];
 
         // Array Problem data structure - 46 problems across 5 days
@@ -487,9 +486,8 @@
         // Toggle problem completion
         function toggleProblem(problemId) {
             problemStatus[problemId] = !problemStatus[problemId];
-            localStorage.setItem('arrayProblemStatus', JSON.stringify(problemStatus));
             
-            // Save detailed status to Firebase for cross-browser sync
+            // Save directly to Firebase only (no localStorage)
             saveDetailedStatusToFirebase();
             
             // Track user progress for admin
@@ -505,7 +503,7 @@
             }
         }
 
-        // Update user progress tracking
+        // Update user progress tracking (Firebase-only)
         async function updateUserProgress() {
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             if (!currentUser) return;
@@ -514,15 +512,11 @@
             const total = allProblems.length;
             const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
             
-            // Get existing user progress data
-            let userProgress = JSON.parse(localStorage.getItem('userProgress')) || {};
-            
-            // Update current user's progress
-            userProgress[currentUser.email] = {
+            // Prepare user progress data
+            const userProgressData = {
                 name: currentUser.name,
                 email: currentUser.email,
                 sheets: {
-                    ...userProgress[currentUser.email]?.sheets,
                     'Array': {
                         completed: completed,
                         total: total,
@@ -532,16 +526,63 @@
                 }
             };
             
-            // Save to localStorage (backup)
-            localStorage.setItem('userProgress', JSON.stringify(userProgress));
-            
-            // Save to Firebase for real-time admin access
+            // Save directly to Firebase only (no localStorage backup)
             try {
-                await db.collection('userProgress').doc(currentUser.email).set(userProgress[currentUser.email]);
-                console.log('Array progress saved to Firebase successfully');
+                await db.collection('userProgress').doc(currentUser.email).set(userProgressData, { merge: true });
+                console.log('✅ Array progress saved to Firebase successfully');
             } catch (error) {
-                console.error('Error saving Array progress to Firebase:', error);
-                // Firebase error is not critical, localStorage backup exists
+                console.error('❌ Error saving Array progress to Firebase:', error);
+            }
+        }
+
+        // Load user progress from Firebase (Firebase-first, no localStorage fallback)
+        async function loadUserProgressFromFirebase() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) return;
+            
+            try {
+                console.log('🔄 Loading user progress from Firebase...');
+                
+                // Load detailed problem status from Firebase
+                const problemStatusDoc = await db.collection('userProblemStatus').doc(currentUser.email).get();
+                
+                if (problemStatusDoc.exists) {
+                    const detailedStatus = problemStatusDoc.data();
+                    if (detailedStatus.arrayProblemStatus) {
+                        // Load the detailed problem status from Firebase
+                        problemStatus = detailedStatus.arrayProblemStatus;
+                        console.log('✅ Array problem status loaded from Firebase:', problemStatus);
+                    } else {
+                        console.log('📝 No Array problem status found, starting fresh');
+                        problemStatus = {};
+                    }
+                } else {
+                    console.log('📝 No existing progress found in Firebase, starting fresh');
+                    problemStatus = {};
+                }
+                
+            } catch (error) {
+                console.error('❌ Error loading user progress from Firebase:', error);
+                // On Firebase error, start with empty state (no localStorage fallback)
+                problemStatus = {};
+                console.log('🔄 Starting with empty problem status due to Firebase error');
+            }
+        }
+
+        // Save detailed problem status to Firebase (Firebase-only storage)
+        async function saveDetailedStatusToFirebase() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) return;
+            
+            try {
+                await db.collection('userProblemStatus').doc(currentUser.email).set({
+                    arrayProblemStatus: problemStatus,
+                    lastUpdated: new Date().toISOString()
+                }, { merge: true });
+                
+                console.log('✅ Array problem status saved to Firebase');
+            } catch (error) {
+                console.error('❌ Error saving detailed status to Firebase:', error);
             }
         }
 
@@ -649,7 +690,7 @@
             updateTheme();
             initializeProblems();
             
-            // Load user progress from Firebase first (cross-browser sync)
+            // Load user progress from Firebase FIRST (Firebase-only, no localStorage)
             await loadUserProgressFromFirebase();
             
             renderProblems();
