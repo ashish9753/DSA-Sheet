@@ -300,7 +300,7 @@
 
             <button type="submit" 
                 class="w-full bg-gradient-to-r from-green-600 to-teal-600 text-white py-3 px-4 rounded-lg font-semibold btn-glow transform transition-all duration-300">
-                Send Verification Email
+                Sign Up
             </button>
         </form>
 
@@ -725,37 +725,27 @@
                 name: name,
                 email: email,
                 password: password,
-                registeredAt: new Date().toISOString()
+                registeredAt: new Date().toISOString(),
+                verified: true // Skip email verification
             };
             
-            // Store pending user
-            pendingUser = newUserData;
-            
-            // Send verification email
-            showSuccess('Sending verification email...');
-            const emailResult = await sendVerificationEmail(newUserData);
-            
-            if (emailResult.success) {
-                // Show verification pending screen
-                signupForm.classList.add('hidden');
-                verificationPending.classList.remove('hidden');
-                verificationEmail.textContent = email;
+            try {
+                // Save user to Firebase directly
+                await db.collection('users').doc(newUserData.id.toString()).set(newUserData);
                 
-                showSuccess('✅ Verification email sent successfully! Please check your inbox (and spam folder).');
+                // Log the user in immediately
+                localStorage.setItem('currentUser', JSON.stringify(newUserData));
                 
-                // Hide toggle button while verification is pending
-                toggleAuth.style.display = 'none';
-            } else {
-                console.error('Detailed EmailJS Error:', emailResult);
-                const errorMsg = emailResult.message || 'Failed to send verification email. Please try again.';
-                showError(`❌ ${errorMsg}`);
+                showSuccess('✅ Account created successfully! Redirecting...');
                 
-                // Show debugging info in console
-                console.log('🔍 Debugging Info:');
-                console.log('- Check your internet connection');
-                console.log('- Verify EmailJS service is active: https://dashboard.emailjs.com/admin');
-                console.log('- Check template exists: https://dashboard.emailjs.com/admin/templates');
-                console.log('- Verify public key is correct');
+                // Redirect to main page after short delay
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Error creating account:', error);
+                showError('❌ Failed to create account. Please try again.');
             }
         });
 
