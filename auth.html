@@ -3,156 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Programming Series Hub</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-    <!-- EmailJS SDK -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <title>DSA Hub - Site Moved</title>
     <link rel="shortcut icon" href="logo.png">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         
         * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
             font-family: 'Inter', sans-serif;
-        }
-        
-        .gradient-bg {
-            background: linear-gradient(-45deg, #1a1a2e, #16213e, #0f3460, #533483);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-            position: relative;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a0033 25%, #2d1b69 50%, #0a0a0a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             overflow: hidden;
-        }
-
-        /* Light mode gradient background */
-        .light .gradient-bg {
-            background: linear-gradient(-45deg, #f0f9ff, #e0f2fe, #bae6fd, #7dd3fc) !important;
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-        }
-
-        .gradient-bg::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.2) 0%, transparent 50%),
-                        radial-gradient(circle at 40% 80%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
-            animation: floatingOrbs 20s ease infinite;
-        }
-
-        /* Light mode gradient overlay */
-        .light .gradient-bg::before {
-            background: radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(147, 51, 234, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 40% 80%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
-        }
-        
-        .auth-container {
-            backdrop-filter: blur(20px);
-            background: rgba(20, 20, 40, 0.85);
-            border: 2px solid rgba(120, 119, 198, 0.3);
-            box-shadow: 
-                0 25px 50px -12px rgba(0, 0, 0, 0.6),
-                0 0 0 1px rgba(120, 119, 198, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            animation: containerFloat 6s ease-in-out infinite;
             position: relative;
-            z-index: 10;
-        }
-
-        /* Light mode auth container */
-        .light .auth-container {
-            background: rgba(255, 255, 255, 0.9) !important;
-            border: 2px solid rgba(59, 130, 246, 0.2) !important;
-            box-shadow: 
-                0 25px 50px -12px rgba(0, 0, 0, 0.15),
-                0 0 0 1px rgba(59, 130, 246, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
-        }
-
-        /* Light mode text colors */
-        .light .auth-container h1 {
-            color: #1f2937 !important;
-        }
-
-        .light .auth-container p {
-            color: #374151 !important;
-        }
-
-        .light .auth-container label {
-            color: #374151 !important;
-        }
-
-        .light .auth-container input {
-            background: rgba(255, 255, 255, 0.8) !important;
-            border-color: rgba(59, 130, 246, 0.3) !important;
-            color: #1f2937 !important;
-        }
-
-        .light .auth-container input::placeholder {
-            color: #9ca3af !important;
+            animation: backgroundShift 10s ease-in-out infinite;
         }
         
-        .auth-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, transparent, rgba(120, 119, 198, 0.05), transparent);
-            border-radius: inherit;
-            z-index: -1;
+        @keyframes backgroundShift {
+            0%, 100% { background: linear-gradient(135deg, #0f0f23 0%, #1a0033 25%, #2d1b69 50%, #0a0a0a 100%); }
+            50% { background: linear-gradient(135deg, #1a0033 0%, #2d1b69 25%, #0f0f23 50%, #1a0033 100%); }
         }
         
-        .input-glow {
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
-        .input-glow:focus {
-            box-shadow: 
-                0 0 20px rgba(120, 119, 198, 0.4),
-                0 0 40px rgba(120, 119, 198, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-        }
-        
-        .btn-glow {
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-glow::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-        
-        .btn-glow:hover::before {
-            left: 100%;
-        }
-        
-        .btn-glow:hover {
-            transform: translateY(-3px);
-            box-shadow: 
-                0 10px 25px rgba(0, 0, 0, 0.3),
-                0 0 20px rgba(120, 119, 198, 0.3);
-        }
-        
-        .floating-particles {
+        /* Animated Background Elements */
+        .bg-animation {
             position: absolute;
             width: 100%;
             height: 100%;
@@ -160,748 +40,613 @@
             z-index: 1;
         }
         
-        .particle {
+        .floating-shape {
             position: absolute;
-            background: rgba(120, 119, 198, 0.3);
             border-radius: 50%;
-            animation: floatUp 15s infinite linear;
+            background: rgba(138, 43, 226, 0.2);
+            animation: floatEnhanced 12s ease-in-out infinite;
+            filter: blur(1.5px);
         }
         
-        .text-glow {
-            text-shadow: 0 0 20px rgba(120, 119, 198, 0.5);
-            animation: textPulse 3s ease-in-out infinite;
+        .floating-shape::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            height: 70%;
+            background: rgba(75, 0, 130, 0.4);
+            border-radius: 50%;
+            animation: innerGlowEnhanced 6s ease-in-out infinite;
+        }
+        
+        @keyframes innerGlowEnhanced {
+            0%, 100% { 
+                opacity: 0.4; 
+                transform: translate(-50%, -50%) scale(1); 
+                filter: blur(2px);
+            }
+            33% { 
+                opacity: 0.8; 
+                transform: translate(-50%, -50%) scale(1.3); 
+                filter: blur(1px);
+            }
+            66% { 
+                opacity: 0.6; 
+                transform: translate(-50%, -50%) scale(0.8); 
+                filter: blur(3px);
+            }
+        }
+        
+        @keyframes floatEnhanced {
+            0%, 100% { 
+                transform: translateY(0px) translateX(0px) scale(1) rotate(0deg);
+                opacity: 0.2;
+            }
+            25% { 
+                transform: translateY(-30px) translateX(20px) scale(1.2) rotate(90deg);
+                opacity: 0.4;
+            }
+            50% { 
+                transform: translateY(-15px) translateX(-25px) scale(0.8) rotate(180deg);
+                opacity: 0.3;
+            }
+            75% { 
+                transform: translateY(25px) translateX(10px) scale(1.1) rotate(270deg);
+                opacity: 0.35;
+            }
+        }
+        
+        .shape-1 {
+            width: 140px;
+            height: 140px;
+            top: 15%;
+            left: 8%;
+            animation-delay: 0s;
+            background: radial-gradient(circle, rgba(147, 51, 234, 0.3), rgba(124, 58, 237, 0.1));
+        }
+        
+        .shape-2 {
+            width: 220px;
+            height: 220px;
+            top: 65%;
+            right: 10%;
+            animation-delay: 2s;
+            background: radial-gradient(circle, rgba(139, 69, 19, 0.25), rgba(168, 85, 247, 0.1));
+        }
+        
+        .shape-3 {
+            width: 110px;
+            height: 110px;
+            bottom: 15%;
+            left: 15%;
+            animation-delay: 4s;
+            background: radial-gradient(circle, rgba(75, 0, 130, 0.35), rgba(99, 102, 241, 0.15));
+        }
+        
+        .shape-4 {
+            width: 180px;
+            height: 180px;
+            top: 5%;
+            right: 30%;
+            animation-delay: 1s;
+            background: radial-gradient(circle, rgba(138, 43, 226, 0.28), rgba(139, 92, 246, 0.12));
+        }
+        
+        .shape-5 {
+            width: 90px;
+            height: 90px;
+            top: 45%;
+            left: 5%;
+            animation-delay: 3s;
+            background: radial-gradient(circle, rgba(106, 90, 205, 0.3), rgba(124, 58, 237, 0.15));
+        }
+        
+        .shape-6 {
+            width: 250px;
+            height: 250px;
+            bottom: 30%;
+            right: 5%;
+            animation-delay: 5s;
+            background: radial-gradient(circle, rgba(72, 61, 139, 0.25), rgba(139, 92, 246, 0.1));
+        }
+        
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg) scale(1); 
+                opacity: 0.7;
+            }
+            25% { 
+                transform: translateY(-30px) rotate(90deg) scale(1.1); 
+                opacity: 0.9;
+            }
+            50% { 
+                transform: translateY(-60px) rotate(180deg) scale(0.9); 
+                opacity: 0.5;
+            }
+            75% { 
+                transform: translateY(-30px) rotate(270deg) scale(1.2); 
+                opacity: 0.8;
+            }
+        }
+        
+        /* Main Container */
+        .container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 600px;
+            padding: 3rem;
+            background: rgba(15, 15, 35, 0.85);
+            backdrop-filter: blur(25px);
+            border-radius: 30px;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            box-shadow: 
+                0 30px 60px -12px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(138, 43, 226, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            animation: slideIn 1.5s ease-out, containerGlow 4s ease-in-out infinite;
+        }
+        
+        @keyframes slideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(100px) scale(0.8) rotateX(20deg);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1) rotateX(0deg);
+            }
+        }
+        
+        @keyframes containerGlow {
+            0%, 100% { 
+                box-shadow: 
+                    0 30px 60px -12px rgba(0, 0, 0, 0.5),
+                    0 0 0 1px rgba(138, 43, 226, 0.2),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            }
+            50% { 
+                box-shadow: 
+                    0 30px 60px -12px rgba(0, 0, 0, 0.7),
+                    0 0 0 1px rgba(138, 43, 226, 0.5),
+                    0 0 40px rgba(138, 43, 226, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            }
+        }
+        
+        /* Icon Animation */
+        .icon-container {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .main-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #8b5cf6, #a855f7, #6366f1);
+            border-radius: 30px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: iconFloat 3s ease-in-out infinite, iconGlow 2s ease-in-out infinite;
+            box-shadow: 
+                0 20px 40px rgba(139, 92, 246, 0.4),
+                0 0 0 1px rgba(168, 85, 247, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .main-icon::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: iconShine 3s ease-in-out infinite;
+            transform: rotate(-45deg);
+        }
+        
+        .main-icon svg {
+            width: 60px;
+            height: 60px;
+            color: white;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+            animation: iconSpin 8s linear infinite;
+        }
+        
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+            25% { transform: translateY(-10px) rotate(2deg) scale(1.05); }
+            50% { transform: translateY(-5px) rotate(-1deg) scale(1.02); }
+            75% { transform: translateY(-15px) rotate(1deg) scale(1.08); }
+        }
+        
+        @keyframes iconGlow {
+            0%, 100% { 
+                box-shadow: 
+                    0 20px 40px rgba(139, 92, 246, 0.4),
+                    0 0 0 1px rgba(168, 85, 247, 0.3);
+            }
+            50% { 
+                box-shadow: 
+                    0 25px 50px rgba(139, 92, 246, 0.6),
+                    0 0 30px rgba(168, 85, 247, 0.5),
+                    0 0 0 1px rgba(168, 85, 247, 0.5);
+            }
+        }
+        
+        @keyframes iconShine {
+            0% { transform: translateX(-200%) translateY(-200%) rotate(-45deg); }
+            50% { transform: translateX(-50%) translateY(-50%) rotate(-45deg); }
+            100% { transform: translateX(200%) translateY(200%) rotate(-45deg); }
+        }
+        
+        @keyframes iconSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Typography */
+        .title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a855f7, #8b5cf6, #6366f1, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 300% 300%;
+            animation: gradientShift 4s ease-in-out infinite, fadeInUp 1s ease-out 0.3s both, textGlow 3s ease-in-out infinite;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 30px rgba(168, 85, 247, 0.5);
         }
         
         @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
+            0%, 100% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
         }
         
-        @keyframes floatingOrbs {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            33% { transform: translateY(-30px) rotate(120deg); }
-            66% { transform: translateY(20px) rotate(240deg); }
+        @keyframes textGlow {
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.3)); }
+            50% { filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.8)); }
         }
         
-        @keyframes containerFloat {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+        .subtitle {
+            font-size: 1.4rem;
+            color: #c084fc;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease-out 0.6s both, subtitlePulse 2s ease-in-out infinite;
+            text-shadow: 0 0 15px rgba(192, 132, 252, 0.5);
         }
         
-        @keyframes floatUp {
+        @keyframes subtitlePulse {
+            0%, 100% { opacity: 0.8; transform: translateY(0px); }
+            50% { opacity: 1; transform: translateY(-2px); }
+        }
+        
+        .message {
+            font-size: 1.2rem;
+            color: #e2e8f0;
+            line-height: 1.7;
+            margin-bottom: 2.5rem;
+            animation: fadeInUp 1s ease-out 0.9s both, messageFloat 6s ease-in-out infinite;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        @keyframes messageFloat {
+            0%, 100% { transform: translateY(0px); opacity: 0.9; }
+            50% { transform: translateY(-5px); opacity: 1; }
+        }
+        
+        @keyframes fadeInUp {
             0% {
                 opacity: 0;
-                transform: translateY(100vh) rotate(0deg);
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
+                transform: translateY(30px);
             }
             100% {
-                opacity: 0;
-                transform: translateY(-100px) rotate(360deg);
+                opacity: 1;
+                transform: translateY(0);
             }
         }
         
-        @keyframes textPulse {
-            0%, 100% { text-shadow: 0 0 20px rgba(120, 119, 198, 0.5); }
-            50% { text-shadow: 0 0 30px rgba(120, 119, 198, 0.8), 0 0 40px rgba(120, 119, 198, 0.3); }
+        /* Button Styles */
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            animation: fadeInUp 1s ease-out 1.2s both;
         }
         
-        .modal-dark {
-            background: rgba(10, 10, 20, 0.95);
-            backdrop-filter: blur(20px);
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6, #a855f7, #6366f1);
+            color: white;
+            padding: 1.2rem 2.5rem;
+            border: none;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 15px 35px rgba(139, 92, 246, 0.4),
+                0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: buttonPulse 3s ease-in-out infinite;
         }
         
-        .modal-content {
-            background: linear-gradient(145deg, #1e1e3f, #2a2a5a);
-            border: 2px solid rgba(120, 119, 198, 0.3);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        @keyframes buttonPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 
+                0 25px 50px rgba(139, 92, 246, 0.6),
+                0 0 40px rgba(168, 85, 247, 0.4),
+                0 10px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #a855f7;
+            padding: 1.2rem 2.5rem;
+            border: 2px solid #8b5cf6;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 16px rgba(139, 92, 246, 0.2);
+        }
+        
+        .btn-secondary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
+            transition: left 0.4s ease;
+            z-index: -1;
+        }
+        
+        .btn-secondary:hover::before {
+            left: 0;
+        }
+        
+        .btn-secondary:hover {
+            color: white;
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 
+                0 15px 30px rgba(139, 92, 246, 0.4),
+                0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Countdown Timer */
+        .countdown {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            margin-top: 2rem;
+            animation: fadeInUp 1s ease-out 1.5s both, countdownPulse 2s ease-in-out infinite;
+            text-shadow: 0 0 10px rgba(148, 163, 184, 0.3);
+        }
+        
+        @keyframes countdownPulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.4)); }
+        }
+        
+        .countdown-number {
+            font-weight: 800;
+            color: #a855f7;
+            font-size: 1.4rem;
+            animation: numberGlow 1s ease-in-out infinite;
+            text-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
+        }
+        
+        @keyframes numberGlow {
+            0%, 100% { 
+                transform: scale(1);
+                filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.4));
+            }
+            50% { 
+                transform: scale(1.1);
+                filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.8));
+            }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+                padding: 2rem;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .message {
+                font-size: 1rem;
+            }
+        }
+        
+        /* Loading Animation */
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body class="gradient-bg min-h-screen flex items-center justify-center p-4 transition-colors duration-300" id="body">
-    <!-- Dark Mode Toggle -->
-    <button id="darkModeToggle" class="fixed top-4 right-4 bg-white/20 hover:bg-white/30 rounded-full p-3 transition-all duration-300 backdrop-blur-sm z-50">
-        <svg id="sunIcon" class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
-        </svg>
-        <svg id="moonIcon" class="w-6 h-6 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
-        </svg>
-    </button>
-
-    <!-- Floating Particles -->
-    <div class="floating-particles">
-        <div class="particle" style="left: 10%; width: 4px; height: 4px; animation-delay: 0s;"></div>
-        <div class="particle" style="left: 20%; width: 6px; height: 6px; animation-delay: 2s;"></div>
-        <div class="particle" style="left: 30%; width: 3px; height: 3px; animation-delay: 4s;"></div>
-        <div class="particle" style="left: 40%; width: 5px; height: 5px; animation-delay: 1s;"></div>
-        <div class="particle" style="left: 50%; width: 4px; height: 4px; animation-delay: 6s;"></div>
-        <div class="particle" style="left: 60%; width: 7px; height: 7px; animation-delay: 3s;"></div>
-        <div class="particle" style="left: 70%; width: 3px; height: 3px; animation-delay: 5s;"></div>
-        <div class="particle" style="left: 80%; width: 5px; height: 5px; animation-delay: 7s;"></div>
-        <div class="particle" style="left: 90%; width: 4px; height: 4px; animation-delay: 1s;"></div>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+        <div class="floating-shape shape-3"></div>
+        <div class="floating-shape shape-4"></div>
     </div>
-
-    <div class="auth-container rounded-2xl p-8 w-full max-w-md shadow-2xl">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-white mb-2 text-glow">Welcome Back</h1>
-            <p class="text-gray-300">Access Programming Series Hub</p>
-        </div>
-
-        <!-- Login Form -->
-        <form id="loginForm" class="space-y-6">
-            <div>
-                <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
-                <input type="email" id="email" name="email" required
-                    class="w-full px-4 py-3 bg-gray-800/50 border-2 border-gray-600/50 rounded-lg text-white placeholder-gray-400 input-glow focus:outline-none focus:border-purple-400 transition-all duration-300"
-                    placeholder="Enter your email">
-            </div>
-            
-            <div>
-                <label for="password" class="block text-sm font-medium text-gray-300 mb-2">Password</label>
-                <input type="password" id="password" name="password" required
-                    class="w-full px-4 py-3 bg-gray-800/50 border-2 border-gray-600/50 rounded-lg text-white placeholder-gray-400 input-glow focus:outline-none focus:border-purple-400 transition-all duration-300"
-                    placeholder="Enter your password">
-            </div>
-
-            <button type="submit" 
-                class="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 px-4 rounded-lg font-semibold btn-glow transform transition-all duration-300">
-                Sign In
-            </button>
-        </form>
-
-        <!-- Signup Form (Hidden by default) -->
-        <form id="signupForm" class="space-y-6 hidden">
-            <div>
-                <label for="signupName" class="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
-                <input type="text" id="signupName" name="name" required
-                    class="w-full px-4 py-3 bg-gray-800/50 border-2 border-gray-600/50 rounded-lg text-white placeholder-gray-400 input-glow focus:outline-none focus:border-purple-400 transition-all duration-300"
-                    placeholder="Enter your full name">
-            </div>
-
-            <div>
-                <label for="signupEmail" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
-                <input type="email" id="signupEmail" name="email" required
-                    class="w-full px-4 py-3 bg-gray-800/50 border-2 border-gray-600/50 rounded-lg text-white placeholder-gray-400 input-glow focus:outline-none focus:border-purple-400 transition-all duration-300"
-                    placeholder="Enter your email">
-            </div>
-            
-            <div>
-                <label for="signupPassword" class="block text-sm font-medium text-gray-300 mb-2">Password</label>
-                <input type="password" id="signupPassword" name="password" required
-                    class="w-full px-4 py-3 bg-gray-800/50 border-2 border-gray-600/50 rounded-lg text-white placeholder-gray-400 input-glow focus:outline-none focus:border-purple-400 transition-all duration-300"
-                    placeholder="Create a password">
-            </div>
-
-            <button type="submit" 
-                class="w-full bg-gradient-to-r from-green-600 to-teal-600 text-white py-3 px-4 rounded-lg font-semibold btn-glow transform transition-all duration-300">
-                Sign Up
-            </button>
-        </form>
-
-        <!-- Email Verification Pending -->
-        <div id="verificationPending" class="space-y-6 hidden">
-            <div class="text-center">
-                <div class="bg-yellow-500/20 rounded-full p-4 mx-auto w-fit mb-4">
-                    <svg class="w-8 h-8 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-                <h3 class="text-xl font-semibold text-white mb-2">Verification Email Sent!</h3>
-                <p class="text-gray-200 mb-4">Please check your email and click the verification link to complete your registration.</p>
-                <p class="text-sm text-gray-300">Email sent to: <span id="verificationEmail" class="font-medium"></span></p>
-            </div>
-            
-            <div class="flex space-x-4">
-                <button id="resendEmail" class="flex-1 bg-yellow-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-yellow-600 transition-colors duration-300">
-                    Resend Email
-                </button>
-                <button id="backToSignup" class="flex-1 bg-white/20 text-white py-2 px-4 rounded-lg font-medium hover:bg-white/30 transition-colors duration-300">
-                    Back to Signup
-                </button>
+    
+    <!-- Main Content -->
+    <div class="container">
+        <div class="icon-container">
+            <div class="main-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
             </div>
         </div>
-
-        <!-- Toggle between Login and Signup -->
-        <div class="mt-6 text-center">
-            <button id="toggleAuth" class="text-white hover:text-gray-200 transition-colors duration-300">
-                Don't have an account? <span class="font-semibold">Sign Up</span>
-            </button>
-        </div>
-
-        <!-- Admin Login -->
-        <div class="mt-8 pt-6 border-t border-white/20">
-            <button id="adminLoginBtn" class="w-full bg-red-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-600 transition-colors duration-300 mb-3">
-                Admin Login
-            </button>
-            
-            <!-- Debug EmailJS Button (for testing) -->
-            <button id="testEmailBtn" class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-600 transition-colors duration-300 text-sm">
-                🧪 Test EmailJS Connection
-            </button>
-        </div>
-
-        <!-- Error Message -->
-        <div id="errorMessage" class="mt-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-200 text-sm hidden"></div>
         
-        <!-- Success Message -->
-        <div id="successMessage" class="mt-4 p-3 bg-green-500/20 border border-green-500/30 rounded-lg text-green-200 text-sm hidden"></div>
-    </div>
-
-    <!-- Admin Modal -->
-    <div id="adminModal" class="fixed inset-0 modal-dark hidden items-center justify-center z-50">
-        <div class="modal-content rounded-2xl p-8 w-full max-w-md mx-4">
-            <div class="text-center mb-6">
-                <h2 class="text-2xl font-bold text-white text-glow">Admin Login</h2>
-                <p class="text-gray-300">Enter admin credentials</p>
-            </div>
-            
-            <form id="adminForm" class="space-y-4">
-                <div>
-                    <label for="adminPassword" class="block text-sm font-medium text-gray-300 mb-2">Admin Password</label>
-                    <input type="password" id="adminPassword" required
-                        class="w-full px-4 py-3 bg-gray-700/50 border-2 border-gray-600/50 rounded-lg text-white placeholder-gray-400 input-glow focus:outline-none focus:border-red-400 transition-all duration-300"
-                        placeholder="Enter admin password">
-                </div>
-                
-                <div class="flex space-x-4">
-                    <button type="submit" class="flex-1 bg-gradient-to-r from-red-600 to-pink-600 text-white py-3 px-4 rounded-lg font-semibold btn-glow transition-all duration-300">
-                        Login as Admin
-                    </button>
-                    <button type="button" id="closeAdminModal" class="flex-1 bg-gray-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-gray-500 transition-all duration-300">
-                        Cancel
-                    </button>
-                </div>
-            </form>
+        <h1 class="title">Site Moved!</h1>
+        <p class="subtitle">DSA Programming Hub</p>
+        
+        <div class="message">
+            <p>🚀 We've upgraded our platform! This page is no longer active.</p>
+            <p>Please visit our <strong>new and improved site</strong> for the best DSA learning experience.</p>
+        </div>
+        
+        <div class="btn-container">
+            <a href="https://ashish9753.github.io/DSA-Sheet/index.html" class="btn-primary" id="redirectBtn">
+                Visit New Site
+                <span class="loader" id="loader" style="display: none;"></span>
+            </a>
+            <a href="https://ashish9753.github.io/DSA-Sheet/index.html" class="btn-secondary">
+                Copy New URL
+            </a>
+        </div>
+        
+        <div class="countdown">
+            Auto-redirecting in <span class="countdown-number" id="countdown">10</span> seconds
         </div>
     </div>
 
     <script>
-        // EmailJS Configuration - ✅ FULLY CONFIGURED!
-        const EMAILJS_CONFIG = {
-            serviceId: 'service_edtklod',          // ✅ Real Gmail service ID
-            templateId: 'template_9eouah7',        // ✅ NEW Template ID (updated!)
-            publicKey: 'EflOAWCAq5ryO5lm7'        // ✅ Real public key (verified!)
-        };
-
-        // Verify configuration
-        console.log('🔧 EmailJS Configuration:');
-        console.log('Service ID:', EMAILJS_CONFIG.serviceId);
-        console.log('Template ID:', EMAILJS_CONFIG.templateId);
-        console.log('Public Key:', EMAILJS_CONFIG.publicKey);
-
-        // Initialize EmailJS and test connection
-        emailjs.init(EMAILJS_CONFIG.publicKey);
-
-        // Test EmailJS Connection Function
-        async function testEmailJSConnection() {
-            console.log('🧪 Testing EmailJS Connection...');
+        // Auto-redirect countdown
+        let countdownTime = 10;
+        const countdownElement = document.getElementById('countdown');
+        const redirectBtn = document.getElementById('redirectBtn');
+        const loader = document.getElementById('loader');
+        
+        const countdown = setInterval(() => {
+            countdownTime--;
+            countdownElement.textContent = countdownTime;
             
-            // Test if EmailJS is loaded
-            if (typeof emailjs === 'undefined') {
-                console.log('❌ EmailJS library not loaded!');
-                return false;
-            }
-            
-            try {
-                // Ultra-simple test email
-                const testParams = {
-                    name: 'Test User',
-                    email: 'test@example.com',
-                    verification_link: 'https://google.com'
-                };
+            if (countdownTime <= 0) {
+                clearInterval(countdown);
+                // Show loading animation
+                loader.style.display = 'inline-block';
+                redirectBtn.innerHTML = 'Redirecting... <span class="loader"></span>';
                 
-                console.log('📧 Testing with params:', testParams);
-                console.log('📧 Service ID:', EMAILJS_CONFIG.serviceId);
-                console.log('📧 Template ID:', EMAILJS_CONFIG.templateId);
-                console.log('📧 Public Key:', EMAILJS_CONFIG.publicKey);
-                
-                // This will test if EmailJS is reachable
-                const result = await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, testParams);
-                console.log('✅ EmailJS connection successful:', result);
-                return true;
-            } catch (error) {
-                console.log('📊 EmailJS Detailed Error Analysis:');
-                console.log('❌ Error Status:', error.status);
-                console.log('❌ Error Text:', error.text);
-                console.log('❌ Full Error:', error);
-                
-                // Specific error handling
-                if (error.status === 404) {
-                    console.log('🔍 404 Error = Service or Template NOT FOUND');
-                    console.log('   ❌ Either service_edtklod does not exist');
-                    console.log('   ❌ Or template_9eouah7 does not exist');
-                    console.log('   🔧 Go to EmailJS dashboard and verify both exist');
-                } else if (error.status === 401) {
-                    console.log('🔍 401 Error = INVALID PUBLIC KEY');
-                    console.log('   ❌ Public key EflOAWCAq5ryO5lm7 is wrong');
-                    console.log('   🔧 Check EmailJS Account settings for correct key');
-                } else if (error.status === 422) {
-                    console.log('🔍 422 Error = TEMPLATE VARIABLE MISMATCH');
-                    console.log('   ❌ Template does not have {{name}}, {{email}}, {{verification_link}}');
-                    console.log('   🔧 Update template variables');
-                } else if (error.status === 400) {
-                    console.log('🔍 400 Error = BAD REQUEST');
-                    console.log('   ❌ Template content or format is invalid');
-                    console.log('   🔧 Check template HTML in EmailJS dashboard');
-                } else {
-                    console.log('🔍 Unknown Error:', error.status);
-                    console.log('   🔧 Check EmailJS dashboard for service status');
-                }
-                
-                return false;
-            }
-        }
-
-        // Run connection test on page load
-        testEmailJSConnection();
-
-        // Firebase Configuration - YOUR ACTUAL CONFIG
-        const firebaseConfig = {
-            apiKey: "AIzaSyBbOMWi1qdWOzpm_0KeLE_mOHUGjzk0He4",
-            authDomain: "programming-series-hub.firebaseapp.com",
-            projectId: "programming-series-hub",
-            storageBucket: "programming-series-hub.firebasestorage.app",
-            messagingSenderId: "919993604014",
-            appId: "1:919993604014:web:bd0f8f34a5e923ecf31a3f",
-            measurementId: "G-ZJY6P2HHR7"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        // Pending user data for email verification
-        let pendingUser = null;
-
-        // Generate verification token
-        function generateVerificationToken() {
-            return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-        }
-
-        // Send verification email with enhanced error handling
-        async function sendVerificationEmail(userData) {
-            const verificationToken = generateVerificationToken();
-            const verificationLink = `https://ashish9753.github.io/DSA-Sheet/verify.html?token=${verificationToken}&email=${encodeURIComponent(userData.email)}`;
-            
-            // Store pending user with verification token
-            const userWithToken = {
-                ...userData,
-                verificationToken: verificationToken,
-                isVerified: false,
-                tokenCreatedAt: new Date().toISOString()
-            };
-            
-            try {
-                await db.collection('pendingUsers').doc(verificationToken).set(userWithToken);
-                console.log('✅ Pending user stored in Firebase');
-            } catch (error) {
-                console.error('❌ Firebase error, using localStorage:', error);
-                localStorage.setItem('pendingUser_' + verificationToken, JSON.stringify(userWithToken));
-            }
-
-            // Try multiple email parameter formats for compatibility
-            const emailParams1 = {
-                name: userData.name,              // Match {{name}} in template
-                email: userData.email,            // Match {{email}} in template
-                verification_link: verificationLink,
-                user_name: userData.name,
-                from_name: 'Programming Series Hub',
-                subject: 'Verify Your Email - Programming Series Hub'
-            };
-
-            const emailParams2 = {
-                to_name: userData.name,
-                to_email: userData.email,
-                verification_link: verificationLink,
-                user_name: userData.name
-            };
-
-            const emailParams3 = {
-                user_name: userData.name,
-                user_email: userData.email,
-                verify_link: verificationLink,
-                verification_url: verificationLink
-            };
-
-            const emailParams4 = {
-                name: userData.name,
-                email: userData.email,
-                link: verificationLink
-            };
-
-            console.log('📧 EmailJS Config Check:');
-            console.log('Service ID:', EMAILJS_CONFIG.serviceId);
-            console.log('Template ID:', EMAILJS_CONFIG.templateId);
-            console.log('Public Key:', EMAILJS_CONFIG.publicKey);
-
-            // Try different parameter formats
-            const paramSets = [emailParams1, emailParams2, emailParams3, emailParams4];
-            
-            for (let i = 0; i < paramSets.length; i++) {
-                try {
-                    console.log(`🚀 Attempt ${i + 1}: Sending email with params:`, paramSets[i]);
-                    const response = await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, paramSets[i]);
-                    console.log('✅ EmailJS Success Response:', response);
-                    return { success: true, token: verificationToken, response: response };
-                } catch (error) {
-                    console.error(`❌ Attempt ${i + 1} failed:`, error);
-                    if (i === paramSets.length - 1) {
-                        // Last attempt failed, show detailed error
-                        console.error('❌ All EmailJS attempts failed. Error Details:', error);
-                        console.error('Error Code:', error.status);
-                        console.error('Error Message:', error.text);
-                        
-                        let errorMessage = 'Failed to send verification email. ';
-                        if (error.status === 400) {
-                            errorMessage += 'Template variables mismatch. Check your EmailJS template.';
-                        } else if (error.status === 401) {
-                            errorMessage += 'Authentication failed. Check your public key.';
-                        } else if (error.status === 404) {
-                            errorMessage += 'Service or template not found.';
-                        } else if (error.status === 422) {
-                            errorMessage += 'Invalid template variables or email format.';
-                        } else {
-                            errorMessage += `Error: ${error.text || error.message || 'Unknown error'}`;
-                        }
-                        
-                        return { success: false, error: error, message: errorMessage };
-                    }
-                }
-            }
-        }
-
-        // Firebase Helper Functions
-        async function saveUserToFirebase(user) {
-            try {
-                await db.collection('users').doc(user.id.toString()).set(user);
-                console.log('User saved to Firebase');
-            } catch (error) {
-                console.error('Error saving user:', error);
-                // Fallback to localStorage
-                const users = JSON.parse(localStorage.getItem('users') || '[]');
-                users.push(user);
-                localStorage.setItem('users', JSON.stringify(users));
-            }
-        }
-
-        async function getUserFromFirebase(email, password) {
-            try {
-                const snapshot = await db.collection('users').where('email', '==', email).get();
-                if (!snapshot.empty) {
-                    const userDoc = snapshot.docs[0];
-                    const user = userDoc.data();
-                    if (user.password === password && user.isVerified) {
-                        return user;
-                    } else if (!user.isVerified) {
-                        showError('Please verify your email before logging in');
-                        return null;
-                    }
-                }
-                return null;
-            } catch (error) {
-                console.error('Error getting user:', error);
-                // Fallback to localStorage
-                const users = JSON.parse(localStorage.getItem('users') || '[]');
-                const user = users.find(u => u.email === email && u.password === password);
-                if (user && !user.isVerified) {
-                    showError('Please verify your email before logging in');
-                    return null;
-                }
-                return user || null;
-            }
-        }
-
-        async function checkUserExists(email) {
-            try {
-                const snapshot = await db.collection('users').where('email', '==', email).get();
-                return !snapshot.empty;
-            } catch (error) {
-                console.error('Error checking user:', error);
-                // Fallback to localStorage
-                const users = JSON.parse(localStorage.getItem('users') || '[]');
-                return users.some(u => u.email === email);
-            }
-        }
-
-        // Admin password (in a real app, this should be hashed and stored securely)
-        const ADMIN_PASSWORD = "Ashish_lpu123";
-        
-        // Get elements
-        const loginForm = document.getElementById('loginForm');
-        const signupForm = document.getElementById('signupForm');
-        const verificationPending = document.getElementById('verificationPending');
-        const toggleAuth = document.getElementById('toggleAuth');
-        const adminLoginBtn = document.getElementById('adminLoginBtn');
-        const adminModal = document.getElementById('adminModal');
-        const adminForm = document.getElementById('adminForm');
-        const closeAdminModal = document.getElementById('closeAdminModal');
-        const errorMessage = document.getElementById('errorMessage');
-        const successMessage = document.getElementById('successMessage');
-        const resendEmail = document.getElementById('resendEmail');
-        const backToSignup = document.getElementById('backToSignup');
-        const verificationEmail = document.getElementById('verificationEmail');
-        const testEmailBtn = document.getElementById('testEmailBtn');
-        
-        let isLogin = true;
-        
-        // Initialize users in localStorage if not exists
-        if (!localStorage.getItem('users')) {
-            localStorage.setItem('users', JSON.stringify([]));
-        }
-        
-        // Check if user is already logged in
-        if (localStorage.getItem('currentUser') || localStorage.getItem('isAdmin')) {
-            window.location.href = 'index.html';
-        }
-        
-        // Toggle between login and signup
-        toggleAuth.addEventListener('click', () => {
-            if (isLogin) {
-                loginForm.classList.add('hidden');
-                signupForm.classList.remove('hidden');
-                verificationPending.classList.add('hidden');
-                toggleAuth.innerHTML = 'Already have an account? <span class="font-semibold">Sign In</span>';
-                document.querySelector('h1').textContent = 'Create Account';
-                document.querySelector('p').textContent = 'Join Programming Series Hub';
-                isLogin = false;
-            } else {
-                signupForm.classList.add('hidden');
-                verificationPending.classList.add('hidden');
-                loginForm.classList.remove('hidden');
-                toggleAuth.innerHTML = 'Don\'t have an account? <span class="font-semibold">Sign Up</span>';
-                document.querySelector('h1').textContent = 'Welcome Back';
-                document.querySelector('p').textContent = 'Access Programming Series Hub';
-                isLogin = true;
-            }
-            hideMessages();
-        });
-        
-        // Login form submission
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            showSuccess('Checking credentials...');
-            
-            const user = await getUserFromFirebase(email, password);
-            
-            if (user) {
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                showSuccess('Login successful! Redirecting...');
+                // Redirect after a short delay
                 setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1500);
-            } else {
-                showError('Invalid email or password, or email not verified');
+                    window.location.href = 'https://https://ashish9753.github.io/DSA-Sheet1/';
+                }, 1000);
             }
-        });
+        }, 1000);
         
-        // Signup form submission
-        signupForm.addEventListener('submit', async (e) => {
+        // Manual redirect with loading animation
+        redirectBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            const name = document.getElementById('signupName').value;
-            const email = document.getElementById('signupEmail').value;
-            const password = document.getElementById('signupPassword').value;
+            loader.style.display = 'inline-block';
+            this.innerHTML = 'Redirecting... <span class="loader"></span>';
             
-            showSuccess('Creating account...');
-            
-            // Check if user already exists
-            const userExists = await checkUserExists(email);
-            if (userExists) {
-                showError('User with this email already exists');
-                return;
-            }
-            
-            // Create new user data
-            const newUserData = {
-                id: Date.now(),
-                name: name,
-                email: email,
-                password: password,
-                registeredAt: new Date().toISOString(),
-                verified: true // Skip email verification
-            };
-            
-            try {
-                // Save user to Firebase directly
-                await db.collection('users').doc(newUserData.id.toString()).set(newUserData);
-                
-                // Log the user in immediately
-                localStorage.setItem('currentUser', JSON.stringify(newUserData));
-                
-                showSuccess('✅ Account created successfully! Redirecting...');
-                
-                // Redirect to main page after short delay
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1500);
-                
-            } catch (error) {
-                console.error('Error creating account:', error);
-                showError('❌ Failed to create account. Please try again.');
-            }
-        });
-
-        // Resend email functionality
-        resendEmail.addEventListener('click', async () => {
-            if (pendingUser) {
-                showSuccess('Resending verification email...');
-                const emailResult = await sendVerificationEmail(pendingUser);
-                
-                if (emailResult.success) {
-                    showSuccess('Verification email resent! Please check your inbox.');
-                } else {
-                    showError('Failed to resend email. Please try again.');
-                }
-            }
-        });
-
-        // Back to signup functionality
-        backToSignup.addEventListener('click', () => {
-            verificationPending.classList.add('hidden');
-            signupForm.classList.remove('hidden');
-            toggleAuth.style.display = 'block';
-            pendingUser = null;
-            hideMessages();
-        });
-        
-        // Admin login
-        adminLoginBtn.addEventListener('click', () => {
-            adminModal.classList.remove('hidden');
-            adminModal.classList.add('flex');
-        });
-        
-        closeAdminModal.addEventListener('click', () => {
-            adminModal.classList.add('hidden');
-            adminModal.classList.remove('flex');
-        });
-        
-        adminForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const password = document.getElementById('adminPassword').value;
-            
-            if (password === ADMIN_PASSWORD) {
-                localStorage.setItem('isAdmin', 'true');
-                window.location.href = 'admin.html';
-            } else {
-                showError('Invalid admin password');
-                adminModal.classList.add('hidden');
-                adminModal.classList.remove('flex');
-            }
-        });
-        
-        // Test EmailJS button
-        testEmailBtn.addEventListener('click', async () => {
-            showSuccess('Testing EmailJS connection...');
-            
-            const testResult = await testEmailJSConnection();
-            if (testResult) {
-                showSuccess('✅ EmailJS is working! You can proceed with signup.');
-            } else {
-                showError('❌ EmailJS connection failed. Check console for details.');
-            }
-        });
-        
-        // Utility functions
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.classList.remove('hidden');
-            successMessage.classList.add('hidden');
-        }
-        
-        function showSuccess(message) {
-            successMessage.textContent = message;
-            successMessage.classList.remove('hidden');
-            errorMessage.classList.add('hidden');
-        }
-        
-        function hideMessages() {
-            errorMessage.classList.add('hidden');
-            successMessage.classList.add('hidden');
-        }
-        
-        // Close modal when clicking outside
-        adminModal.addEventListener('click', (e) => {
-            if (e.target === adminModal) {
-                adminModal.classList.add('hidden');
-                adminModal.classList.remove('flex');
-            }
-        });
-
-        // Dark mode functionality
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        const sunIcon = document.getElementById('sunIcon');
-        const moonIcon = document.getElementById('moonIcon');
-        const body = document.getElementById('body');
-        
-        // Check for saved theme preference or default to dark
-        const currentTheme = localStorage.getItem('theme') || 'dark';
-        
-        function setTheme(theme) {
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-                body.classList.remove('light');
-                sunIcon.classList.add('hidden');
-                moonIcon.classList.remove('hidden');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-                body.classList.add('light');
-                sunIcon.classList.remove('hidden');
-                moonIcon.classList.add('hidden');
-                localStorage.setItem('theme', 'light');
-            }
-        }
-        
-        // Apply saved theme
-        setTheme(currentTheme);
-        
-        darkModeToggle.addEventListener('click', () => {
-            const isDark = document.documentElement.classList.contains('dark');
-            setTheme(isDark ? 'light' : 'dark');
-            
-            // Add animation effect
-            body.style.transition = 'all 0.5s ease';
             setTimeout(() => {
-                body.style.transition = '';
+                window.location.href = 'https://ashish9753.github.io/DSA-Sheet/index.html';
             }, 500);
         });
+        
+        // Copy URL functionality
+        document.querySelector('.btn-secondary').addEventListener('click', function(e) {
+            e.preventDefault();
+            navigator.clipboard.writeText('https://ashish9753.github.io/DSA-Sheet/index.html').then(() => {
+                this.textContent = '✓ URL Copied!';
+                setTimeout(() => {
+                    this.textContent = 'Copy New URL';
+                }, 2000);
+            }).catch(() => {
+                // Fallback for older browsers
+                this.textContent = 'URL: ashish9753.github.io/DSA-Sheet';
+                setTimeout(() => {
+                    this.textContent = 'Copy New URL';
+                }, 3000);
+            });
+        });
+        
+        // Add some interactive animations
+        document.addEventListener('mousemove', function(e) {
+            const container = document.querySelector('.container');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            container.style.transform = `perspective(1000px) rotateY(${(x - 0.5) * 5}deg) rotateX(${(y - 0.5) * -5}deg)`;
+        });
+        
+        // Reset transform when mouse leaves
+        document.addEventListener('mouseleave', function() {
+            const container = document.querySelector('.container');
+            container.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg)';
+        });
     </script>
-
-    <!-- Footer -->
-    <footer class="bg-gradient-to-r from-gray-900 via-black to-gray-900 text-white mt-16 relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-gray-900/20"></div>
-        <div class="container mx-auto px-4 py-8 relative z-10">
-            <div class="text-center">
-                <h3 class="text-xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                    Programming Series Hub
-                </h3>
-                <p class="text-gray-200 mb-4">
-                    Your journey to mastering Data Structures & Algorithms starts here
-                </p>
-                <div class="flex justify-center space-x-4 mb-4">
-                    <a href="#" class="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-all duration-300 hover:scale-110">
-                        <i class="fab fa-github text-lg"></i>
-                    </a>
-                    <a href="https://www.linkedin.com/in/ashish2208/" class="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-all duration-300 hover:scale-110">
-                        <i class="fab fa-linkedin text-lg"></i>
-                    </a>
-                    <a href="#" class="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-all duration-300 hover:scale-110">
-                        <i class="fab fa-twitter text-lg"></i>
-                    </a>
-                </div>
-                <div class="border-t border-white/20 pt-4">
-                    <p class="text-gray-200 text-sm">&copy; 2025 Programming Series Hub. Built by <span class="font-semibold text-blue-400">Ashish Sharma</span></p>
-                </div>
-            </div>
-        </div>
-    </footer>
 </body>
 </html>

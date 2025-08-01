@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Programming Series Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <link rel="shortcut icon" href="logo.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(-45deg, #1a1a2e, #16213e, #0f3460, #533483);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Light mode gradient background */
+        .light .gradient-bg {
+            background: linear-gradient(-45deg, #f0f9ff, #e0f2fe, #bae6fd, #7dd3fc) !important;
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        .gradient-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.2) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 80%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+            animation: floatingOrbs 20s ease infinite;
+        }
+
+        /* Light mode gradient overlay */
+        .light .gradient-bg::before {
+            background: radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(147, 51, 234, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 80%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+        }
+        
+        .auth-container {
+            backdrop-filter: blur(20px);
+            background: rgba(20, 20, 40, 0.85);
+            border: 2px solid rgba(120, 119, 198, 0.3);
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.6),
+                0 0 0 1px rgba(120, 119, 198, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            animation: containerFloat 6s ease-in-out infinite;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Light mode auth container */
+        .light .auth-container {
+            background: rgba(255, 255, 255, 0.9) !important;
+            border: 2px solid rgba(59, 130, 246, 0.2) !important;
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(59, 130, 246, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+        }
+
+        /* Light mode text colors */
+        .light .auth-container h1 {
+            color: #1f2937 !important;
+        }
+
+        .light .auth-container p {
+            color: #374151 !important;
+        }
+
+        .light .auth-container label {
+            color: #374151 !important;
+        }
+
+        .light .auth-container input {
+            background: rgba(255, 255, 255, 0.8) !important;
+            border-color: rgba(59, 130, 246, 0.3) !important;
+            color: #1f2937 !important;
+        }
+
+        .light .auth-container input::placeholder {
+            color: #9ca3af !important;
+        }
+        
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(120, 119, 198, 0.05), transparent);
+            border-radius: inherit;
+            z-index: -1;
+        }
+        
+        .input-glow {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .input-glow:focus {
+            box-shadow: 
+                0 0 20px rgba(120, 119, 198, 0.4),
+                0 0 40px rgba(120, 119, 198, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .btn-glow {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-glow::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn-glow:hover::before {
+            left: 100%;
+        }
+        
+        .btn-glow:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 10px 25px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(120, 119, 198, 0.3);
+        }
+        
+        .floating-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(120, 119, 198, 0.3);
+            border-radius: 50%;
+            animation: floatUp 15s infinite linear;
+        }
+        
+        .text-glow {
+            text-shadow: 0 0 20px rgba(120, 119, 198, 0.5);
+            animation: textPulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes floatingOrbs {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-30px) rotate(120deg); }
+            66% { transform: translateY(20px) rotate(240deg); }
+        }
+        
+        @keyframes containerFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes floatUp {
+            0% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(0deg);
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) rotate(360deg);
+            }
+        }
+        
+        @keyframes textPulse {
+            0%, 100% { text-shadow: 0 0 20px rgba(120, 119, 198, 0.5); }
+            50% { text-shadow: 0 0 30px rgba(120, 119, 198, 0.8), 0 0 40px rgba(120, 119, 198, 0.3); }
+        }
+        
+        .modal-dark {
+            background: rgba(10, 10, 20, 0.95);
+            backdrop-filter: blur(20px);
+        }
+        
+        .modal-content {
+            background: linear-gradient(145deg, #1e1e3f, #2a2a5a);
+            border: 2px solid rgba(120, 119, 198, 0.3);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen flex items-center justify-center p-4 transition-colors duration-300" id="body">
+    <!-- Dark Mode Toggle -->
+    <button id="darkModeToggle" class="fixed top-4 right-4 bg-white/20 hover:bg-white/30 rounded-full p-3 transition-all duration-300 backdrop-blur-sm z-50">
+        <svg id="sunIcon" class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+        <svg id="moonIcon" class="w-6 h-6 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+        </svg>
+    </button>
+
+    <!-- Floating Particles -->
+    <div class="floating-particles">
+        <div class="particle" style="left: 10%; width: 4px; height: 4px; animation-delay: 0s;"></div>
+        <div class="particle" style="left: 20%; width: 6px; height: 6px; animation-delay: 2s;"></div>
+        <div class="particle" style="left: 30%; width: 3px; height: 3px; animation-delay: 4s;"></div>
+        <div class="particle" style="left: 40%; width: 5px; height: 5px; animation-delay: 1s;"></div>
+        <div class="particle" style="left: 50%; width: 4px; height: 4px; animation-delay: 6s;"></div>
+        <div class="particle" style="left: 60%; width: 7px; height: 7px; animation-delay: 3s;"></div>
+        <div class="particle" style="left: 70%; width: 3px; height: 3px; animation-delay: 5s;"></div>
+        <div class="particle" style="left: 80%; width: 5px; height: 5px; animation-delay: 7s;"></div>
+        <div class="particle" style="left: 90%; width: 4px; height: 4px; animation-delay: 1s;"></div>
+    </div>
+
+    <div class="auth-container rounded-2xl p-8 w-full max-w-md shadow-2xl">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-white mb-2 text-glow">Welcome Back</h1>
+            <p class="text-gray-300">Access Programming Series Hub</p>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="space-y-6">
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                <input type="email" id="email" name="email" required
+                    class="w-full px-4 py-3 bg-gray-800/50 border-2 border-gray-600/50 rounded-lg text-white placeholder-gray-400 input-glow focus:outline-none focus:border-purple-400 transition-all duration-300"
+                    placeholder="Enter your email">
+            </div>
+            
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                <input type="password" id="password" name="password" required
+                    class="w-full px-4 py-3 bg-gray-800/50 border-2 border-gray-600/50 rounded-lg text-white placeholder-gray-400 input-glow focus:outline-none focus:border-purple-400 transition-all duration-300"
+                    placeholder="Enter your password">
+            </div>
+
+            <button type="submit" 
+                class="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 px-4 rounded-lg font-semibold btn-glow transform transition-all duration-300">
+                Sign In
+            </button>
+        </form>
+
+        <!-- Signup Form (Hidden by default) -->
+        <form id="signupForm" class="space-y-6 hidden">
+            <div>
+                <label for="signupName" class="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                <input type="text" id="signupName" name="name" required
+                    class="w-full px-4 py-3 bg-gray-800/50 border-2 border-gray-600/50 rounded-lg text-white placeholder-gray-400 input-glow focus:outline-none focus:border-purple-400 transition-all duration-300"
+                    placeholder="Enter your full name">
+            </div>
+
+            <div>
+                <label for="signupEmail" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                <input type="email" id="signupEmail" name="email" required
+                    class="w-full px-4 py-3 bg-gray-800/50 border-2 border-gray-600/50 rounded-lg text-white placeholder-gray-400 input-glow focus:outline-none focus:border-purple-400 transition-all duration-300"
+                    placeholder="Enter your email">
+            </div>
+            
+            <div>
+                <label for="signupPassword" class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                <input type="password" id="signupPassword" name="password" required
+                    class="w-full px-4 py-3 bg-gray-800/50 border-2 border-gray-600/50 rounded-lg text-white placeholder-gray-400 input-glow focus:outline-none focus:border-purple-400 transition-all duration-300"
+                    placeholder="Create a password">
+            </div>
+
+            <button type="submit" 
+                class="w-full bg-gradient-to-r from-green-600 to-teal-600 text-white py-3 px-4 rounded-lg font-semibold btn-glow transform transition-all duration-300">
+                Sign Up
+            </button>
+        </form>
+
+        <!-- Email Verification Pending -->
+        <div id="verificationPending" class="space-y-6 hidden">
+            <div class="text-center">
+                <div class="bg-yellow-500/20 rounded-full p-4 mx-auto w-fit mb-4">
+                    <svg class="w-8 h-8 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold text-white mb-2">Verification Email Sent!</h3>
+                <p class="text-gray-200 mb-4">Please check your email and click the verification link to complete your registration.</p>
+                <p class="text-sm text-gray-300">Email sent to: <span id="verificationEmail" class="font-medium"></span></p>
+            </div>
+            
+            <div class="flex space-x-4">
+                <button id="resendEmail" class="flex-1 bg-yellow-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-yellow-600 transition-colors duration-300">
+                    Resend Email
+                </button>
+                <button id="backToSignup" class="flex-1 bg-white/20 text-white py-2 px-4 rounded-lg font-medium hover:bg-white/30 transition-colors duration-300">
+                    Back to Signup
+                </button>
+            </div>
+        </div>
+
+        <!-- Toggle between Login and Signup -->
+        <div class="mt-6 text-center">
+            <button id="toggleAuth" class="text-white hover:text-gray-200 transition-colors duration-300">
+                Don't have an account? <span class="font-semibold">Sign Up</span>
+            </button>
+        </div>
+
+        <!-- Admin Login -->
+        <div class="mt-8 pt-6 border-t border-white/20">
+            <button id="adminLoginBtn" class="w-full bg-red-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-600 transition-colors duration-300 mb-3">
+                Admin Login
+            </button>
+            
+            <!-- Debug EmailJS Button (for testing) -->
+            <button id="testEmailBtn" class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-600 transition-colors duration-300 text-sm">
+                🧪 Test EmailJS Connection
+            </button>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="mt-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-200 text-sm hidden"></div>
+        
+        <!-- Success Message -->
+        <div id="successMessage" class="mt-4 p-3 bg-green-500/20 border border-green-500/30 rounded-lg text-green-200 text-sm hidden"></div>
+    </div>
+
+    <!-- Admin Modal -->
+    <div id="adminModal" class="fixed inset-0 modal-dark hidden items-center justify-center z-50">
+        <div class="modal-content rounded-2xl p-8 w-full max-w-md mx-4">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-white text-glow">Admin Login</h2>
+                <p class="text-gray-300">Enter admin credentials</p>
+            </div>
+            
+            <form id="adminForm" class="space-y-4">
+                <div>
+                    <label for="adminPassword" class="block text-sm font-medium text-gray-300 mb-2">Admin Password</label>
+                    <input type="password" id="adminPassword" required
+                        class="w-full px-4 py-3 bg-gray-700/50 border-2 border-gray-600/50 rounded-lg text-white placeholder-gray-400 input-glow focus:outline-none focus:border-red-400 transition-all duration-300"
+                        placeholder="Enter admin password">
+                </div>
+                
+                <div class="flex space-x-4">
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-red-600 to-pink-600 text-white py-3 px-4 rounded-lg font-semibold btn-glow transition-all duration-300">
+                        Login as Admin
+                    </button>
+                    <button type="button" id="closeAdminModal" class="flex-1 bg-gray-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-gray-500 transition-all duration-300">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // EmailJS Configuration - ✅ FULLY CONFIGURED!
+        const EMAILJS_CONFIG = {
+            serviceId: 'service_edtklod',          // ✅ Real Gmail service ID
+            templateId: 'template_9eouah7',        // ✅ NEW Template ID (updated!)
+            publicKey: 'EflOAWCAq5ryO5lm7'        // ✅ Real public key (verified!)
+        };
+
+        // Verify configuration
+        console.log('🔧 EmailJS Configuration:');
+        console.log('Service ID:', EMAILJS_CONFIG.serviceId);
+        console.log('Template ID:', EMAILJS_CONFIG.templateId);
+        console.log('Public Key:', EMAILJS_CONFIG.publicKey);
+
+        // Initialize EmailJS and test connection
+        emailjs.init(EMAILJS_CONFIG.publicKey);
+
+        // Test EmailJS Connection Function
+        async function testEmailJSConnection() {
+            console.log('🧪 Testing EmailJS Connection...');
+            
+            // Test if EmailJS is loaded
+            if (typeof emailjs === 'undefined') {
+                console.log('❌ EmailJS library not loaded!');
+                return false;
+            }
+            
+            try {
+                // Ultra-simple test email
+                const testParams = {
+                    name: 'Test User',
+                    email: 'test@example.com',
+                    verification_link: 'https://google.com'
+                };
+                
+                console.log('📧 Testing with params:', testParams);
+                console.log('📧 Service ID:', EMAILJS_CONFIG.serviceId);
+                console.log('📧 Template ID:', EMAILJS_CONFIG.templateId);
+                console.log('📧 Public Key:', EMAILJS_CONFIG.publicKey);
+                
+                // This will test if EmailJS is reachable
+                const result = await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, testParams);
+                console.log('✅ EmailJS connection successful:', result);
+                return true;
+            } catch (error) {
+                console.log('📊 EmailJS Detailed Error Analysis:');
+                console.log('❌ Error Status:', error.status);
+                console.log('❌ Error Text:', error.text);
+                console.log('❌ Full Error:', error);
+                
+                // Specific error handling
+                if (error.status === 404) {
+                    console.log('🔍 404 Error = Service or Template NOT FOUND');
+                    console.log('   ❌ Either service_edtklod does not exist');
+                    console.log('   ❌ Or template_9eouah7 does not exist');
+                    console.log('   🔧 Go to EmailJS dashboard and verify both exist');
+                } else if (error.status === 401) {
+                    console.log('🔍 401 Error = INVALID PUBLIC KEY');
+                    console.log('   ❌ Public key EflOAWCAq5ryO5lm7 is wrong');
+                    console.log('   🔧 Check EmailJS Account settings for correct key');
+                } else if (error.status === 422) {
+                    console.log('🔍 422 Error = TEMPLATE VARIABLE MISMATCH');
+                    console.log('   ❌ Template does not have {{name}}, {{email}}, {{verification_link}}');
+                    console.log('   🔧 Update template variables');
+                } else if (error.status === 400) {
+                    console.log('🔍 400 Error = BAD REQUEST');
+                    console.log('   ❌ Template content or format is invalid');
+                    console.log('   🔧 Check template HTML in EmailJS dashboard');
+                } else {
+                    console.log('🔍 Unknown Error:', error.status);
+                    console.log('   🔧 Check EmailJS dashboard for service status');
+                }
+                
+                return false;
+            }
+        }
+
+        // Run connection test on page load
+        testEmailJSConnection();
+
+        // Firebase Configuration - YOUR ACTUAL CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyBbOMWi1qdWOzpm_0KeLE_mOHUGjzk0He4",
+            authDomain: "programming-series-hub.firebaseapp.com",
+            projectId: "programming-series-hub",
+            storageBucket: "programming-series-hub.firebasestorage.app",
+            messagingSenderId: "919993604014",
+            appId: "1:919993604014:web:bd0f8f34a5e923ecf31a3f",
+            measurementId: "G-ZJY6P2HHR7"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Pending user data for email verification
+        let pendingUser = null;
+
+        // Generate verification token
+        function generateVerificationToken() {
+            return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        }
+
+        // Send verification email with enhanced error handling
+        async function sendVerificationEmail(userData) {
+            const verificationToken = generateVerificationToken();
+            const verificationLink = `https://ashish9753.github.io/DSA-Sheet/verify.html?token=${verificationToken}&email=${encodeURIComponent(userData.email)}`;
+            
+            // Store pending user with verification token
+            const userWithToken = {
+                ...userData,
+                verificationToken: verificationToken,
+                isVerified: false,
+                tokenCreatedAt: new Date().toISOString()
+            };
+            
+            try {
+                await db.collection('pendingUsers').doc(verificationToken).set(userWithToken);
+                console.log('✅ Pending user stored in Firebase');
+            } catch (error) {
+                console.error('❌ Firebase error, using localStorage:', error);
+                localStorage.setItem('pendingUser_' + verificationToken, JSON.stringify(userWithToken));
+            }
+
+            // Try multiple email parameter formats for compatibility
+            const emailParams1 = {
+                name: userData.name,              // Match {{name}} in template
+                email: userData.email,            // Match {{email}} in template
+                verification_link: verificationLink,
+                user_name: userData.name,
+                from_name: 'Programming Series Hub',
+                subject: 'Verify Your Email - Programming Series Hub'
+            };
+
+            const emailParams2 = {
+                to_name: userData.name,
+                to_email: userData.email,
+                verification_link: verificationLink,
+                user_name: userData.name
+            };
+
+            const emailParams3 = {
+                user_name: userData.name,
+                user_email: userData.email,
+                verify_link: verificationLink,
+                verification_url: verificationLink
+            };
+
+            const emailParams4 = {
+                name: userData.name,
+                email: userData.email,
+                link: verificationLink
+            };
+
+            console.log('📧 EmailJS Config Check:');
+            console.log('Service ID:', EMAILJS_CONFIG.serviceId);
+            console.log('Template ID:', EMAILJS_CONFIG.templateId);
+            console.log('Public Key:', EMAILJS_CONFIG.publicKey);
+
+            // Try different parameter formats
+            const paramSets = [emailParams1, emailParams2, emailParams3, emailParams4];
+            
+            for (let i = 0; i < paramSets.length; i++) {
+                try {
+                    console.log(`🚀 Attempt ${i + 1}: Sending email with params:`, paramSets[i]);
+                    const response = await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, paramSets[i]);
+                    console.log('✅ EmailJS Success Response:', response);
+                    return { success: true, token: verificationToken, response: response };
+                } catch (error) {
+                    console.error(`❌ Attempt ${i + 1} failed:`, error);
+                    if (i === paramSets.length - 1) {
+                        // Last attempt failed, show detailed error
+                        console.error('❌ All EmailJS attempts failed. Error Details:', error);
+                        console.error('Error Code:', error.status);
+                        console.error('Error Message:', error.text);
+                        
+                        let errorMessage = 'Failed to send verification email. ';
+                        if (error.status === 400) {
+                            errorMessage += 'Template variables mismatch. Check your EmailJS template.';
+                        } else if (error.status === 401) {
+                            errorMessage += 'Authentication failed. Check your public key.';
+                        } else if (error.status === 404) {
+                            errorMessage += 'Service or template not found.';
+                        } else if (error.status === 422) {
+                            errorMessage += 'Invalid template variables or email format.';
+                        } else {
+                            errorMessage += `Error: ${error.text || error.message || 'Unknown error'}`;
+                        }
+                        
+                        return { success: false, error: error, message: errorMessage };
+                    }
+                }
+            }
+        }
+
+        // Firebase Helper Functions
+        async function saveUserToFirebase(user) {
+            try {
+                await db.collection('users').doc(user.id.toString()).set(user);
+                console.log('User saved to Firebase');
+            } catch (error) {
+                console.error('Error saving user:', error);
+                // Fallback to localStorage
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                users.push(user);
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+        }
+
+        async function getUserFromFirebase(email, password) {
+            try {
+                const snapshot = await db.collection('users').where('email', '==', email).get();
+                if (!snapshot.empty) {
+                    const userDoc = snapshot.docs[0];
+                    const user = userDoc.data();
+                    if (user.password === password && user.isVerified) {
+                        return user;
+                    } else if (!user.isVerified) {
+                        showError('Please verify your email before logging in');
+                        return null;
+                    }
+                }
+                return null;
+            } catch (error) {
+                console.error('Error getting user:', error);
+                // Fallback to localStorage
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                const user = users.find(u => u.email === email && u.password === password);
+                if (user && !user.isVerified) {
+                    showError('Please verify your email before logging in');
+                    return null;
+                }
+                return user || null;
+            }
+        }
+
+        async function checkUserExists(email) {
+            try {
+                const snapshot = await db.collection('users').where('email', '==', email).get();
+                return !snapshot.empty;
+            } catch (error) {
+                console.error('Error checking user:', error);
+                // Fallback to localStorage
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                return users.some(u => u.email === email);
+            }
+        }
+
+        // Admin password (in a real app, this should be hashed and stored securely)
+        const ADMIN_PASSWORD = "Ashish_lpu123";
+        
+        // Get elements
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const verificationPending = document.getElementById('verificationPending');
+        const toggleAuth = document.getElementById('toggleAuth');
+        const adminLoginBtn = document.getElementById('adminLoginBtn');
+        const adminModal = document.getElementById('adminModal');
+        const adminForm = document.getElementById('adminForm');
+        const closeAdminModal = document.getElementById('closeAdminModal');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const resendEmail = document.getElementById('resendEmail');
+        const backToSignup = document.getElementById('backToSignup');
+        const verificationEmail = document.getElementById('verificationEmail');
+        const testEmailBtn = document.getElementById('testEmailBtn');
+        
+        let isLogin = true;
+        
+        // Initialize users in localStorage if not exists
+        if (!localStorage.getItem('users')) {
+            localStorage.setItem('users', JSON.stringify([]));
+        }
+        
+        // Check if user is already logged in
+        if (localStorage.getItem('currentUser') || localStorage.getItem('isAdmin')) {
+            window.location.href = 'index.html';
+        }
+        
+        // Toggle between login and signup
+        toggleAuth.addEventListener('click', () => {
+            if (isLogin) {
+                loginForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+                verificationPending.classList.add('hidden');
+                toggleAuth.innerHTML = 'Already have an account? <span class="font-semibold">Sign In</span>';
+                document.querySelector('h1').textContent = 'Create Account';
+                document.querySelector('p').textContent = 'Join Programming Series Hub';
+                isLogin = false;
+            } else {
+                signupForm.classList.add('hidden');
+                verificationPending.classList.add('hidden');
+                loginForm.classList.remove('hidden');
+                toggleAuth.innerHTML = 'Don\'t have an account? <span class="font-semibold">Sign Up</span>';
+                document.querySelector('h1').textContent = 'Welcome Back';
+                document.querySelector('p').textContent = 'Access Programming Series Hub';
+                isLogin = true;
+            }
+            hideMessages();
+        });
+        
+        // Login form submission
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            showSuccess('Checking credentials...');
+            
+            const user = await getUserFromFirebase(email, password);
+            
+            if (user) {
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                showSuccess('Login successful! Redirecting...');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            } else {
+                showError('Invalid email or password, or email not verified');
+            }
+        });
+        
+        // Signup form submission
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            
+            showSuccess('Creating account...');
+            
+            // Check if user already exists
+            const userExists = await checkUserExists(email);
+            if (userExists) {
+                showError('User with this email already exists');
+                return;
+            }
+            
+            // Create new user data
+            const newUserData = {
+                id: Date.now(),
+                name: name,
+                email: email,
+                password: password,
+                registeredAt: new Date().toISOString(),
+                verified: true // Skip email verification
+            };
+            
+            try {
+                // Save user to Firebase directly
+                await db.collection('users').doc(newUserData.id.toString()).set(newUserData);
+                
+                // Log the user in immediately
+                localStorage.setItem('currentUser', JSON.stringify(newUserData));
+                
+                showSuccess('✅ Account created successfully! Redirecting...');
+                
+                // Redirect to main page after short delay
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Error creating account:', error);
+                showError('❌ Failed to create account. Please try again.');
+            }
+        });
+
+        // Resend email functionality
+        resendEmail.addEventListener('click', async () => {
+            if (pendingUser) {
+                showSuccess('Resending verification email...');
+                const emailResult = await sendVerificationEmail(pendingUser);
+                
+                if (emailResult.success) {
+                    showSuccess('Verification email resent! Please check your inbox.');
+                } else {
+                    showError('Failed to resend email. Please try again.');
+                }
+            }
+        });
+
+        // Back to signup functionality
+        backToSignup.addEventListener('click', () => {
+            verificationPending.classList.add('hidden');
+            signupForm.classList.remove('hidden');
+            toggleAuth.style.display = 'block';
+            pendingUser = null;
+            hideMessages();
+        });
+        
+        // Admin login
+        adminLoginBtn.addEventListener('click', () => {
+            adminModal.classList.remove('hidden');
+            adminModal.classList.add('flex');
+        });
+        
+        closeAdminModal.addEventListener('click', () => {
+            adminModal.classList.add('hidden');
+            adminModal.classList.remove('flex');
+        });
+        
+        adminForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const password = document.getElementById('adminPassword').value;
+            
+            if (password === ADMIN_PASSWORD) {
+                localStorage.setItem('isAdmin', 'true');
+                window.location.href = 'admin.html';
+            } else {
+                showError('Invalid admin password');
+                adminModal.classList.add('hidden');
+                adminModal.classList.remove('flex');
+            }
+        });
+        
+        // Test EmailJS button
+        testEmailBtn.addEventListener('click', async () => {
+            showSuccess('Testing EmailJS connection...');
+            
+            const testResult = await testEmailJSConnection();
+            if (testResult) {
+                showSuccess('✅ EmailJS is working! You can proceed with signup.');
+            } else {
+                showError('❌ EmailJS connection failed. Check console for details.');
+            }
+        });
+        
+        // Utility functions
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+            successMessage.classList.add('hidden');
+        }
+        
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.classList.remove('hidden');
+            errorMessage.classList.add('hidden');
+        }
+        
+        function hideMessages() {
+            errorMessage.classList.add('hidden');
+            successMessage.classList.add('hidden');
+        }
+        
+        // Close modal when clicking outside
+        adminModal.addEventListener('click', (e) => {
+            if (e.target === adminModal) {
+                adminModal.classList.add('hidden');
+                adminModal.classList.remove('flex');
+            }
+        });
+
+        // Dark mode functionality
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+        const body = document.getElementById('body');
+        
+        // Check for saved theme preference or default to dark
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                body.classList.remove('light');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                body.classList.add('light');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        // Apply saved theme
+        setTheme(currentTheme);
+        
+        darkModeToggle.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.contains('dark');
+            setTheme(isDark ? 'light' : 'dark');
+            
+            // Add animation effect
+            body.style.transition = 'all 0.5s ease';
+            setTimeout(() => {
+                body.style.transition = '';
+            }, 500);
+        });
+    </script>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-r from-gray-900 via-black to-gray-900 text-white mt-16 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-gray-900/20"></div>
+        <div class="container mx-auto px-4 py-8 relative z-10">
+            <div class="text-center">
+                <h3 class="text-xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                    Programming Series Hub
+                </h3>
+                <p class="text-gray-200 mb-4">
+                    Your journey to mastering Data Structures & Algorithms starts here
+                </p>
+                <div class="flex justify-center space-x-4 mb-4">
+                    <a href="#" class="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-all duration-300 hover:scale-110">
+                        <i class="fab fa-github text-lg"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/in/ashish2208/" class="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-all duration-300 hover:scale-110">
+                        <i class="fab fa-linkedin text-lg"></i>
+                    </a>
+                    <a href="#" class="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-all duration-300 hover:scale-110">
+                        <i class="fab fa-twitter text-lg"></i>
+                    </a>
+                </div>
+                <div class="border-t border-white/20 pt-4">
+                    <p class="text-gray-200 text-sm">&copy; 2025 Programming Series Hub. Built by <span class="font-semibold text-blue-400">Ashish Sharma</span></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
