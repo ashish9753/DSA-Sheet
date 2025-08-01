@@ -558,26 +558,27 @@
             </div>
         </div>
         
-        <h1 class="title">Site Moved!</h1>
+        <h1 class="title">Maintenance Mode</h1>
         <p class="subtitle">DSA Programming Hub</p>
         
         <div class="message">
-            <p>🚀 We've upgraded our platform! This page is no longer active.</p>
-            <p>Please visit our <strong>new and improved site</strong> for the best DSA learning experience.</p>
+            <p>⚠️ This website is experiencing some technical issues. We apologize for the inconvenience!</p>
+            <p>Please temporarily use our <strong>backup site</strong> while our team works on resolving the issues.</p>
+            <p>We will update you once everything is back to normal. Thank you for your patience! 🙏</p>
         </div>
         
         <div class="btn-container">
-            <a href="https://ashish9753.github.io/DSA-Sheet/index.html" class="btn-primary" id="redirectBtn">
-                Visit New Site
+            <a href="https://ashish9753.github.io/DSA-Sheet1/" class="btn-primary" id="redirectBtn">
+                Use Temporary Site
                 <span class="loader" id="loader" style="display: none;"></span>
             </a>
-            <a href="https://ashish9753.github.io/DSA-Sheet/index.html" class="btn-secondary">
-                Copy New URL
+            <a href="https://ashish9753.github.io/DSA-Sheet1/" class="btn-secondary">
+                Copy Backup URL
             </a>
         </div>
         
         <div class="countdown">
-            Auto-redirecting in <span class="countdown-number" id="countdown">10</span> seconds
+            Auto-redirecting to backup site in <span class="countdown-number" id="countdown">10</span> seconds
         </div>
     </div>
 
@@ -600,7 +601,7 @@
                 
                 // Redirect after a short delay
                 setTimeout(() => {
-                    window.location.href = 'https://https://ashish9753.github.io/DSA-Sheet1/';
+                    window.location.href = 'https://ashish9753.github.io/DSA-Sheet1/';
                 }, 1000);
             }
         }, 1000);
@@ -612,23 +613,23 @@
             this.innerHTML = 'Redirecting... <span class="loader"></span>';
             
             setTimeout(() => {
-                window.location.href = 'https://ashish9753.github.io/DSA-Sheet/index.html';
+                window.location.href = 'https://ashish9753.github.io/DSA-Sheet1/';
             }, 500);
         });
         
         // Copy URL functionality
         document.querySelector('.btn-secondary').addEventListener('click', function(e) {
             e.preventDefault();
-            navigator.clipboard.writeText('https://ashish9753.github.io/DSA-Sheet/index.html').then(() => {
+            navigator.clipboard.writeText('https://ashish9753.github.io/DSA-Sheet1/').then(() => {
                 this.textContent = '✓ URL Copied!';
                 setTimeout(() => {
-                    this.textContent = 'Copy New URL';
+                    this.textContent = 'Copy Backup URL';
                 }, 2000);
             }).catch(() => {
                 // Fallback for older browsers
-                this.textContent = 'URL: ashish9753.github.io/DSA-Sheet';
+                this.textContent = 'URL: ashish9753.github.io/DSA-Sheet1';
                 setTimeout(() => {
-                    this.textContent = 'Copy New URL';
+                    this.textContent = 'Copy Backup URL';
                 }, 3000);
             });
         });
