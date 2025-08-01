@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programming Series Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <link rel="shortcut icon" href="logo.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(-45deg, #0f0f23, #1a1a3a, #2d1b69, #1e3a8a);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+        
+        /* Light mode gradient background */
+        .light .gradient-bg {
+            background: linear-gradient(-45deg, #f8fafc, #e2e8f0, #cbd5e1, #3b82f6);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+        
+        .gradient-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(147, 51, 234, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+            animation: floatingOrbs 20s ease infinite;
+        }
+        
+        /* Light mode gradient overlay */
+        .light .gradient-bg::before {
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(147, 51, 234, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(16, 185, 129, 0.08) 0%, transparent 50%);
+        }
+        
+        .dark .gradient-bg {
+            background: linear-gradient(-45deg, #050507, #0f0f1e, #1a1a3a, #2d1b69);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            animation: slideInUp 0.6s ease forwards;
+        }
+        
+        .dark .card-hover {
+            background: rgba(15, 15, 35, 0.9);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.15),
+                0 0 30px rgba(59, 130, 246, 0.3);
+        }
+        
+        .dark .card-hover:hover {
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.4),
+                0 0 30px rgba(59, 130, 246, 0.4);
+        }
+        
+        .stats-card {
+            backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            transition: all 0.3s ease;
+            animation: slideInLeft 0.8s ease forwards;
+        }
+        
+        .dark .stats-card {
+            background: rgba(15, 15, 35, 0.9);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .dark .stats-card:hover {
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        }
+        
+        .floating-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+            animation: floatUp 15s infinite linear;
+            transition: all 0.5s ease;
+        }
+        
+        /* Light mode particles */
+        .light .particle {
+            background: rgba(30, 64, 175, 0.2);
+        }
+        
+        .folder-icon {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            border: 2px solid #f59e0b;
+            border-radius: 4px;
+            position: relative;
+        }
+        
+        .folder-icon::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: 2px;
+            width: 20px;
+            height: 6px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            border: 2px solid #f59e0b;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+        }
+        
+        .coming-soon {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .dark .glow-effect {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+        
+        .text-glow {
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+            animation: textPulse 3s ease-in-out infinite;
+            transition: all 0.5s ease;
+        }
+        
+        /* Light mode text glow */
+        .light .text-glow {
+            text-shadow: none !important;
+            color: #000000 !important;
+        }
+        
+        .glow-text {
+            animation: textPulse 3s ease-in-out infinite;
+            transition: all 0.5s ease;
+        }
+        
+        /* Light mode glow text */
+        .light .glow-text {
+            color: #000000 !important;
+            text-shadow: none !important;
+            background: none !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+        }
+        
+        /* Light mode header text */
+        .light header h1 {
+            color: #000000 !important;
+            text-shadow: none !important;
+        }
+        
+        .light header p {
+            color: #000000 !important;
+        }
+        
+        .light header h1.pt-2 {
+            color: #000000 !important;
+        }
+        
+        .btn-glow {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-glow::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn-glow:hover::before {
+            left: 100%;
+        }
+        
+        .btn-glow:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes floatingOrbs {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-30px) rotate(120deg); }
+            66% { transform: translateY(20px) rotate(240deg); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes slideInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInLeft {
+            0% {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes textPulse {
+            0%, 100% { text-shadow: 0 0 20px rgba(59, 130, 246, 0.6); }
+            50% { text-shadow: 0 0 30px rgba(59, 130, 246, 0.9), 0 0 40px rgba(59, 130, 246, 0.3); }
+        }
+        
+        @keyframes floatUp {
+            0% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(0deg);
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) rotate(360deg);
+            }
+        }
+        
+        /* Light Mode Styles */
+        .light {
+            background-color: #ffffff !important;
+        }
+        
+        .light .series-card .relative {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+        }
+        
+        .light .series-card:hover {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+        }
+        
+        .light .series-card h3 {
+            color: #1f2937 !important;
+        }
+        
+        .light .series-card p {
+            color: #4b5563 !important;
+        }
+        
+        .light .series-card .text-gray-300 {
+            color: #4b5563 !important;
+        }
+        
+        .light .series-card .text-gray-400 {
+            color: #6b7280 !important;
+        }
+        
+        .light .series-card .bg-gray-800\/50 {
+            background: rgba(249, 250, 251, 0.9) !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+        }
+        
+        /* Light mode coming soon cards */
+        .light .coming-soon {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+        }
+        
+        .light .coming-soon h3 {
+            color: #1f2937 !important;
+        }
+        
+        .light .coming-soon p {
+            color: #4b5563 !important;
+        }
+        
+        .light .coming-soon .text-gray-400 {
+            color: #6b7280 !important;
+        }
+        
+        .light .coming-soon .text-gray-600 {
+            color: #4b5563 !important;
+        }
+        
+        .light .coming-soon .text-gray-800 {
+            color: #1f2937 !important;
+        }
+        
+        .light .coming-soon .dark\:text-white {
+            color: #1f2937 !important;
+        }
+        
+        .light .coming-soon .dark\:text-gray-300 {
+            color: #4b5563 !important;
+        }
+        
+        .light .coming-soon .bg-yellow-100 {
+            background: rgba(254, 243, 199, 0.8) !important;
+        }
+        
+        .light .coming-soon .dark\:bg-yellow-900 {
+            background: rgba(254, 243, 199, 0.8) !important;
+        }
+        
+        .light .coming-soon .text-yellow-600 {
+            color: #d97706 !important;
+        }
+        
+        .light .coming-soon .dark\:text-yellow-400 {
+            color: #d97706 !important;
+        }
+        
+        /* Light mode footer */
+        .light footer {
+            background: linear-gradient(to right, #f8fafc, #e2e8f0, #f8fafc) !important;
+            color: #1f2937 !important;
+        }
+        
+        .light footer .bg-gradient-to-br {
+            background: rgba(59, 130, 246, 0.05) !important;
+        }
+        
+        .light footer h3 {
+            color: #1e40af !important;
+        }
+        
+        .light footer p {
+            color: #4b5563 !important;
+        }
+        
+        .light footer .text-gray-300 {
+            color: #4b5563 !important;
+        }
+        
+        .light footer .text-blue-400 {
+            color: #1e40af !important;
+        }
+        
+        .light footer a {
+            color: #4b5563 !important;
+        }
+        
+        .light footer a:hover {
+            color: #1e40af !important;
+        }
+        
+        .light footer .border-white\/20 {
+            border-color: rgba(0, 0, 0, 0.1) !important;
+        }
+        
+        .light footer .bg-white\/10 {
+            background: rgba(59, 130, 246, 0.1) !important;
+        }
+        
+        .light footer .bg-white\/10:hover {
+            background: rgba(59, 130, 246, 0.2) !important;
+        }
+        
+        /* Light mode simple footer */
+        .light #simpleFooter {
+            background: #f8fafc !important;
+            color: #1f2937 !important;
+        }
+        
+        .light #simpleFooter .text-gray-400 {
+            color: #4b5563 !important;
+        }
+        
+        .light #simpleFooter .text-white {
+            color: #1f2937 !important;
+        }
+        
+        /* Light mode header text colors */
+        .light header .text-white {
+            color: #1f2937 !important;
+        }
+        
+        .light header .text-gray-200 {
+            color: #4b5563 !important;
+        }
+        
+        .light header .text-yellow-400 {
+            color: #f59e0b !important;
+        }
+        
+        /* Light mode button styles */
+        .light header button {
+            background: rgba(59, 130, 246, 0.1) !important;
+            color: #1e40af !important;
+            border: 1px solid rgba(59, 130, 246, 0.2) !important;
+        }
+        
+        .light header button:hover {
+            background: rgba(59, 130, 246, 0.2) !important;
+        }
+        
+        .light header #welcomeMessage {
+            color: #1f2937 !important;
+        }
+        
+        .light .stats-card {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+        }
+        
+        .light .stats-card h3 {
+            color: #1f2937 !important;
+        }
+        
+        .light .stats-card p {
+            color: #4b5563 !important;
+        }
+        
+        .light header {
+            color: #1f2937 !important;
+        }
+        
+        .light header h1 {
+            color: #1e40af !important;
+        }
+        
+        .light header p {
+            color: #4b5563 !important;
+        }
+        
+        .light header h4 {
+            color: #f59e0b !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 dark:bg-black transition-colors duration-300" id="body">
+    <!-- Floating Particles -->
+    <div class="floating-particles">
+        <div class="particle" style="left: 10%; width: 4px; height: 4px; animation-delay: 0s;"></div>
+        <div class="particle" style="left: 20%; width: 6px; height: 6px; animation-delay: 2s;"></div>
+        <div class="particle" style="left: 30%; width: 3px; height: 3px; animation-delay: 4s;"></div>
+        <div class="particle" style="left: 40%; width: 5px; height: 5px; animation-delay: 1s;"></div>
+        <div class="particle" style="left: 50%; width: 4px; height: 4px; animation-delay: 6s;"></div>
+        <div class="particle" style="left: 60%; width: 7px; height: 7px; animation-delay: 3s;"></div>
+        <div class="particle" style="left: 70%; width: 3px; height: 3px; animation-delay: 5s;"></div>
+        <div class="particle" style="left: 80%; width: 5px; height: 5px; animation-delay: 7s;"></div>
+        <div class="particle" style="left: 90%; width: 4px; height: 4px; animation-delay: 1s;"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="gradient-bg text-white py-8 px-4 relative overflow-hidden">
+        <div class="absolute inset-0 bg-black opacity-20"></div>
+        <div class="max-w-6xl mx-auto relative z-10">
+            <div class="flex justify-between items-center">
+                <div class="animate-float">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-2 text-glow">
+                        Programming Series Hub
+                    </h1>
+                    <p class="text-xl md:text-2xl text-gray-200 font-light">
+                        <h1 class="pt-2">Master Data Structures & Algorithms</h1> <h4 class="pt-4 text-yellow-400">created by Ashish Sharma</h4>
+                    </p>
+                </div>
+                
+                <!-- User Controls -->
+                <div class="flex items-center space-x-4">
+                    <!-- Welcome Message -->
+                    <div id="welcomeMessage" class="text-white hidden">
+                        <span class="text-sm">Welcome, </span>
+                        <span id="userName" class="font-semibold"></span>
+                    </div>
+                    
+                    <!-- Dark Mode Toggle -->
+                    <button id="darkModeToggle" class="bg-white/20 hover:bg-white/30 rounded-full p-3 transition-all duration-300 backdrop-blur-sm">
+                        <svg id="sunIcon" class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        <svg id="moonIcon" class="w-6 h-6 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                        </svg>
+                    </button>
+                    
+                    <!-- Admin Button (only for admin) -->
+                    <button id="adminBtn" class="bg-red-500/80 hover:bg-red-600/80 px-4 py-2 rounded-lg transition-all duration-300 backdrop-blur-sm text-white font-medium hidden">
+                        Admin Panel
+                    </button>
+                    
+                    <!-- Logout Button -->
+                    <button id="logoutBtn" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-all duration-300 backdrop-blur-sm text-white font-medium">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Floating shapes -->
+        <div class="absolute top-10 right-10 w-20 h-20 bg-white/10 rounded-full animate-pulse"></div>
+        <div class="absolute bottom-10 left-10 w-16 h-16 bg-white/10 rounded-full animate-bounce"></div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 py-12">
+        <!-- Stats Section -->
+        <section class="mb-16">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="stats-card rounded-xl p-6 shadow-lg glow-effect">
+                    <div class="flex items-center">
+                        <div class="bg-blue-500 rounded-full p-3">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-2xl font-bold text-gray-800 dark:text-white">10</h3>
+                            <p class="text-gray-600 dark:text-gray-300">Series Available</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-card rounded-xl p-6 shadow-lg glow-effect">
+                    <div class="flex items-center">
+                        <div class="bg-green-500 rounded-full p-3">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-2xl font-bold text-gray-800 dark:text-white">7</h3>
+                            <p class="text-gray-600 dark:text-gray-300">Ready Now</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-card rounded-xl p-6 shadow-lg glow-effect">
+                    <div class="flex items-center">
+                        <div class="bg-purple-500 rounded-full p-3">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-2xl font-bold text-gray-800 dark:text-white">3</h3>
+                            <p class="text-gray-600 dark:text-gray-300">Coming Soon</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Series Grid -->
+        <section>
+            <h2 class="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent glow-text">
+                Choose Your Learning Path
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Array Series (Active) -->
+                <a href="Array.html" class="series-card animate-slideInUp group relative overflow-hidden" style="animation-delay: 0.1s;">
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl"></div>
+                    <div class="relative bg-gray-900/80 backdrop-blur-sm border border-white/10 rounded-xl p-8 h-full">
+                        <div class="flex items-center mb-6">
+                            <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-3 mr-4 group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                                </svg>
+                            </div>
+                            <div class="bg-green-500/20 backdrop-blur-sm text-green-400 px-3 py-1 rounded-full text-sm font-medium border border-green-500/30">
+                                Available
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors duration-300">Array Series</h3>
+                        <p class="text-gray-300 mb-4">
+                            Master array operations, searching, sorting, and advanced array techniques.
+                        </p>
+                        
+                        <!-- Progress Section -->
+                        <div id="arrayProgress" class="mb-4 p-3 bg-gray-800/50 backdrop-blur-sm rounded-lg border border-white/10">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-medium text-gray-300">Progress</span>
+                                <span id="arrayPercentage" class="text-sm font-bold text-blue-400">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-700/50 rounded-full h-2 mb-2">
+                                <div id="arrayProgressBar" class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-400">
+                                <span id="arrayCompleted">0 completed</span>
+                                <span id="arrayTotal">of 0 problems</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center text-green-400 font-medium group-hover:text-blue-400 transition-colors duration-300">
+                            <span>Start Learning</span>
+                            <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Binary Search Series -->
+                <a href="Binary.html" class="series-card animate-slideInUp group relative overflow-hidden" style="animation-delay: 0.2s;">
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl"></div>
+                    <div class="relative bg-gray-900/80 backdrop-blur-sm border border-white/10 rounded-xl p-8 h-full">
+                        <div class="flex items-center mb-6">
+                            <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-3 mr-4 group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                            </div>
+                            <div class="bg-green-500/20 backdrop-blur-sm text-green-400 px-3 py-1 rounded-full text-sm font-medium border border-green-500/30">
+                                Available
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors duration-300">Binary Series</h3>
+                        <p class="text-gray-300 mb-4">
+                            Explore binary search, bit manipulation, and binary-related algorithms step-by-step.
+                        </p>
+                        
+                        <!-- Progress Section -->
+                        <div id="binaryProgress" class="mb-4 p-3 bg-gray-800/50 backdrop-blur-sm rounded-lg border border-white/10">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-medium text-gray-300">Progress</span>
+                                <span id="binaryPercentage" class="text-sm font-bold text-blue-400">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-700/50 rounded-full h-2 mb-2">
+                                <div id="binaryProgressBar" class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-400">
+                                <span id="binaryCompleted">0 completed</span>
+                                <span id="binaryTotal">of 0 problems</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center text-green-400 font-medium group-hover:text-blue-400 transition-colors duration-300">
+                            <span>Start Learning</span>
+                            <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- LinkedList Series -->
+                <a href="LinkedList.html" class="series-card animate-slideInUp group relative overflow-hidden" style="animation-delay: 0.3s;">
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl"></div>
+                    <div class="relative bg-gray-900/80 backdrop-blur-sm border border-white/10 rounded-xl p-8 h-full">
+                        <div class="flex items-center mb-6">
+                            <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-3 mr-4 group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                                </svg>
+                            </div>
+                            <div class="bg-green-500/20 backdrop-blur-sm text-green-400 px-3 py-1 rounded-full text-sm font-medium border border-green-500/30">
+                                Available
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors duration-300">LinkedList Series</h3>
+                        <p class="text-gray-300 mb-4">
+                            Linked list operations, reversing, merging, and complex manipulations.
+                        </p>
+                        
+                        <!-- Progress Section -->
+                        <div id="linkedlistProgress" class="mb-4 p-3 bg-gray-800/50 backdrop-blur-sm rounded-lg border border-white/10">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-medium text-gray-300">Progress</span>
+                                <span id="linkedlistPercentage" class="text-sm font-bold text-blue-400">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-700/50 rounded-full h-2 mb-2">
+                                <div id="linkedlistProgressBar" class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-400">
+                                <span id="linkedlistCompleted">0 completed</span>
+                                <span id="linkedlistTotal">of 0 problems</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center text-green-400 font-medium group-hover:text-blue-400 transition-colors duration-300">
+                            <span>Start Learning</span>
+                            <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Tree Series -->
+                <a href="Tree.html" class="series-card animate-slideInUp group relative overflow-hidden" style="animation-delay: 0.4s;">
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl"></div>
+                    <div class="relative bg-gray-900/80 backdrop-blur-sm border border-white/10 rounded-xl p-8 h-full">
+                        <div class="flex items-center mb-6">
+                            <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-3 mr-4 group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                                </svg>
+                            </div>
+                            <div class="bg-green-500/20 backdrop-blur-sm text-green-400 px-3 py-1 rounded-full text-sm font-medium border border-green-500/30">
+                                Available
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors duration-300">Tree Series</h3>
+                        <p class="text-gray-300 mb-4">
+                            Binary trees, BSTs, AVL trees, and advanced tree algorithms.
+                        </p>
+                        
+                        <!-- Progress Section -->
+                        <div id="treeProgress" class="mb-4 p-3 bg-gray-800/50 backdrop-blur-sm rounded-lg border border-white/10">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-medium text-gray-300">Progress</span>
+                                <span id="treePercentage" class="text-sm font-bold text-blue-400">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-700/50 rounded-full h-2 mb-2">
+                                <div id="treeProgressBar" class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-400">
+                                <span id="treeCompleted">0 completed</span>
+                                <span id="treeTotal">of 0 problems</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center text-green-400 font-medium group-hover:text-blue-400 transition-colors duration-300">
+                            <span>Start Learning</span>
+                            <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Recursion Series -->
+                <a href="Recursion.html" class="series-card animate-slideInUp group relative overflow-hidden" style="animation-delay: 0.5s;">
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl"></div>
+                    <div class="relative bg-gray-900/80 backdrop-blur-sm border border-white/10 rounded-xl p-8 h-full">
+                        <div class="flex items-center mb-6">
+                            <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-3 mr-4 group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                </svg>
+                            </div>
+                            <div class="bg-green-500/20 backdrop-blur-sm text-green-400 px-3 py-1 rounded-full text-sm font-medium border border-green-500/30">
+                                Available
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors duration-300">Recursion Series</h3>
+                        <p class="text-gray-300 mb-4">
+                            Recursive thinking, backtracking, and divide-and-conquer strategies.
+                        </p>
+                        
+                        <!-- Progress Section -->
+                        <div id="recursionProgress" class="mb-4 p-3 bg-gray-800/50 backdrop-blur-sm rounded-lg border border-white/10">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-medium text-gray-300">Progress</span>
+                                <span id="recursionPercentage" class="text-sm font-bold text-blue-400">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-700/50 rounded-full h-2 mb-2">
+                                <div id="recursionProgressBar" class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-400">
+                                <span id="recursionCompleted">0 completed</span>
+                                <span id="recursionTotal">of 0 problems</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center text-green-400 font-medium group-hover:text-blue-400 transition-colors duration-300">
+                            <span>Start Learning</span>
+                            <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- DP Series -->
+                <a href="DP.html" class="series-card animate-slideInUp group relative overflow-hidden" style="animation-delay: 0.6s;">
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl"></div>
+                    <div class="relative bg-gray-900/80 backdrop-blur-sm border border-white/10 rounded-xl p-8 h-full">
+                        <div class="flex items-center mb-6">
+                            <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-3 mr-4 group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                </svg>
+                            </div>
+                            <div class="bg-green-500/20 backdrop-blur-sm text-green-400 px-3 py-1 rounded-full text-sm font-medium border border-green-500/30">
+                                Available
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors duration-300">DP Series</h3>
+                        <p class="text-gray-300 mb-4">
+                            Dynamic programming patterns, memoization, and optimization techniques.
+                        </p>
+                        
+                        <!-- Progress Section -->
+                        <div id="dpProgress" class="mb-4 p-3 bg-gray-800/50 backdrop-blur-sm rounded-lg border border-white/10">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-medium text-gray-300">Progress</span>
+                                <span id="dpPercentage" class="text-sm font-bold text-blue-400">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-700/50 rounded-full h-2 mb-2">
+                                <div id="dpProgressBar" class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-400">
+                                <span id="dpCompleted">0 completed</span>
+                                <span id="dpTotal">of 0 problems</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center text-green-400 font-medium group-hover:text-blue-400 transition-colors duration-300">
+                            <span>Start Learning</span>
+                            <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- College Series -->
+                <a href="Collage.html" class="series-card animate-slideInUp group relative overflow-hidden" style="animation-delay: 0.7s;">
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl"></div>
+                    <div class="relative bg-gray-900/80 backdrop-blur-sm border border-white/10 rounded-xl p-8 h-full">
+                        <div class="flex items-center mb-6">
+                            <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-3 mr-4 group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                                </svg>
+                            </div>
+                            <div class="bg-green-500/20 backdrop-blur-sm text-green-400 px-3 py-1 rounded-full text-sm font-medium border border-green-500/30">
+                                Available
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors duration-300">College Series</h3>
+                        <p class="text-gray-300 mb-4">
+                            Essential college-level problems covering all major DSA topics for interviews.
+                        </p>
+                        
+                        <!-- Progress Section -->
+                        <div id="collegeProgress" class="mb-4 p-3 bg-gray-800/50 backdrop-blur-sm rounded-lg border border-white/10">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-medium text-gray-300">Progress</span>
+                                <span id="collegePercentage" class="text-sm font-bold text-blue-400">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-700/50 rounded-full h-2 mb-2">
+                                <div id="collegeProgressBar" class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-400">
+                                <span id="collegeCompleted">0 completed</span>
+                                <span id="collegeTotal">of 0 problems</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center text-green-400 font-medium group-hover:text-blue-400 transition-colors duration-300">
+                            <span>Start Learning</span>
+                            <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Graph Series -->
+                <div class="card-hover coming-soon bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg animate-slideInUp" style="animation-delay: 0.8s;">
+                    <div class="flex items-center mb-6">
+                        <div class="bg-gradient-to-r from-emerald-500 to-green-600 rounded-lg p-3 mr-4">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                            </svg>
+                        </div>
+                        <div class="bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-400 px-3 py-1 rounded-full text-sm font-medium">
+                            Coming Soon
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-3">Graph Series</h3>
+                    <p class="text-gray-600 dark:text-gray-300 mb-4">
+                        Graph traversal, shortest paths, MST, and graph algorithms.
+                    </p>
+                    <div class="flex items-center text-gray-400 font-medium">
+                        <span>Coming Soon</span>
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- String Series -->
+                <div class="card-hover coming-soon bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg animate-slideInUp" style="animation-delay: 0.9s;">
+                    <div class="flex items-center mb-6">
+                        <div class="bg-gradient-to-r from-violet-500 to-purple-600 rounded-lg p-3 mr-4">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                            </svg>
+                        </div>
+                        <div class="bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-400 px-3 py-1 rounded-full text-sm font-medium">
+                            Coming Soon
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-3">String Series</h3>
+                    <p class="text-gray-600 dark:text-gray-300 mb-4">
+                        String manipulation, pattern matching, and advanced string algorithms.
+                    </p>
+                    <div class="flex items-center text-gray-400 font-medium">
+                        <span>Coming Soon</span>
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                
+                <!-- Stack and Queue Series -->
+                <div class="card-hover coming-soon bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg animate-slideInUp" style="animation-delay: 1.0s;">
+                    <div class="flex items-center mb-6">
+                        <div class="bg-gradient-to-r from-teal-500 to-cyan-600 rounded-lg p-3 mr-4">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                            </svg>
+                        </div>
+                        <div class="bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-400 px-3 py-1 rounded-full text-sm font-medium">
+                            Coming Soon
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-3">Stack and Queue Series</h3>
+                    <p class="text-gray-600 dark:text-gray-300 mb-4">
+                        LIFO and FIFO operations, monotonic stacks, and queue variations.
+                    </p>
+                    <div class="flex items-center text-gray-400 font-medium">
+                        <span>Coming Soon</span>
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBbOMWi1qdWOzpm_0KeLE_mOHUGjzk0He4",
+            authDomain: "programming-series-hub.firebaseapp.com",
+            projectId: "programming-series-hub",
+            storageBucket: "programming-series-hub.firebasestorage.app",
+            messagingSenderId: "919993604014",
+            appId: "1:919993604014:web:bd0f8f34a5e923ecf31a3f",
+            measurementId: "G-ZJY6P2HHR7"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Auto-logout if user is deleted from Firebase
+        async function verifyUserExists() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const isAdmin = localStorage.getItem('isAdmin');
+            
+            // Skip verification for admin users
+            if (isAdmin === 'true') {
+                return true;
+            }
+            
+            if (!currentUser || !currentUser.id) {
+                return true; // Let normal auth flow handle this
+            }
+            
+            try {
+                // Check if user still exists in Firebase using their ID (not email)
+                const userDoc = await db.collection('users').doc(currentUser.id.toString()).get();
+                
+                if (!userDoc.exists) {
+                    // User has been deleted from Firebase, logout immediately
+                    console.log('User deleted by admin, logging out...');
+                    localStorage.removeItem('currentUser');
+                    localStorage.removeItem('userProgress');
+                    localStorage.removeItem('arrayProblemStatus');
+                    localStorage.removeItem('binaryProblemStatus');
+                    localStorage.removeItem('linkedlistProblemStatus');
+                    localStorage.removeItem('treeProblemStatus');
+                    localStorage.removeItem('recursionProblemStatus');
+                    localStorage.removeItem('dpProblemStatus');
+                    localStorage.removeItem('collegeProblemStatus');
+                    localStorage.removeItem('darkMode');
+                    
+                    // Show notification and redirect
+                    alert('Your account has been removed by the administrator. You will be redirected to the login page.');
+                    window.location.href = 'auth.html';
+                    return false;
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('Error verifying user:', error);
+                // On error, allow user to continue (Firebase might be temporarily unavailable)
+                return true;
+            }
+        }
+
+        // Run verification on page load and periodically
+        verifyUserExists();
+        
+        // Check every 30 seconds if user still exists
+        setInterval(verifyUserExists, 30000);
+
+        // Progress data mapping for each sheet
+        const progressSheets = {
+            'Array': { id: 'array', totalProblems: 46 },
+            'Binary': { id: 'binary', totalProblems: 32 },
+            'LinkedList': { id: 'linkedlist', totalProblems: 28 },
+            'Tree': { id: 'tree', totalProblems: 55 },
+            'Recursion': { id: 'recursion', totalProblems: 25 },
+            'DP': { id: 'dp', totalProblems: 56 },
+            'College': { id: 'college', totalProblems: 53 }
+        };
+
+        // Load user progress from Firebase
+        async function loadUserProgress() {
+            try {
+                const currentUser = localStorage.getItem('currentUser');
+                if (!currentUser) return;
+
+                const user = JSON.parse(currentUser);
+                const userEmail = user.email;
+                
+                const progressDoc = await db.collection('userProgress').doc(userEmail).get();
+                const progressData = progressDoc.exists ? progressDoc.data() : { sheets: {} };
+                
+                // Update progress display for each sheet
+                Object.entries(progressSheets).forEach(([sheetName, sheetInfo]) => {
+                    const sheetProgress = progressData.sheets[sheetName];
+                    updateProgressDisplay(sheetInfo.id, sheetProgress, sheetInfo.totalProblems);
+                });
+                
+                console.log('Progress loaded from Firebase:', progressData);
+                
+            } catch (error) {
+                console.error('Error loading user progress:', error);
+                // Fallback to localStorage if Firebase fails
+                loadProgressFromLocalStorage();
+            }
+        }
+
+        // Fallback: Load progress from localStorage
+        function loadProgressFromLocalStorage() {
+            try {
+                const currentUser = localStorage.getItem('currentUser');
+                if (!currentUser) return;
+
+                const user = JSON.parse(currentUser);
+                const userEmail = user.email;
+                const allProgress = JSON.parse(localStorage.getItem('userProgress') || '{}');
+                const userProgress = allProgress[userEmail] || { sheets: {} };
+                
+                Object.entries(progressSheets).forEach(([sheetName, sheetInfo]) => {
+                    const sheetProgress = userProgress.sheets[sheetName];
+                    updateProgressDisplay(sheetInfo.id, sheetProgress, sheetInfo.totalProblems);
+                });
+                
+                console.log('Progress loaded from localStorage:', userProgress);
+                
+            } catch (error) {
+                console.error('Error loading progress from localStorage:', error);
+            }
+        }
+
+        // Force refresh all progress from Firebase
+        async function refreshAllProgress() {
+            try {
+                const currentUser = localStorage.getItem('currentUser');
+                if (!currentUser) return;
+
+                const user = JSON.parse(currentUser);
+                const userEmail = user.email;
+                
+                // Force fresh fetch from Firebase
+                const progressDoc = await db.collection('userProgress').doc(userEmail).get();
+                const progressData = progressDoc.exists ? progressDoc.data() : { sheets: {} };
+                
+                console.log('Refreshing all progress from Firebase:', progressData);
+                
+                // Update progress display for each sheet
+                Object.entries(progressSheets).forEach(([sheetName, sheetInfo]) => {
+                    const sheetProgress = progressData.sheets[sheetName];
+                    updateProgressDisplay(sheetInfo.id, sheetProgress, sheetInfo.totalProblems);
+                    console.log(`Updated ${sheetName} progress:`, sheetProgress);
+                });
+                
+            } catch (error) {
+                console.error('Error refreshing progress:', error);
+            }
+        }
+
+        // Update progress display for a specific sheet
+        function updateProgressDisplay(sheetId, progressData, totalProblems) {
+            const completed = progressData ? progressData.completed : 0;
+            const percentage = progressData ? progressData.percentage : 0;
+            
+            // Debug logging for binary search specifically
+            if (sheetId === 'binary') {
+                console.log('🔍 Binary Search Progress Update:', {
+                    sheetId,
+                    progressData,
+                    completed,
+                    percentage,
+                    totalProblems
+                });
+            }
+            
+            // Update DOM elements
+            const percentageElement = document.getElementById(`${sheetId}Percentage`);
+            const progressBarElement = document.getElementById(`${sheetId}ProgressBar`);
+            const completedElement = document.getElementById(`${sheetId}Completed`);
+            const totalElement = document.getElementById(`${sheetId}Total`);
+            
+            if (percentageElement) {
+                percentageElement.textContent = `${percentage}%`;
+                console.log(`Updated ${sheetId} percentage element to: ${percentage}%`);
+            }
+            if (progressBarElement) {
+                progressBarElement.style.width = `${percentage}%`;
+                console.log(`Updated ${sheetId} progress bar width to: ${percentage}%`);
+            }
+            if (completedElement) completedElement.textContent = `${completed} completed`;
+            if (totalElement) totalElement.textContent = `of ${totalProblems} problems`;
+        }
+
+        // Authentication check - redirect to login if not authenticated
+        function checkAuthentication() {
+            const currentUser = localStorage.getItem('currentUser');
+            const isAdmin = localStorage.getItem('isAdmin');
+            
+            if (!currentUser && !isAdmin) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            
+            // Display user info
+            if (currentUser) {
+                const user = JSON.parse(currentUser);
+                document.getElementById('userName').textContent = user.name;
+                document.getElementById('welcomeMessage').classList.remove('hidden');
+                
+                // Load user progress after authentication with a slight delay
+                setTimeout(() => {
+                    loadUserProgress();
+                    // Also refresh progress after 2 seconds to ensure latest data
+                    setTimeout(refreshAllProgress, 2000);
+                }, 500);
+            }
+            
+            // Show admin button if user is admin
+            if (isAdmin) {
+                document.getElementById('adminBtn').classList.remove('hidden');
+                if (currentUser) {
+                    document.getElementById('userName').textContent = 'Admin';
+                } else {
+                    document.getElementById('welcomeMessage').classList.remove('hidden');
+                    document.getElementById('userName').textContent = 'Admin';
+                }
+            }
+        }
+        
+        // Check authentication on page load
+        checkAuthentication();
+        
+        // Add page visibility change listener to refresh progress when user returns
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                // Page became visible, refresh progress
+                setTimeout(refreshAllProgress, 1000);
+            }
+        });
+        
+        // Add periodic progress refresh every 30 seconds
+        setInterval(refreshAllProgress, 30000);
+        
+        // Add window focus event to refresh progress
+        window.addEventListener('focus', function() {
+            setTimeout(refreshAllProgress, 500);
+        });
+        
+        // Check if user just verified their email
+        const urlParams = new URLSearchParams(window.location.search);
+        const justVerified = urlParams.get('verified');
+        const fromVerification = localStorage.getItem('justVerified');
+        
+        if (justVerified === 'true' || fromVerification === 'true') {
+            // Show welcome notification
+            setTimeout(() => {
+                const notification = document.createElement('div');
+                notification.innerHTML = `
+                    <div class="fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg z-50 animate-pulse">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span><strong>Welcome!</strong> Your account is now verified and ready to use! 🎉</span>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(notification);
+                
+                // Remove notification after 5 seconds
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
+                
+                // Clear the flag
+                localStorage.removeItem('justVerified');
+                
+                // Clean URL
+                if (justVerified) {
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            }, 1000);
+        }
+        
+        // Dark mode functionality
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const adminBtn = document.getElementById('adminBtn');
+        const body = document.getElementById('body');
+        
+        // Check for saved theme preference or default to dark
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                body.classList.remove('light');
+                body.classList.add('dark:bg-black', 'bg-gray-900');
+                body.style.backgroundColor = '#111827';
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                body.classList.add('light');
+                body.classList.remove('dark:bg-black', 'bg-gray-900');
+                body.style.backgroundColor = '#ffffff';
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        // Apply saved theme
+        setTheme(currentTheme);
+        
+        darkModeToggle.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.contains('dark');
+            setTheme(isDark ? 'light' : 'dark');
+            
+            // Add animation effect
+            body.style.transition = 'all 0.5s ease';
+            setTimeout(() => {
+                body.style.transition = '';
+            }, 500);
+        });
+        
+        // Logout functionality
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('isAdmin');
+            window.location.href = 'auth.html';
+        });
+        
+        // Admin panel access
+        if (adminBtn) {
+            adminBtn.addEventListener('click', () => {
+                window.location.href = 'admin.html';
+            });
+        }
+        
+        // Add smooth scrolling for better UX
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate cards on scroll
+            const cards = document.querySelectorAll('.card-hover');
+            
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+        });
+    </script>
+
+    <!-- Footer -->
+    <footer class="glass bg-gradient-to-r from-black/95 via-gray-950/95 to-black/95 dark:from-black/98 dark:via-gray-950/98 dark:to-black/98 light:from-white/90 light:via-gray-50/90 light:to-white/90 backdrop-blur-2xl border-t border-white/5 dark:border-white/5 light:border-gray-200/50 text-white dark:text-white light:text-black mt-20 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-gray-950/30 via-black/40 to-gray-950/30 dark:from-gray-950/40 dark:via-black/50 dark:to-gray-950/40 light:from-blue-100/20 light:via-purple-100/20 light:to-pink-100/20"></div>
+        
+        <!-- Floating particles for footer -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute top-10 left-10 w-2 h-2 bg-blue-500/30 rounded-full animate-bounce" style="animation-delay: 0s;"></div>
+            <div class="absolute top-20 right-20 w-1 h-1 bg-purple-500/40 rounded-full animate-bounce" style="animation-delay: 1s;"></div>
+            <div class="absolute bottom-10 left-1/4 w-3 h-3 bg-pink-500/20 rounded-full animate-bounce" style="animation-delay: 2s;"></div>
+            <div class="absolute bottom-20 right-1/3 w-1 h-1 bg-blue-400/50 rounded-full animate-bounce" style="animation-delay: 3s;"></div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-16 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <!-- About Section -->
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-gradient-shift">
+                        Programming Series Hub
+                    </h3>
+                    <p class="text-gray-300 dark:text-gray-300 light:text-black leading-relaxed text-sm">
+                        Master Data Structures & Algorithms with our comprehensive problem-solving platform. 
+                        From basic concepts to advanced techniques, we've got you covered for coding interviews and competitive programming.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="https://www.linkedin.com/in/ashish2208/" class="flex items-center justify-center w-12 h-12 glass bg-gradient-to-r from-blue-500/10 to-blue-600/10 dark:from-blue-500/15 dark:to-blue-600/15 hover:from-blue-500/20 hover:to-blue-600/20 dark:hover:from-blue-500/25 dark:hover:to-blue-600/25 rounded-xl transition-all duration-300 hover:scale-110 hover:rotate-6 backdrop-blur-lg border border-blue-500/20 dark:border-blue-500/15 group">
+                            <i class="fab fa-linkedin text-blue-400 text-lg group-hover:text-white transition-colors duration-300"></i>
+                        </a>
+                        <a href="#" class="flex items-center justify-center w-12 h-12 glass bg-gradient-to-r from-gray-500/10 to-gray-600/10 dark:from-gray-500/15 dark:to-gray-600/15 hover:from-gray-500/20 hover:to-gray-600/20 dark:hover:from-gray-500/25 dark:hover:to-gray-600/25 rounded-xl transition-all duration-300 hover:scale-110 hover:rotate-6 backdrop-blur-lg border border-gray-500/20 dark:border-gray-500/15 group">
+                            <i class="fab fa-github text-gray-400 text-lg group-hover:text-white transition-colors duration-300"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="space-y-6">
+                    <h4 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Quick Links</h4>
+                    <ul class="space-y-3">
+                        <li><a href="Array.html" class="flex items-center p-2 glass bg-black/20 dark:bg-black/30 light:bg-black/5 hover:bg-black/30 dark:hover:bg-black/40 light:hover:bg-black/10 rounded-lg transition-all duration-300 hover:scale-105 backdrop-blur-sm text-sm group">
+                            <i class="fas fa-list mr-3 text-blue-400 group-hover:scale-110 transition-transform duration-300"></i>
+                            <span class="text-gray-300 dark:text-gray-300 light:text-black group-hover:text-blue-400 dark:group-hover:text-blue-400 light:group-hover:text-blue-600">Array Problems</span>
+                        </a></li>
+                        <li><a href="LinkedList.html" class="flex items-center p-2 glass bg-black/20 dark:bg-black/30 light:bg-black/5 hover:bg-black/30 dark:hover:bg-black/40 light:hover:bg-black/10 rounded-lg transition-all duration-300 hover:scale-105 backdrop-blur-sm text-sm group">
+                            <i class="fas fa-link mr-3 text-purple-400 group-hover:scale-110 transition-transform duration-300"></i>
+                            <span class="text-gray-300 dark:text-gray-300 light:text-black group-hover:text-purple-400 dark:group-hover:text-purple-400 light:group-hover:text-purple-600">Linked List</span>
+                        </a></li>
+                        <li><a href="Tree.html" class="flex items-center p-2 glass bg-black/20 dark:bg-black/30 light:bg-black/5 hover:bg-black/30 dark:hover:bg-black/40 light:hover:bg-black/10 rounded-lg transition-all duration-300 hover:scale-105 backdrop-blur-sm text-sm group">
+                            <i class="fas fa-tree mr-3 text-green-400 group-hover:scale-110 transition-transform duration-300"></i>
+                            <span class="text-gray-300 dark:text-gray-300 light:text-black group-hover:text-green-400 dark:group-hover:text-green-400 light:group-hover:text-green-600">Tree & BST</span>
+                        </a></li>
+                        <li><a href="Recursion.html" class="flex items-center p-2 glass bg-black/20 dark:bg-black/30 light:bg-black/5 hover:bg-black/30 dark:hover:bg-black/40 light:hover:bg-black/10 rounded-lg transition-all duration-300 hover:scale-105 backdrop-blur-sm text-sm group">
+                            <i class="fas fa-repeat mr-3 text-cyan-400 group-hover:scale-110 transition-transform duration-300"></i>
+                            <span class="text-gray-300 dark:text-gray-300 light:text-black group-hover:text-cyan-400 dark:group-hover:text-cyan-400 light:group-hover:text-cyan-600">Recursion</span>
+                        </a></li>
+                        <li><a href="DP.html" class="flex items-center p-2 glass bg-black/20 dark:bg-black/30 light:bg-black/5 hover:bg-black/30 dark:hover:bg-black/40 light:hover:bg-black/10 rounded-lg transition-all duration-300 hover:scale-105 backdrop-blur-sm text-sm group">
+                            <i class="fas fa-chart-line mr-3 text-pink-400 group-hover:scale-110 transition-transform duration-300"></i>
+                            <span class="text-gray-300 dark:text-gray-300 light:text-black group-hover:text-pink-400 dark:group-hover:text-pink-400 light:group-hover:text-pink-600">Dynamic Programming</span>
+                        </a></li>
+                        <li><a href="Binary.html" class="flex items-center p-2 glass bg-black/20 dark:bg-black/30 light:bg-black/5 hover:bg-black/30 dark:hover:bg-black/40 light:hover:bg-black/10 rounded-lg transition-all duration-300 hover:scale-105 backdrop-blur-sm text-sm group">
+                            <i class="fas fa-search mr-3 text-orange-400 group-hover:scale-110 transition-transform duration-300"></i>
+                            <span class="text-gray-300 dark:text-gray-300 light:text-black group-hover:text-orange-400 dark:group-hover:text-orange-400 light:group-hover:text-orange-600">Binary Search</span>
+                        </a></li>
+                    </ul>
+                </div>
+
+                <!-- Connect Section -->
+                <div class="space-y-6">
+                    <h4 class="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Features</h4>
+                    <ul class="space-y-2 mb-4">
+                        <li class="text-gray-300 dark:text-gray-300 light:text-black text-sm flex items-center">
+                            <i class="fas fa-check mr-2 text-green-400"></i>Email Verification
+                        </li>
+                        <li class="text-gray-300 dark:text-gray-300 light:text-black text-sm flex items-center">
+                            <i class="fas fa-check mr-2 text-green-400"></i>Progress Tracking
+                        </li>
+                        <li class="text-gray-300 dark:text-gray-300 light:text-black text-sm flex items-center">
+                            <i class="fas fa-check mr-2 text-green-400"></i>Real-time Database
+                        </li>
+                        <li class="text-gray-300 dark:text-gray-300 light:text-black text-sm flex items-center">
+                            <i class="fas fa-check mr-2 text-green-400"></i>Dark/Light Mode
+                        </li>
+                        <li class="text-gray-300 dark:text-gray-300 light:text-black text-sm flex items-center">
+                            <i class="fas fa-check mr-2 text-green-400"></i>Interview Prep
+                        </li>
+                    </ul>
+                    <div class="glass bg-black/20 dark:bg-black/30 light:bg-black/5 backdrop-blur-lg rounded-xl p-4 border border-white/5 dark:border-white/5 light:border-black/10">
+                        <p class="text-gray-300 dark:text-gray-300 light:text-black text-sm leading-relaxed">
+                            Built with passion by 
+                            <span class="font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Ashish Sharma</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="border-t border-white/10 dark:border-white/10 light:border-black/10 mt-12 pt-8 text-center">
+                <p class="text-gray-400 dark:text-gray-400 light:text-black text-sm font-medium">
+                    &copy; 2025 Programming Series Hub. Crafted for coding excellence.
+                </p>
+            </div>
+        </div>
+
+        <!-- Floating Back to Top Button -->
+        <button id="backToTop" class="fixed bottom-8 right-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 opacity-0 invisible btn-glow">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+    </footer>
+
+    <script>
+        // Back to top functionality
+        const backToTopBtn = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.classList.remove('opacity-0', 'invisible');
+                backToTopBtn.classList.add('opacity-100', 'visible');
+            } else {
+                backToTopBtn.classList.add('opacity-0', 'invisible');
+                backToTopBtn.classList.remove('opacity-100', 'visible');
+            }
+        });
+        
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
+</body>
+</html>
